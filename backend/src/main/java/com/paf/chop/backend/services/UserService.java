@@ -31,26 +31,26 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public String toggleFollow(Long currentUserId, Long targetUserId) {
-        User current = userRepository.findById(currentUserId).orElse(null);
+    public String toggleFollowByEmail(String email, Long targetUserId) {
+        User current = userRepository.findByEmail(email);
         User target = userRepository.findById(targetUserId).orElse(null);
-
+    
         if (current == null || target == null || current.equals(target)) return "Invalid users";
-
+    
         if (current.getFollowing().contains(target)) {
             current.getFollowing().remove(target);
             target.getFollowers().remove(current);
         } else {
             current.getFollowing().add(target);
             target.getFollowers().add(current);
-
-            // add points for activity
+    
+            // Score logic
             current.setCoins(current.getCoins() + 10);
             if (current.getCoins() >= 100) {
                 current.setIsVerified(true);
             }
-        }
-
+    }
+    
         userRepository.save(current);
         userRepository.save(target);
         return "Follow/unfollow successful";
