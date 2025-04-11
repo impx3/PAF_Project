@@ -36,7 +36,7 @@ public class PostController {
 
     @GetMapping("/home")
     public String HomeEndpoint(){
-        return "Homee at Postcontroller";
+        return "Homee at PC";
     }
 
     @PostMapping
@@ -60,11 +60,6 @@ public class PostController {
         return ResponseEntity.ok(postService.createPost(post));
     }
 
-
-    @GetMapping("/")
-    public String HomeEndPoint(){
-        return "Home";
-    }
 
 
     @PostMapping("/multi")
