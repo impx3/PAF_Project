@@ -1,5 +1,11 @@
 package com.paf.chop.backend.controllers;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import java.util.stream.Collectors;
+
 import com.paf.chop.backend.models.Post;
 import com.paf.chop.backend.services.PostService;
 
@@ -62,18 +68,15 @@ public class PostController {
         // HATEOAS links
         EntityModel<Post> resource = EntityModel.of(savedPost);
         resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).updatePost(savedPost.getId(), savedPost.getTitle(), savedPost.getContent(), image, imageUrl)).withRel("put"));
+                WebMvcLinkBuilder.methodOn(PostController.class).updatePost(savedPost.getId(), savedPost.getTitle(),
+                        savedPost.getContent(), image, imageUrl))
+                .withRel("put"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
-
-
-
-
-
 
         return ResponseEntity.ok(resource);
     }
@@ -140,7 +143,20 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
-        return ResponseEntity.ok(postService.getPostById(id));
+    public ResponseEntity<EntityModel<Post>> getPostById(@PathVariable Long id) {
+
+        Post savedPost = postService.getPostById(id);
+
+        // HATEOAS links
+        EntityModel<Post> resource = EntityModel.of(savedPost);
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+
+        return ResponseEntity.ok(resource);
     }
+
 }
