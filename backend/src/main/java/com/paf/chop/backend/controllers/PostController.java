@@ -78,7 +78,9 @@ public class PostController {
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
-        return ResponseEntity.ok(resource);
+        return ResponseEntity
+            .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(savedPost.getId()).toUri())
+            .body(resource);
     }
 
     @PostMapping("/multi")
@@ -101,8 +103,10 @@ public class PostController {
         System.out.println("nameszzz" + savedImageFilenames.get(0));
         post.setImageUrl(String.join(",", savedImageFilenames));
 
-        return ResponseEntity.ok(postService.createPost(post));
-
+        // return ResponseEntity.ok(postService.createPost(post));
+        return ResponseEntity
+        .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(post.getId()).toUri())
+        .body(postService.createPost(post));
     }
 
     @PutMapping("/{id}")
@@ -128,7 +132,11 @@ public class PostController {
         post.setContent(content);
         post.setImageUrl(imageUrl);
 
-        return ResponseEntity.ok(postService.updatePost(id, post));
+        // return ResponseEntity.ok(postService.updatePost(id, post));
+        
+        return ResponseEntity
+        .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(post.getId()).toUri())
+        .body(postService.updatePost(id, post));
     }
 
     @DeleteMapping("/{id}")
