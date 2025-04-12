@@ -1,5 +1,7 @@
 package com.paf.chop.backend.controllers;
 
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,17 +61,6 @@ public class UserController {
         return (user != null) ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCurrentUser(Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email);
-        if (user != null) {
-            userRepository.delete(user);
-            return ResponseEntity.ok("User deleted");
-        }
-        return ResponseEntity.status(404).body("User not found");
-    }
-
     @GetMapping("/{id}/followers")
     public Set<User> getFollowers(@PathVariable Long id) {
         return userService.getFollowers(id);
@@ -88,4 +81,29 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> updates, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) return ResponseEntity.status(404).body("User not found");
+
+        if (updates.containsKey("username")) user.setUsername(updates.get("username"));
+        if (updates.containsKey("bio")) user.setBio(updates.get("bio"));
+        if (updates.containsKey("profileImage")) user.setProfileImage(updates.get("profileImage"));
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+        return ResponseEntity.ok("Profile updated successfully");
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            userRepository.delete(user);
+            return ResponseEntity.ok("User deleted");
+        }
+        return ResponseEntity.status(404).body("User not found");
+    }
 }
