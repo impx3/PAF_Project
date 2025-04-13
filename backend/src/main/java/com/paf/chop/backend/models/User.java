@@ -4,20 +4,21 @@ import com.paf.chop.backend.configs.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
+// import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "t_users")
+@Entity // for mysql
+@Table(name = "t_users") // for mysql
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    // private String id = UUID.randomUUID().toString();
 
     @Column(nullable = false, unique = true)
     private String username;
