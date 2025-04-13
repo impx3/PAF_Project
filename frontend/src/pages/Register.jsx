@@ -12,7 +12,7 @@ const Register = () => {
     try {
       const res = await api.post('/auth/register', form);
       localStorage.setItem('token', res.data.token);
-      navigate('/home');
+      navigate('/login');
       toast.success('Registration successful!');
     } catch (err) {
       // alert('Register failed');
