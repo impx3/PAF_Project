@@ -25,6 +25,9 @@ public class FileStorageService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    @Value("${video.upload-dir}")
+    private String viduploadDir;
+
                 private static final Logger LOGGER = Logger.getLogger(FileStorageService.class.getName());
 
 
@@ -93,5 +96,38 @@ public class FileStorageService {
 
         return filenames;
     }
+
+    public String saveVideo(MultipartFile file) throws IOException {
+  // making sure  directory exists
+  Path uploadPath = Paths.get(viduploadDir);
+  if (!Files.exists(uploadPath)) {
+      Files.createDirectories(uploadPath);
+  }
+  // extract the original file extension
+  String originalFilename = file.getOriginalFilename();
+
+ // making sure originalFilename is not null and contains a dot to get file extension
+ String fileExtension = "";
+ if (originalFilename != null && originalFilename.lastIndexOf(".") != -1) {
+     fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+ } else {
+     LOGGER.warning("No file extension found!");
+ }
+ // fileExtension = ".png";
+  // generate a unique file name and include the extension
+  String fileName = UUID.randomUUID().toString() + fileExtension;
+
+
+  // create file path
+  Path filePath = uploadPath.resolve(fileName);
+
+  // store the file
+  Files.write(filePath, file.getBytes());
+
+  // return the stored file path
+  return filePath.toString();
+
+    }
+
 
 }

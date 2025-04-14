@@ -33,6 +33,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/posts*").permitAll()
                         .requestMatchers("/api/posts/*").permitAll()
                         .requestMatchers("/images/*").permitAll()
+                        .requestMatchers("/videos*").permitAll()
+                        .requestMatchers("/videos/*").permitAll()
+                        .requestMatchers("/videos/upload-video").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
