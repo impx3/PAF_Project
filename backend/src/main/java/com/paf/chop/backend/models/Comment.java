@@ -17,6 +17,9 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long commentId;
 
+    @Column(nullable = false, unique = true)
+    private String username;
+
     @Column(nullable = false , name = "comment_body")
     private String commentBody;
 

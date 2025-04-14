@@ -1,11 +1,8 @@
 package com.paf.chop.backend.dto.response;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Data
 public class CommentResponseDTO {
 
@@ -13,6 +10,6 @@ public class CommentResponseDTO {
     private String username;
     private String commentBody;
     private Integer likeCount;
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
 }
