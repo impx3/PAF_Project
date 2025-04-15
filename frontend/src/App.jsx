@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import DeleteAccount from './pages/DeleteAccount';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import LandingPage from './pages/LandingPage';
 import PrivateRoute from './routes/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import LeftPanel from './components/LeftPanel';
@@ -29,6 +30,7 @@ function App() {
             <Route path="/followers" element={<PrivateRoute><Followers /></PrivateRoute>} />
             <Route path="/edit-profile" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
             <Route path="/delete-account" element={<PrivateRoute><DeleteAccount /></PrivateRoute>} />
+            <Route path="/" element={<LandingPage />} />
           </Routes>
         </div>
        {/* </div> */}
