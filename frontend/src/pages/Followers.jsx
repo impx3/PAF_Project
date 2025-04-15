@@ -44,7 +44,7 @@ const Followers = () => {
             title={
               currentUser?.isVerified
                 ? 'Click to chat'
-                : 'You must be verified to chat'
+                : 'You must be verified to chat with this user'
             }
           >
             <FiMessageSquare size={20} />
