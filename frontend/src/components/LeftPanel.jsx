@@ -1,25 +1,35 @@
 //Sidebar profile
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FiLogOut, FiMessageSquare } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
 
 const LeftPanel = ({ isOpen, toggleLeftPanel }) => {
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const { currentUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const panelRef = useRef();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setCurrentUser(null);
+    logout();
     navigate('/');
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && panelRef.current && !panelRef.current.contains(e.target)) {
+        toggleLeftPanel(); // Closing the panel
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, toggleLeftPanel]);
+
   return (
-    <div className={`fixed top-0 left-0 h-full w-64 bg-white shadow transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-    <div className="p-4 text-center">
-    <img src={currentUser?.profileImage || '/default-avatar.png'} className="w-20 h-20 rounded-full mx-auto mb-2" alt="Profile" />
+    <div className={`fixed top-0 left-0 h-full w-64 bg-white shadow z-50 transform transition-transform duration-300 ease-in-out
+      ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>    
+      <div ref={panelRef} className="p-4 text-center h-full overflow-y-auto">
+        <img src={currentUser?.profileImage || '/default-avatar.png'} className="w-20 h-20 rounded-full mx-auto mb-2" alt="Profile" />
         <h3 className="text-lg font-bold">{currentUser?.firstName} {currentUser?.lastName}</h3>
         <p className="text-sm text-gray-600">@{currentUser?.username}</p>
         <p className="text-sm mt-1">Email: {currentUser?.email}</p>
@@ -36,16 +46,21 @@ const LeftPanel = ({ isOpen, toggleLeftPanel }) => {
         <button onClick={handleLogout} className="mt-6 flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
           <FiLogOut /> Logout
         </button>
-    <h2 className="text-xl font-bold mb-6">Menu</h2>
-    <nav className="flex flex-col space-y-3">
-      <Link to="/home" className="hover:text-blue-300">Home</Link>
-      <Link to="/profile/user2025001" className="hover:text-blue-300">Profile</Link>
-      <Link to="/followers" className="hover:text-blue-300">Followers</Link>
-      <Link to="/delete-account" className="hover:text-red-400">Delete Account</Link>
-    </nav>
-    </div>
+
+        <h2 className="text-xl font-bold my-6">Menu</h2>
+        <nav className="flex flex-col space-y-3">
+          <Link to="/home" className="hover:text-blue-400">Home</Link>
+          <Link to={`/profile/${currentUser?.id}`} className="hover:text-blue-400">Profile</Link>
+          <Link to="/followers" className="hover:text-blue-400">Followers</Link>
+          <Link to="/delete-account" className="hover:text-red-400">Delete Account</Link>
+        </nav>
+      </div>
     </div>
   );
 };
 
 export default LeftPanel;
+
+//<div className={`fixed top-0 left-0 h-full w-64 bg-white shadow z-50
+//  transition-all duration-300 ease-in-out
+//  ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
