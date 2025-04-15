@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import api from '../utils/axiosConfig';
+import jwt_decode from 'jwt-decode';
 
 export const AuthContext = createContext();
 
@@ -18,12 +19,23 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) fetchCurrentUser();
+    if (token) {
+      fetchCurrentUser(); // 💡 Fetch full profile from backend
+    }
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, setCurrentUser }}>
+    <AuthContext.Provider value={{ currentUser, setCurrentUser, fetchCurrentUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+//localStorage.removeItem('token');
+//setCurrentUser(null);
+//navigate('/'); // or wherever you want to redirect
