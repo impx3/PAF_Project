@@ -4,7 +4,7 @@ import com.paf.chop.backend.dto.request.LoginRequestDTO;
 import com.paf.chop.backend.dto.request.RegisterRequestDTO;
 import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.services.AuthService;
-import com.paf.chop.backend.utils.JwtUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

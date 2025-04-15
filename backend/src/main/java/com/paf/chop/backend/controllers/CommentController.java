@@ -3,6 +3,7 @@ package com.paf.chop.backend.controllers;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.services.CommentService;
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,16 @@ public class CommentController {
     private CommentService commentService;
 
     @PostMapping("/add")
-    public ResponseEntity<CommentResponseDTO> addComment(@RequestBody CommentRequestDTO commentRequestDTO ) {
+    public ResponseEntity<ApiResponse<CommentResponseDTO>> addComment(@RequestBody CommentRequestDTO commentRequestDTO) {
         CommentResponseDTO commentResponseDTO = commentService.comment(commentRequestDTO);
 
-        if(commentResponseDTO == null){
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (commentResponseDTO == null) {
+            ApiResponse<CommentResponseDTO> response = new ApiResponse<>(false, "Failed to add comment", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        return  ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDTO);
 
+        ApiResponse<CommentResponseDTO> response = new ApiResponse<>(true, "Comment added successfully", commentResponseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }

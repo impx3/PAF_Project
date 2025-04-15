@@ -9,6 +9,7 @@ import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +18,10 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -36,7 +41,9 @@ public class AuthService {
                 return null;
             }
 
-            if(!loginRequestDTO.getPassword().equals(user.getPassword())){
+
+            if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())){
+                log.info("password not matched");
                 return null;
             }
 
@@ -63,11 +70,15 @@ public class AuthService {
             }
             User user = new User();
             user.setUsername(registerRequestDTO.getUsername());
-            user.setPassword(registerRequestDTO.getPassword());
+
             user.setFirstName(registerRequestDTO.getFirstName());
             user.setLastName(registerRequestDTO.getLastName());
             user.setEmail(registerRequestDTO.getEmail());
             user.setUserRole(UserRole.USER);
+
+            String encodedPassword = passwordEncoder.encode(registerRequestDTO.getPassword());
+            user.setPassword(encodedPassword);
+
             userRepository.save(user);
 
             log.info("user registered successfully");
