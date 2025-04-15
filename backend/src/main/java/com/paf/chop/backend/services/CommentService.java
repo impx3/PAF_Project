@@ -8,9 +8,13 @@ import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.CommentRepository;
 import com.paf.chop.backend.repositories.PostRepository;
 import com.paf.chop.backend.repositories.UserRepository;
+import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -54,6 +58,26 @@ public class CommentService {
 
     }
 
+    public ApiResponse<List<CommentResponseDTO>> getComments(Long postId) {
+        try {
+            List<Comment> comments = commentRepository.findByPostId(postId);
+
+            List<CommentResponseDTO> commentDTOs = comments.stream()
+                    .map(this::getCommentResponseDTO)
+                    .toList();
+
+            if (commentDTOs.isEmpty()) {
+                return ApiResponse.success(Collections.emptyList(), "No comments yet");
+            }
+
+            return ApiResponse.success(commentDTOs, "Comments fetched successfully");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     public CommentResponseDTO getCommentResponseDTO(Comment comment) {
         CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
@@ -68,4 +92,6 @@ public class CommentService {
 
         return commentResponseDTO;
     }
+
+
 }

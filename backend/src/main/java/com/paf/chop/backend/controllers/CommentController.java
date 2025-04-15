@@ -7,10 +7,9 @@ import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -31,5 +30,20 @@ public class CommentController {
         ApiResponse<CommentResponseDTO> response = new ApiResponse<>(true, "Comment added successfully", commentResponseDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<ApiResponse<List<CommentResponseDTO>>> getComments(@PathVariable Long postId) {
+
+        ApiResponse<List<CommentResponseDTO>> comments = commentService.getComments(postId);
+
+        if (comments.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(comments);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(comments);
+        }
+    }
+
+
+
 
 }
