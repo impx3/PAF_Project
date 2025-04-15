@@ -10,7 +10,8 @@ import PrivateRoute from './routes/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import LeftPanel from './components/LeftPanel';
 import Header from './components/Header';
-// import React from 'react';
+import EditProfile from './pages/EditProfile';
+import UserList from './pages/UserList';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/edit-profile" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
             <Route path="/delete-account" element={<PrivateRoute><DeleteAccount /></PrivateRoute>} />
             <Route path="/" element={<LandingPage />} />
+            <Route path="/explore" element={<UserList />} />
           </Routes>
         </div>
        {/* </div> */}
