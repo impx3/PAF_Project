@@ -13,17 +13,19 @@ public class ApiResponse<T> {
     private T result;
 
 
-    public ApiResponse<T> error(String message) {
-        this.success = false;
-        this.result = null;
-        this.message = message;
-        return this;
-    }
+   public static <T> ApiResponse<T> error(String message) {
+       ApiResponse<T> response = new ApiResponse<>();
+       response.success = false;
+       response.result = null;
+       response.message = message;
+       return response;
+   }
 
-    public ApiResponse<T> success(T result, String message) {
-        this.success = true;
-        this.result = result;
-        this.message = message;
-        return this;
-    }
+   public static <T> ApiResponse<T> success(T result, String message) {
+       ApiResponse<T> response = new ApiResponse<>();
+       response.success = true;
+       response.result = result;
+       response.message = message;
+       return response;
+   }
 }
