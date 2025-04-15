@@ -66,10 +66,6 @@ public class CommentService {
                     .map(this::getCommentResponseDTO)
                     .toList();
 
-            if (commentDTOs.isEmpty()) {
-                return ApiResponse.success(Collections.emptyList(), "No comments yet");
-            }
-
             return ApiResponse.success(commentDTOs, "Comments fetched successfully");
 
         } catch (Exception e) {
