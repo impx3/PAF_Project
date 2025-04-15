@@ -11,8 +11,8 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Entity // for mysql
-@Table(name = "t_users") // for mysql
+@Entity
+@Table(name = "t_users")
 public class User {
 
     @Id

@@ -5,12 +5,3 @@ module.exports = {
   },
   plugins: [],
 };
-
-
-//cd frontend
-//npm install
-//npm start
-//This will open http://localhost:3000 in the browser.
-
-//cd backend
-//mvn spring-boot:run
