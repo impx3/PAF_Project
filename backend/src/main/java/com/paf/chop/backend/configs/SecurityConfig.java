@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/videos*").permitAll()
                         .requestMatchers("/videos/*").permitAll()
                         .requestMatchers("/videos/upload-video").permitAll()
+                        .requestMatchers("/videos*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
