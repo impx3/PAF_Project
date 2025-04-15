@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
 
     public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {;
         try {

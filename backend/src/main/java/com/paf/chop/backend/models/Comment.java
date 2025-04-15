@@ -15,16 +15,18 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long commentId;
-
-    @Column(nullable = false, unique = true)
-    private String username;
+    private Long commentId;
 
     @Column(nullable = false , name = "comment_body")
     private String commentBody;
 
-    @Column(nullable = false , name = "post_id")
-    private long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", referencedColumnName = "id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private Post post;
 
     @Column(nullable = false , name = "like_count")
     private Integer likeCount = 0;

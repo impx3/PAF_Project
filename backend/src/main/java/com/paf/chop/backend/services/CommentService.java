@@ -3,8 +3,10 @@ package com.paf.chop.backend.services;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.models.Comment;
+import com.paf.chop.backend.models.Post;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.CommentRepository;
+import com.paf.chop.backend.repositories.PostRepository;
 import com.paf.chop.backend.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,13 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     @Autowired
-    CommentRepository commentRepository;
+    private CommentRepository commentRepository;
+
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     public CommentResponseDTO comment(CommentRequestDTO commentRequestDTO) {
         try{
@@ -25,22 +31,23 @@ public class CommentService {
                 return null;
             }
 
-            User user = userRepository.findByUsername(commentRequestDTO.getUsername());
+            User user = userRepository.findById(commentRequestDTO.getUserId()).orElse(null);
+            Post post = postRepository.findById(commentRequestDTO.getPostId()).orElse(null);
+
+            if(user == null || post == null){
+                return null;
+            }
 
             //send request body data to the database to store
             Comment comment = new Comment();
 
             //request dto data
             comment.setCommentBody(commentRequestDTO.getCommentBody());
-            comment.setPostId(commentRequestDTO.getPostId());
-            comment.setUsername(commentRequestDTO.getUsername());
+            comment.setPost(post);
+            comment.setUser(user);
 
             Comment savedComment = commentRepository.save(comment);
-            String profileImage = user.getProfileImage();
-
-            return getCommentResponseDTO(savedComment,profileImage);
-
-
+            return getCommentResponseDTO(savedComment);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -48,11 +55,13 @@ public class CommentService {
     }
 
 
-    public CommentResponseDTO getCommentResponseDTO(Comment comment,String profileImage) {
+    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
         CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
         //response dto data
-        commentResponseDTO.setProfileImage(profileImage);
-        commentResponseDTO.setUsername(comment.getUsername());
+        commentResponseDTO.setProfileImage(comment.getUser().getProfileImage() == null ? "" : comment.getUser().getProfileImage());
+        commentResponseDTO.setCreatedUserId(comment.getUser().getId());
+        commentResponseDTO.setCreatedUserName(comment.getUser().getUsername());
+        commentResponseDTO.setPostId(comment.getPost().getId());
         commentResponseDTO.setCommentBody(comment.getCommentBody());
         commentResponseDTO.setLikeCount(comment.getLikeCount());
         commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());

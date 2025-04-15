@@ -5,11 +5,11 @@ import java.time.LocalDateTime;
 
 @Data
 public class CommentResponseDTO {
-
+    private Long postId;
+    private Long createdUserId;
+    private String createdUserName;
     private String profileImage;
-    private String username;
     private String commentBody;
     private Integer likeCount;
     private LocalDateTime updatedAt;
-
 }
