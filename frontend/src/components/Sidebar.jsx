@@ -2,14 +2,10 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { FiHome, FiUsers, FiUser, FiLogOut, FiCompass } from 'react-icons/fi';
-import LeftPanel from './LeftPanel';
 
-const Sidebar = () => {
+const Sidebar = ({ toggleLeftPanel }) => {
   const { currentUser, logout } = useContext(AuthContext);
-  const [isLeftPanelOpen, setLeftPanelOpen] = useState(false);
   const navigate = useNavigate();
-
-  const toggleLeftPanel = () => setLeftPanelOpen(!isLeftPanelOpen);
 
   const handleLogout = () => {
     logout();
@@ -29,7 +25,7 @@ const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t">
-        {/* Profile Pic triggers profile panel */}
+        {/* Profile Pic should be clicked to view profile panel */}
         <div className="flex items-center justify-between">
           <img
             src={currentUser?.profileImage || '/default-avatar.png'}
@@ -46,9 +42,6 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
-
-      {/* Profile Panel */}
-      <LeftPanel isOpen={isLeftPanelOpen} toggleLeftPanel={toggleLeftPanel} />
     </div>
   );
 };
