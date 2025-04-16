@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import api from '../utils/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
+import FollowButton from '../components/FollowButton';
 
 const UserList = () => {
   const { currentUser } = useContext(AuthContext);
@@ -33,12 +34,8 @@ const UserList = () => {
             <p className="font-medium">{user.firstName} {user.lastName}</p>
             <p className="text-sm text-gray-500">@{user.username}</p>
           </div>
-          <button
-            onClick={() => toggleFollow(user.id)}
-            className={`px-4 py-1 rounded text-white ${followStatus[user.id] ? 'bg-red-500' : 'bg-blue-500'}`}
-          >
-            {followStatus[user.id] ? 'Unfollow' : 'Follow'}
-          </button>
+          <FollowButton targetId={user.id} />
+
         </div>
       ))}
     </div>
