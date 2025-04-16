@@ -43,6 +43,39 @@ public class CommentController {
         }
     }
 
+    @PutMapping("/update/{commentId}")
+    public ResponseEntity<ApiResponse<CommentResponseDTO>> updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDTO commentRequestDTO) {
+        ApiResponse<CommentResponseDTO> commentResponseDTO = commentService.updateComment(commentId, commentRequestDTO);
+
+        if (commentResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(commentResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commentResponseDTO);
+        }
+    }
+
+    @DeleteMapping("/delete/{commentId}")
+    public ResponseEntity<ApiResponse<CommentResponseDTO>> deleteComment(@PathVariable Long commentId) {
+        ApiResponse<CommentResponseDTO> commentResponseDTO = commentService.deleteComment(commentId);
+
+        if (commentResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(commentResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commentResponseDTO);
+        }
+    }
+
+    @PostMapping("/like/{commentId}")
+    public ResponseEntity<ApiResponse<CommentResponseDTO>> likeComment(@PathVariable Long commentId) {
+        ApiResponse<CommentResponseDTO> commentResponseDTO = commentService.likeComment(commentId);
+
+        if (commentResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(commentResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commentResponseDTO);
+        }
+    }
+
 
 
 
