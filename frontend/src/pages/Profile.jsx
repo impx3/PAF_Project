@@ -26,8 +26,8 @@ const Profile = () => {
   if (!user) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="p-6"> //ml-64 p-4 max-w-lg mx-auto
-      <div className="bg-white rounded shadow p-6"> //rounded-lg shadow
+    <div className="p-6"> {/*ml-64 p-4 max-w-lg mx-auto*/}
+      <div className="bg-white rounded shadow p-6"> {/*rounded-lg shadow*/}
         <h2 className="text-xl font-bold">{user.username}</h2>
         {user.isVerified && (
           <span className="text-green-600 ml-2">✔ Verified</span>
