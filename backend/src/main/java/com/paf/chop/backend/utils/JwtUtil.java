@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
 
-@Value("${jwt.secret}")
-private String SECRET_KEY;
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     public String generateToken(User user) {
         long expirationTime = 1000 * 60 * 60; // 1 hour
