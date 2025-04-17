@@ -20,6 +20,7 @@ import UserList from './pages/UserList';
 function App() {
   return (
     <AuthProvider>
+      <ToastContainer />
       <BrowserRouter>
       <Routes>
           {/* Public Routes */}
