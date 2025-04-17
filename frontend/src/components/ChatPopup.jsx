@@ -15,11 +15,11 @@ const ChatPopup = ({ user, onClose }) => {
       </div>
 
       <div className="p-3 h-48 overflow-y-auto text-sm text-gray-800">
-      {messages.map(msg => (
+      {/* {messages.map(msg => (
         <p key={msg.id} className={`mb-2 p-2 rounded w-fit ${msg.sender === 'me' ? 'bg-blue-100 ml-auto text-right' : 'bg-gray-100'}`}>
           {msg.content}
         </p>
-      ))}
+      ))} */}
 
       </div>
 
