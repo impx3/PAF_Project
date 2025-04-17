@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { FiMessageSquare } from 'react-icons/fi';
 import api from '../utils/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
-import ChatPopup from './ChatPopup';
+import ChatPopup from '../components/ChatPopup';
 
 const Followers = () => {
   const { currentUser } = useContext(AuthContext);
