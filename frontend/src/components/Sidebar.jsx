@@ -32,8 +32,7 @@ const Sidebar = ({ toggleLeftPanel }) => {
             alt="User"
             className="w-10 h-10 rounded-full cursor-pointer"
             onClick={toggleLeftPanel}
-            title="Open Profile"
-          />
+            title="Open Profile"/>
           <button
             onClick={handleLogout}
             className="text-sm text-red-500 hover:text-red-700"
