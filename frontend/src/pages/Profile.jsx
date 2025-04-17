@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import api from '../utils/axiosConfig';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const { id } = useParams(); // target user
