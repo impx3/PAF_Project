@@ -20,15 +20,13 @@ public class CommentController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<CommentResponseDTO>> addComment(@RequestBody CommentRequestDTO commentRequestDTO) {
-        CommentResponseDTO commentResponseDTO = commentService.comment(commentRequestDTO);
+        ApiResponse<CommentResponseDTO> commentResponseDTO = commentService.comment(commentRequestDTO);
 
-        if (commentResponseDTO == null) {
-            ApiResponse<CommentResponseDTO> response = new ApiResponse<>(false, "Failed to add comment", null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        if (commentResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(commentResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commentResponseDTO);
         }
-
-        ApiResponse<CommentResponseDTO> response = new ApiResponse<>(true, "Comment added successfully", commentResponseDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{postId}")
