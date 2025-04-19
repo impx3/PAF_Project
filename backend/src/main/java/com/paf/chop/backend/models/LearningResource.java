@@ -1,5 +1,6 @@
 package com.paf.chop.backend.models;
 
+import com.paf.chop.backend.enums.ResourceType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,16 +8,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
-@Table(name = "learning_plans")
+@Table(name = "learning_resources")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LearningPlan {
+public class LearningResource {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,25 +24,16 @@ public class LearningPlan {
     @Column(nullable = false)
     private String title;
     
-    private String description;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ResourceType type;
     
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private String url;
     
-    @Column(name = "is_public", nullable = false)
-    private Boolean isPublic = false; // Default to private
-    
-    @ElementCollection
-    @CollectionTable(
-        name = "learning_plan_completed_resources",
-        joinColumns = @JoinColumn(name = "learning_plan_id")
-    )
-    @Column(name = "resource_id")
-    private Set<Long> completedResources = new HashSet<>();
-    
-    @Column(name = "progress_percentage")
-    private Integer progressPercentage = 0;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "learning_plan_id", nullable = false)
+    private LearningPlan learningPlan;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;

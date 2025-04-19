@@ -1,66 +1,136 @@
 package com.paf.chop.backend.controllers;
 
-import com.paf.chop.backend.models.LearningPlan;
+import com.paf.chop.backend.dto.request.LearningPlanRequestDTO;
+import com.paf.chop.backend.dto.request.ResourceCompletionDTO;
+import com.paf.chop.backend.dto.response.LearningPlanResponseDTO;
+import com.paf.chop.backend.models.User;
+import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.services.LearningPlanService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/learning-plans")
+@RequiredArgsConstructor
 public class LearningPlanController {
 
-    @Autowired
-    private LearningPlanService learningPlanService;
+    private final LearningPlanService learningPlanService;
+    private final UserRepository userRepository;
 
-    // 1. Create a new learning plan
+    /**
+     * Create a new learning plan
+     */
     @PostMapping
-    public LearningPlan createLearningPlan(@RequestBody LearningPlan plan) {
-        return learningPlanService.createLearningPlan(plan);
+    public ResponseEntity<LearningPlanResponseDTO> createLearningPlan(
+            @RequestBody LearningPlanRequestDTO requestDTO) {
+        Long userId = getCurrentUserId();
+        LearningPlanResponseDTO responseDTO = learningPlanService.createLearningPlan(requestDTO, userId);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    // 2. Get all learning plans by a user
-    @GetMapping("/user/{userId}")
-    public List<LearningPlan> getUserPlans(@PathVariable String userId) {
-        return learningPlanService.getPlansByUser(userId);
-    }
-
-    // 3. Get all public learning plans
-    @GetMapping("/public")
-    public List<LearningPlan> getPublicPlans() {
-        return learningPlanService.getAllPublicPlans();
-    }
-
-    // 4. Get a single plan by ID
-    @GetMapping("/{id}")
-    public LearningPlan getPlanById(@PathVariable Long id) {
-        return learningPlanService.getPlanById(id);
-    }
-
-    // 5. Update a learning plan
+    /**
+     * Update an existing learning plan
+     */
     @PutMapping("/{id}")
-    public LearningPlan updatePlan(@PathVariable Long id, @RequestBody LearningPlan updatedPlan) {
-        return learningPlanService.updateLearningPlan(id, updatedPlan);
+    public ResponseEntity<LearningPlanResponseDTO> updateLearningPlan(
+            @PathVariable Long id,
+            @RequestBody LearningPlanRequestDTO requestDTO) {
+        Long userId = getCurrentUserId();
+        LearningPlanResponseDTO responseDTO = learningPlanService.updateLearningPlan(id, requestDTO, userId);
+        return ResponseEntity.ok(responseDTO);
     }
 
-    // 6. Delete a learning plan
+    /**
+     * Delete a learning plan
+     */
     @DeleteMapping("/{id}")
-    public void deletePlan(@PathVariable Long id) {
-        learningPlanService.deleteLearningPlan(id);
+    public ResponseEntity<Void> deleteLearningPlan(@PathVariable Long id) {
+        Long userId = getCurrentUserId();
+        learningPlanService.deleteLearningPlan(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
-    // 7. Mark a resource as completed
-    @PostMapping("/{id}/complete-resource")
-    public LearningPlan completeResource(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String resourceUrl = body.get("resourceUrl");
-        return learningPlanService.markResourceCompleted(id, resourceUrl);
+    /**
+     * Get a learning plan by ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<LearningPlanResponseDTO> getLearningPlanById(@PathVariable Long id) {
+        Long userId = getCurrentUserId();
+        LearningPlanResponseDTO responseDTO = learningPlanService.getLearningPlanById(id, userId);
+        return ResponseEntity.ok(responseDTO);
     }
 
-    // 8. Toggle public/private visibility
-    @PatchMapping("/{id}/toggle-public")
-    public LearningPlan togglePlanVisibility(@PathVariable Long id) {
-        return learningPlanService.togglePlanVisibility(id);
+    /**
+     * Get all learning plans for the current user
+     */
+    @GetMapping("/me")
+    public ResponseEntity<List<LearningPlanResponseDTO>> getCurrentUserLearningPlans() {
+        Long userId = getCurrentUserId();
+        List<LearningPlanResponseDTO> responseDTOs = learningPlanService.getUserLearningPlans(userId);
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    /**
+     * Get all public learning plans
+     */
+    @GetMapping("/public")
+    public ResponseEntity<List<LearningPlanResponseDTO>> getPublicLearningPlans() {
+        List<LearningPlanResponseDTO> responseDTOs = learningPlanService.getPublicLearningPlans();
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    /**
+     * Mark a resource as completed or not completed
+     */
+    @PostMapping("/{id}/resources/{resourceId}/complete")
+    public ResponseEntity<LearningPlanResponseDTO> markResourceCompletion(
+            @PathVariable Long id,
+            @PathVariable Long resourceId,
+            @RequestParam(defaultValue = "true") Boolean completed) {
+        Long userId = getCurrentUserId();
+
+        ResourceCompletionDTO completionDTO = new ResourceCompletionDTO();
+        completionDTO.setResourceId(resourceId);
+        completionDTO.setCompleted(completed);
+
+        LearningPlanResponseDTO responseDTO = learningPlanService.updateResourceCompletion(id, completionDTO, userId);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    /**
+     * Search public learning plans by keyword
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<LearningPlanResponseDTO>> searchPublicLearningPlans(
+            @RequestParam String keyword) {
+        List<LearningPlanResponseDTO> responseDTOs = learningPlanService.searchPublicLearningPlans(keyword);
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    /**
+     * Helper method to get the current user ID from the security context
+     */
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
+        }
+
+        // Get username from the authentication object
+        String username = authentication.getName();
+
+        // Look up the user from the database using the username
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalStateException("User not found: " + username);
+        }
+
+        return user.getId();
     }
 }
