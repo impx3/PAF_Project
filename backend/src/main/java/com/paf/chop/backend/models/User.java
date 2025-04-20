@@ -1,5 +1,6 @@
 package com.paf.chop.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.paf.chop.backend.configs.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -48,9 +49,11 @@ public class User {
 
     private String bio;
 
+    @JsonIgnore
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
 
