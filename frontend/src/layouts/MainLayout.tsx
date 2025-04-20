@@ -1,7 +1,7 @@
 import React, { useState, ReactNode } from 'react';
 import Sidebar from '../components/Sidebar';
 import LeftPanel from '../components/LeftPanel';
-import './MainLayout.css';
+import '../styles/MainLayout.css';
 
 interface MainLayoutProps {
   children: ReactNode;
