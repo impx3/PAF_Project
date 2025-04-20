@@ -1,0 +1,49 @@
+.wrapper {
+  min-height: 100vh;
+  background-color: #fef9c3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #111827;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+.registerBtn {
+  background-color: #16a34a;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.registerBtn:hover {
+  background-color: #15803d;
+}
+
+.loginBtn {
+  background-color: #2563eb;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.loginBtn:hover {
+  background-color: #1e40af;
+}
