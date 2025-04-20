@@ -5,14 +5,21 @@ import styles from '../styles/LandingPage.module.css';
 import logo from '../images/chop-chop-logo.png';
 
 const LandingPage: React.FC = () => {
-  const { currentUser } = useContext(AuthContext);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (currentUser) {
-      navigate('/home');
+    const context = useContext(AuthContext);
+    const navigate = useNavigate();
+  
+    if (!context) {
+      return null;
     }
-  }, [currentUser, navigate]);
+  
+    const { currentUser } = context;
+  
+    useEffect(() => {
+      if (currentUser) {
+        navigate('/home');
+      }
+    }, [currentUser, navigate]);
 
   return (
     <div className={styles.wrapper}>
