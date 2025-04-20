@@ -1,7 +1,9 @@
 package com.paf.chop.backend.controllers;
 
+import com.paf.chop.backend.dto.response.ConversationResponseDTO;
 import com.paf.chop.backend.models.Message;
 import com.paf.chop.backend.services.MessageService;
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,11 @@ public class MessageController {
     private MessageService messageService;
 
     @GetMapping("/with/{currentUserId}/and/{recipientId}")
-    public ResponseEntity<List<Message>> getConversation(@PathVariable Long currentUserId, @PathVariable Long recipientId) {
-        return ResponseEntity.ok(messageService.getConversation(currentUserId, recipientId));
+    public ResponseEntity<ApiResponse<List<ConversationResponseDTO>>> getConversation(@PathVariable Long currentUserId, @PathVariable Long recipientId) {
+         if(messageService.getConversation(currentUserId, recipientId).isSuccess()){
+            return ResponseEntity.ok(messageService.getConversation(currentUserId, recipientId));
+         }else{
+            return ResponseEntity.badRequest().body(messageService.getConversation(currentUserId, recipientId));
+         }
     }
 }

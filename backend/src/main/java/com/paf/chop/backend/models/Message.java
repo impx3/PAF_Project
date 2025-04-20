@@ -34,6 +34,9 @@ public class Message {
 
     private boolean seen;
 
+    @Column(name = "is_delivered")
+    private boolean isDelivered = false;
+
     @PrePersist
     private void prePersist() {
         this.timestamp = LocalDateTime.now();

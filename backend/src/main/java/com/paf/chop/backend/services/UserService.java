@@ -10,6 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
+    private final  UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public boolean isUserExists(Long userId) {
+        return userRepository.existsById(userId);
+    }
 }
