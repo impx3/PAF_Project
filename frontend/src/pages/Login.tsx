@@ -12,16 +12,17 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const res = await api.post('/auth/login', form);
-      localStorage.setItem('token', res.data.token);
-      setCurrentUser(res.data);
-      toast.success('Login successful!');
-      navigate('/home');
-    } catch (err) {
-      toast.error('Login failed!');
-    }
+  try {
+    const res = await api.post('/auth/login', form);
+    localStorage.setItem('token', res.data.result.token);
+    setCurrentUser(res.data.result);
+    navigate('/home');
+    toast.success('Login successful!');
+  } catch (err) {
+    toast.error('Login failed');
+  }
   };
+
 
   return (
     <div className={styles.loginWrapper}>
