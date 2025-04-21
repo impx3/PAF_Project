@@ -11,7 +11,7 @@ interface RegisterForm {
   firstName: string;
   lastName: string;
   password: string;
-  confirmPassword?: string; // 🔑 optional
+  confirmPassword?: string;
 }
 
 
@@ -28,7 +28,7 @@ const Register = () => {
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const isPasswordStrong = (password: string): boolean => {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&_])[A-Za-z\d@$!%*?#&_]{6,}$/.test(password);
@@ -58,17 +58,20 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       console.log('Sending register payload:', payload); 
 
       const res = await api.post('/auth/register', payload);
-      if (res.data.success) {
-        localStorage.setItem('token', res.data.result.token);
-        toast.success('Registration successful!');
-        navigate('/login');
-      } else {
-        toast.error(res.data.message || 'Registration failed!');
-      }
-    } catch (err) {
-      toast.error('Something went wrong during registration.');
-    }
-  };
+      // if (res.data.success) {
+      //  localStorage.setItem('token', res.data.result.token);
+
+      if (res.data?.token) {
+          localStorage.setItem('token', res.data.token);
+            toast.success('Registration successful!');
+            navigate('/login');
+          } else {
+            toast.error(res.data.message || 'Registration failed!');
+          }
+        } catch (err) {
+          toast.error('Something went wrong during registration.');
+        }
+      };
 
   return (
     <div className={styles.registerContainer}>

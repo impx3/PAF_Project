@@ -8,20 +8,28 @@ import styles from '../styles/Login.module.css';
 
 const Login: React.FC = () => {
   const [form, setForm] = useState({ username: '', password: '' });
-  const { setCurrentUser } = useContext(AuthContext);
+  const auth = useContext(AuthContext);
+  const setCurrentUser = auth?.setCurrentUser;
+
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-  try {
-    const res = await api.post('/auth/login', form);
-    localStorage.setItem('token', res.data.result.token);
-    setCurrentUser(res.data.result);
-    navigate('/home');
-    toast.success('Login successful!');
-  } catch (err) {
-    toast.error('Login failed');
-  }
+    try {
+      const res = await api.post('/auth/login', form);
+  
+      if (res.data?.token) {
+        localStorage.setItem('token', res.data.token);
+        if (auth?.setCurrentUser) auth.setCurrentUser(res.data); 
+        toast.success('Login successful!');
+        navigate('/home');
+      } else {
+        toast.error('Invalid response from server.');
+      }
+    } catch (err) {
+      toast.error('Login failed');
+    }
   };
+  
 
 
   return (
