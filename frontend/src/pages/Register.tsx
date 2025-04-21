@@ -26,14 +26,14 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
-    try {
-      const res = await api.post('/auth/register', form);
-      localStorage.setItem('token', res.data.token);
-      toast.success('Registration successful!');
-      navigate('/login');
-    } catch (err) {
-      toast.error('Registration failed.');
-    }
+  try {
+    const res = await api.post('/auth/register', form);
+    localStorage.setItem('token', res.data.result.token);
+    navigate('/login');
+    toast.success('Registration successful!');
+  } catch (err) {
+    toast.error('Registration failed.');
+  }
   };
 
   return (
