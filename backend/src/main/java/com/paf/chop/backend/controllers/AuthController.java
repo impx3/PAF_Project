@@ -4,7 +4,7 @@ import com.paf.chop.backend.dto.request.LoginRequestDTO;
 import com.paf.chop.backend.dto.request.RegisterRequestDTO;
 import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.services.AuthService;
-import com.paf.chop.backend.utils.JwtUtil;
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,26 +22,29 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> login(@RequestBody LoginRequestDTO loginRequestDTO) {
 
         UserResponseDTO loginResponseDTO = authService.login(loginRequestDTO);
 
         if(loginResponseDTO == null){
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            ApiResponse<UserResponseDTO> response = new ApiResponse<>(false, "Login fail", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        return  ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
+        ApiResponse<UserResponseDTO> response = new ApiResponse<>(true, "Login successfully", loginResponseDTO);
+        return  ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
 
-        UserResponseDTO requestResponseDTO = authService.register(registerRequestDTO);
+        ApiResponse<UserResponseDTO> requestResponseDTO = authService.register(registerRequestDTO);
 
-        if(requestResponseDTO == null){
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if(requestResponseDTO.isSuccess()){
+            return ResponseEntity.status(HttpStatus.CREATED).body(requestResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(requestResponseDTO);
         }
-        return  ResponseEntity.status(HttpStatus.CREATED).body(requestResponseDTO);
 
     }
 }

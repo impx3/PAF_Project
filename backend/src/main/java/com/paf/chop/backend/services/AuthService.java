@@ -6,9 +6,11 @@ import com.paf.chop.backend.dto.request.RegisterRequestDTO;
 import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
+import com.paf.chop.backend.utils.ApiResponse;
 import com.paf.chop.backend.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,15 +18,19 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
 
     @Autowired
-    JwtUtil jwtUtil;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {;
         try {
             log.info("login request : {}", loginRequestDTO.getUsername());
-            if(loginRequestDTO.getPassword()==null && loginRequestDTO.getUsername()==null){
+            if(loginRequestDTO.getPassword()==null || loginRequestDTO.getUsername()==null){
                 log.info("login empty request");
                 return null;
             }
@@ -36,7 +42,9 @@ public class AuthService {
                 return null;
             }
 
-            if(!loginRequestDTO.getPassword().equals(user.getPassword())){
+
+            if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())){
+                log.info("password not matched");
                 return null;
             }
 
@@ -52,28 +60,37 @@ public class AuthService {
 
 
     }
-    public UserResponseDTO register(RegisterRequestDTO registerRequestDTO) {
+    public ApiResponse<UserResponseDTO> register(RegisterRequestDTO registerRequestDTO) {
         try{
             if(registerRequestDTO.getUsername() == null
-                    && registerRequestDTO.getPassword() == null
-                    && registerRequestDTO.getFirstName() == null
-                    && registerRequestDTO.getLastName() == null
-                    && registerRequestDTO.getEmail() == null) {
-                return null;
+                    || registerRequestDTO.getPassword() == null
+                    || registerRequestDTO.getFirstName() == null
+                    || registerRequestDTO.getLastName() == null
+                    || registerRequestDTO.getEmail() == null) {
+                return ApiResponse.error("Missing Fields");
+            }
+            if (userRepository.isUserExistByUsernameOrEmail(registerRequestDTO.getUsername(), registerRequestDTO.getEmail()) ){
+                log.error("Email already exists");
+                return ApiResponse.error("User already exists");
+
             }
             User user = new User();
             user.setUsername(registerRequestDTO.getUsername());
-            user.setPassword(registerRequestDTO.getPassword());
+
             user.setFirstName(registerRequestDTO.getFirstName());
             user.setLastName(registerRequestDTO.getLastName());
             user.setEmail(registerRequestDTO.getEmail());
             user.setUserRole(UserRole.USER);
+
+            String encodedPassword = passwordEncoder.encode(registerRequestDTO.getPassword());
+            user.setPassword(encodedPassword);
+
             userRepository.save(user);
 
             log.info("user registered successfully");
 
             String token = jwtUtil.generateToken(user);
-            return getUserResponseDTO(user , token);
+            return ApiResponse.success(getUserResponseDTO(user , token), "User Registered Successfully");
 
         }catch(Exception e){
             throw new RuntimeException(e);
