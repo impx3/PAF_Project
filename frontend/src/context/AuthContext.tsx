@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchCurrentUser = async () => {
     try {
       const res = await api.get('/users/me');
-      setCurrentUser(res.data);
+      setCurrentUser(res.data.result);
     } catch (err) {
       localStorage.removeItem('token');
       setCurrentUser(null);
