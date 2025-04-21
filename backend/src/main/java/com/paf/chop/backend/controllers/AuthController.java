@@ -28,7 +28,7 @@ public class AuthController {
         UserResponseDTO loginResponseDTO = authService.login(loginRequestDTO);
 
         if(loginResponseDTO == null){
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         return  ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
 
@@ -40,7 +40,7 @@ public class AuthController {
         UserResponseDTO requestResponseDTO = authService.register(registerRequestDTO);
 
         if(requestResponseDTO == null){
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         return  ResponseEntity.status(HttpStatus.CREATED).body(requestResponseDTO);
 

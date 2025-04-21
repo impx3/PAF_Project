@@ -21,7 +21,7 @@ public class AuthService {
     @Autowired
     JwtUtil jwtUtil;
 
-    public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {;
+    public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {
         try {
             log.info("login request : {}", loginRequestDTO.getUsername());
             if(loginRequestDTO.getPassword()==null && loginRequestDTO.getUsername()==null){
@@ -70,7 +70,7 @@ public class AuthService {
             user.setUserRole(UserRole.USER);
             userRepository.save(user);
 
-            log.info("user registered successfully");
+            //log.info("user registered successfully");
 
             String token = jwtUtil.generateToken(user);
             return getUserResponseDTO(user , token);
