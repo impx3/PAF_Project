@@ -1,4 +1,4 @@
-body {
+/* body {
   background-image: url('../images/landing-page-background.png');
   background-attachment: fixed;
   background-size: cover; 
@@ -8,7 +8,7 @@ body {
   justify-content: center; 
   align-items: center;
   min-height: 100vh;
-}
+} */
 
 .rounded-logo {
   border-radius: 10px; 
