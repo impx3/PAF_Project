@@ -1,16 +1,13 @@
 package com.paf.chop.backend.dto.response;
 
-import com.paf.chop.backend.configs.UserRole;
-import jakarta.persistence.*;
+
+import com.paf.chop.backend.models.User;
+
+
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 
-@Getter
-@Setter
+
 @Data
 public class UserResponseDTO {
 
@@ -27,5 +24,23 @@ public class UserResponseDTO {
     private String bio;
     private String userRole;
     private String token;
+
+    public UserResponseDTO() {
+    }
+
+    public UserResponseDTO (User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.email = user.getEmail();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.isVerified = user.getIsVerified();
+        this.coins = user.getCoins();
+        this.totalLikes = user.getTotalLikes();
+        this.totalPost = user.getTotalPost();
+        this.profileImage = user.getProfileImage();
+        this.bio = user.getBio();
+        this.userRole = user.getUserRole().name();
+    }
 
 }

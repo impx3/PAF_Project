@@ -58,6 +58,9 @@ public class User {
     @Column(nullable = false)
     private UserRole userRole = UserRole.USER;
 
+    @Column(name = "firebase_uid")
+    private String firebaseUid;
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();

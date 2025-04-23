@@ -1,6 +1,7 @@
 package com.paf.chop.backend.configs;
 
 import com.paf.chop.backend.services.MyUserDetailsService;
+import com.paf.chop.backend.utils.FirebaseTokenFilter;
 import com.paf.chop.backend.utils.JWTFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,9 @@ public class SecurityConfig {
     @Autowired
     private JWTFilter jwtRequestFilter;
 
+    @Autowired
+    private FirebaseTokenFilter firebaseTokenFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -36,7 +40,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
-        // Add JWT filter before processing UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

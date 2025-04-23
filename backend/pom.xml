@@ -55,6 +55,12 @@
             <version>0.9.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-context</artifactId>
+            <version>1.54.0</version>  <!-- align with your firebase-admin version’s gRPC -->
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -87,6 +93,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>9.1.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
