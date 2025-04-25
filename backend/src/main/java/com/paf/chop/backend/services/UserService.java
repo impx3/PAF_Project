@@ -16,11 +16,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final  UserRepository userRepository;
 
-    public User getUser(Long id) {
-        return userRepository.findById(id).orElse(null);
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public List<User> getAll() {
@@ -34,23 +34,23 @@ public class UserService {
     public String toggleFollowByEmail(String email, Long targetUserId) {
         User current = userRepository.findByEmail(email);
         User target = userRepository.findById(targetUserId).orElse(null);
-    
+
         if (current == null || target == null || current.equals(target)) return "Invalid users";
-    
+
         if (current.getFollowing().contains(target)) {
             current.getFollowing().remove(target);
             target.getFollowers().remove(current);
         } else {
             current.getFollowing().add(target);
             target.getFollowers().add(current);
-    
+
             // Score logic
             current.setCoins(current.getCoins() + 10);
             if (current.getCoins() >= 100) {
                 current.setIsVerified(true);
             }
     }
-    
+
         userRepository.save(current);
         userRepository.save(target);
         return "Follow/unfollow successful";
@@ -64,5 +64,9 @@ public class UserService {
     public Set<User> getFollowing(Long id) {
         User user = userRepository.findById(id).orElse(null);
         return (user != null) ? user.getFollowing() : new HashSet<>();
+    }
+
+    public boolean isUserExists(Long userId) {
+        return userRepository.existsById(userId);
     }
 }
