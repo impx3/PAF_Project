@@ -66,10 +66,13 @@ public class LearningPlanServiceImpl implements LearningPlanService {
             throw new UnauthorizedAccessException("You are not authorized to update this learning plan");
         }
 
-        // Update learning plan fields
-        learningPlan.setTitle(requestDTO.getTitle());
-        learningPlan.setDescription(requestDTO.getDescription());
-        
+        // Only update fields that are provided in the request
+        if (requestDTO.getTitle() != null) {
+            learningPlan.setTitle(requestDTO.getTitle());
+        }
+        if (requestDTO.getDescription() != null) {
+            learningPlan.setDescription(requestDTO.getDescription());
+        }
         if (requestDTO.getIsPublic() != null) {
             learningPlan.setIsPublic(requestDTO.getIsPublic());
         }
