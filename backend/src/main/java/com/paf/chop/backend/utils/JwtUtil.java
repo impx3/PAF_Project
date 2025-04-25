@@ -37,8 +37,13 @@ public class JwtUtil {
         return extractAllClaims(token).getExpiration();
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+    }
+
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return ((Number) claims.get("id")).longValue();
     }
 
     public boolean isTokenExpired(String token) {
