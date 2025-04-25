@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { AppRouting } from "@/utils/AppRouting.tsx";
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AuthProvider } from './context/AuthContext';
@@ -20,6 +21,7 @@ import UserList from './pages/UserList';
 const App: React.FC = () => {
   return (
     <AuthProvider>
+       <AppRouting />
       <ToastContainer />
       <BrowserRouter>
         <Routes>
@@ -95,5 +97,3 @@ const App: React.FC = () => {
     </AuthProvider>
   );
 };
-
-export default App;
