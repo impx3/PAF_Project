@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -30,14 +32,24 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Existing permitted endpoints
+                        // Auth endpoints
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/*").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        
+                        // Posts endpoints
                         .requestMatchers("/api/posts*").permitAll()
                         .requestMatchers("/api/posts/*").permitAll()
+                        
+                        // Media endpoints
                         .requestMatchers("/images/*").permitAll()
                         .requestMatchers("/videos*").permitAll()
                         .requestMatchers("/videos/*").permitAll()
                         .requestMatchers("/videos/upload-video").permitAll()
+                        
+                        // Comments endpoints
+                        .requestMatchers("/api/comments/**").authenticated()
                         
                         // New learning plan endpoints - public access
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/public").permitAll()
@@ -70,5 +82,10 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         // Expose the AuthenticationManager as a Bean using AuthenticationConfiguration
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
