@@ -4,6 +4,7 @@ import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.services.CommentService;
 import com.paf.chop.backend.utils.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/comments")
 public class CommentController {
@@ -20,6 +22,7 @@ public class CommentController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<CommentResponseDTO>> addComment(@RequestBody CommentRequestDTO commentRequestDTO) {
+        log.info("Adding comment for post : {}", commentRequestDTO.getPostId());
         ApiResponse<CommentResponseDTO> commentResponseDTO = commentService.comment(commentRequestDTO);
 
         if (commentResponseDTO.isSuccess()) {

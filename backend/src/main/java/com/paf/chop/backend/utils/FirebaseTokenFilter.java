@@ -18,34 +18,44 @@ import java.util.Collections;
 @Component
 public class FirebaseTokenFilter extends OncePerRequestFilter {
 
+    private static final String FIREBASE_PREFIX = "Firebase ";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            try {
-                FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-                String uid = decodedToken.getUid();
-
-                // TODO: You can fetch user details from your DB using uid if needed
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(uid, null, Collections.emptyList());
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            } catch (Exception e) {
-                // Invalid token
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
+        // ← If there's no "Firebase " prefix, let someone else (e.g. your JWTFilter) handle it:
+        if (authHeader == null || !authHeader.startsWith(FIREBASE_PREFIX)) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
+        // Strip off the "Firebase " and verify the ID token
+        String idToken = authHeader.substring(FIREBASE_PREFIX.length());
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance()
+                    .verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+
+            // Build an Authentication and set it into the context
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(uid, null, Collections.emptyList());
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        } catch (Exception e) {
+            // Invalid or expired Firebase ID token
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // Continue down the filter chain
         filterChain.doFilter(request, response);
     }
 }
