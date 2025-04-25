@@ -27,9 +27,14 @@ import com.paf.chop.backend.services.UserService;
 @RequestMapping("/api/users")
 public class UserController {
 
+    private final UserService userService;
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserService userService;
-    private UserRepository userRepository;
+    public UserController(UserService userService, UserRepository userRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {

@@ -66,6 +66,10 @@ public class UserService {
         return (user != null) ? user.getFollowing() : new HashSet<>();
     }
 
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     public boolean isUserExists(Long userId) {
         return userRepository.existsById(userId);
     }
