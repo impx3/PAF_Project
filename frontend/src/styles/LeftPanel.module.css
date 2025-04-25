@@ -1,0 +1,114 @@
+.panelWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 16rem;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  z-index: 50;
+  transition: transform 0.3s ease-in-out;
+}
+
+.panelOpen {
+  transform: translateX(0);
+}
+
+.panelClosed {
+  transform: translateX(-100%);
+}
+
+.panel {
+  padding: 1rem;
+  text-align: center;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+}
+
+.name {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.username {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.info {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.chatButtonWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.chatBtn {
+  padding: 0.5rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.verified {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.unverified {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+}
+
+.logoutBtn {
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logoutBtn:hover {
+  background-color: #dc2626;
+}
+
+.menuTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 1.5rem 0 1rem;
+}
+
+.navLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.navLinks a {
+  color: #1f2937;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.navLinks a:hover {
+  color: #3b82f6;
+}
+
+.deleteLink {
+  color: #f87171;
+}
