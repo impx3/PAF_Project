@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -33,31 +34,31 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {;
+    public ApiResponse<UserResponseDTO> login(LoginRequestDTO loginRequestDTO) {;
         try {
             log.info("login request : {}", loginRequestDTO.getUsername());
+
             if(loginRequestDTO.getPassword()==null || loginRequestDTO.getUsername()==null){
-                log.info("login empty request");
-                return null;
+                log.error("login : Missing Fields");
+                return ApiResponse.error("Missing Fields");
             }
 
             User user = userRepository.findByUsername(loginRequestDTO.getUsername());
 
             if(user==null){
-                log.info("user not found");
-                return null;
+                log.error("user not found");
+                return ApiResponse.error("user not found");
             }
 
-
             if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())){
-                log.info("password not matched");
-                return null;
+                log.error("password not matched");
+                return ApiResponse.error("password not matched");
             }
 
             String token = jwtUtil.generateToken(user);
-
             log.info("login successful");
-            return getUserResponseDTO(user, token);
+
+            return ApiResponse.success(getUserResponseDTO(user, token),"Login Successful");
 
         }catch(Exception e) {
             throw new RuntimeException(e);
@@ -68,13 +69,16 @@ public class AuthService {
     }
     public ApiResponse<UserResponseDTO> register(RegisterRequestDTO registerRequestDTO) {
         try{
-            if(registerRequestDTO.getUsername() == null
-                    || registerRequestDTO.getPassword() == null
-                    || registerRequestDTO.getFirstName() == null
-                    || registerRequestDTO.getLastName() == null
-                    || registerRequestDTO.getEmail() == null) {
+            if (!StringUtils.hasText(registerRequestDTO.getUsername()) ||
+                    !StringUtils.hasText(registerRequestDTO.getPassword()) ||
+                    !StringUtils.hasText(registerRequestDTO.getFirstName()) ||
+                    !StringUtils.hasText(registerRequestDTO.getLastName()) ||
+                    !StringUtils.hasText(registerRequestDTO.getEmail())) {
+
+                log.error("register : Missing Fields");
                 return ApiResponse.error("Missing Fields");
             }
+
             if (userRepository.isUserExistByUsernameOrEmail(registerRequestDTO.getUsername(), registerRequestDTO.getEmail()) ){
                 log.error("Email already exists");
                 return ApiResponse.error("User already exists");
@@ -92,7 +96,6 @@ public class AuthService {
             user.setPassword(encodedPassword);
 
             userRepository.save(user);
-
             log.info("user registered successfully");
 
             String token = jwtUtil.generateToken(user);

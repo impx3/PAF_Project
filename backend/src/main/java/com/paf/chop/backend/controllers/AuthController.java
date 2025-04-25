@@ -26,14 +26,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<UserResponseDTO>> login(@RequestBody LoginRequestDTO loginRequestDTO) {
 
-        UserResponseDTO loginResponseDTO = authService.login(loginRequestDTO);
+        ApiResponse<UserResponseDTO> loginResponseDTO = authService.login(loginRequestDTO);
 
-        if(loginResponseDTO == null){
-            ApiResponse<UserResponseDTO> response = new ApiResponse<>(false, "Login fail", null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        if(loginResponseDTO.isSuccess()){
+            return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loginResponseDTO);
         }
-        ApiResponse<UserResponseDTO> response = new ApiResponse<>(true, "Login successfully", loginResponseDTO);
-        return  ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 
