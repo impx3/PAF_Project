@@ -20,4 +20,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.firebaseUid = :firebaseUid")
     Optional<User> findByFirebaseUid(@Param("firebaseUid") String firebaseUid);
 
+    User findByEmail( String email);
 }
