@@ -1,0 +1,217 @@
+/* src/styles/custom.css */
+
+.input-field {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.button-primary {
+  @apply bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition;
+}
+
+.page-container {
+  @apply max-w-4xl mx-auto p-6;
+}
+
+.section-title {
+  @apply text-2xl font-semibold mb-4 text-gray-800;
+}
+
+/* src/styles/LandingPage.css */
+
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+}
+
+/* src/styles/Register.css */
+
+.register-form {
+  max-width: 500px;
+  margin: 80px auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* src/styles/Login.css */
+
+.login-form {
+  max-width: 400px;
+  margin: 100px auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* src/styles/Home.css */
+
+.home-page {
+  padding: 20px;
+}
+
+.feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* src/styles/Sidebar.css */
+
+.sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  padding: 20px;
+  border-right: 1px solid #e5e7eb;
+}
+
+/* src/styles/LeftPanel.css */
+
+.left-panel {
+  background-color: #f9fafb;
+  height: 100vh;
+  width: 220px;
+  padding: 16px;
+  border-right: 1px solid #e5e7eb;
+}
+
+/* src/styles/MainLayout.css */
+
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+/* src/styles/Profile.css */
+
+.profile-page {
+  padding: 30px;
+}
+
+.learning-plan {
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+/* src/styles/UserList.css */
+
+.user-list {
+  padding: 30px;
+}
+
+.user-card {
+  padding: 15px;
+  margin-bottom: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+/* src/styles/EditProfile.css */
+
+.edit-profile {
+  padding: 20px;
+  max-width: 700px;
+  margin: auto;
+}
+
+.edit-form input,
+.edit-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+/* src/styles/Followers.css */
+
+.followers-page {
+  display: flex;
+  padding: 20px;
+}
+
+.followers-list {
+  width: 250px;
+  border-right: 1px solid #e5e7eb;
+  padding-right: 20px;
+}
+
+.follower-item {
+  padding: 10px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+}
+
+/* src/styles/FollowButton.css */
+
+.follow-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.following {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.not-following {
+  background-color: #fef9c3;
+  color: #92400e;
+}
+
+/* src/styles/DeleteAccount.css */
+
+.delete-account {
+  padding: 40px;
+  text-align: center;
+}
+
+.delete-btn {
+  background-color: #ef4444;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+}
+
+/* src/styles/ChatPopup.css */
+
+.chat-popup {
+  position: fixed;
+  bottom: 80px;
+  right: 30px;
+  background-color: white;
+  border: 1px solid #ccc;
+  width: 300px;
+  z-index: 1000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chat-header {
+  background-color: #f3f4f6;
+  padding: 10px;
+  font-weight: bold;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chat-body {
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.chat-input {
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+  padding: 5px;
+}

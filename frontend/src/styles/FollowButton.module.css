@@ -1,0 +1,28 @@
+.followBtn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.following {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.following:hover {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+.notFollowing {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.notFollowing:hover {
+  background-color: #2563eb;
+}
