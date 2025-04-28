@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
-import api from '../utils/axiosConfig';
-import { useParams, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import React, { useEffect, useState } from "react";
+import api from "../utils/axiosConfig";
+import { useParams, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-import styles from '../styles/Profile.module.css';
+import styles from "../styles/Profile.module.css";
 
 interface User {
   id: number;
@@ -12,20 +12,27 @@ interface User {
   bio?: string;
 }
 
-const Profile: React.FC = () => {
+export const Profile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await api.get(`/users/${id}`);
-      setUser(res.data);
-      setIsFollowing(
-        currentUser?.following?.some((f: { id: number }) => f.id === res.data.id)
-      );
+      try {
+        const res = await api.get(`/users/${id}`);
+        setUser(res.data);
+
+        if (currentUser?.following) {
+          const followingIds = currentUser.following.map((f) => f.id);
+          setIsFollowing(followingIds.includes(res.data.id));
+        }
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+      }
     };
+
     fetchUser();
   }, [id, currentUser]);
 
@@ -40,22 +47,24 @@ const Profile: React.FC = () => {
     <div className={styles.wrapper}>
       <div className={styles.card}>
         <h2 className={styles.username}>{user.username}</h2>
-        {user.isVerified && <span className={styles.verified}>✔ Verified</span>}
-        <p className={styles.bio}>{user.bio || 'No bio yet.'}</p>
+        {user.isVerified && (
+          <span className={styles.verified}>✔ Verified</span>
+        )}
+        <p className={styles.bio}>{user.bio || "No bio yet."}</p>
 
         <div className={styles.buttonGroup}>
           <button
             className={`${styles.followBtn} ${isFollowing ? styles.unfollow : styles.follow}`}
             onClick={handleFollow}
           >
-            {isFollowing ? 'Unfollow' : 'Follow'}
+            {isFollowing ? "Unfollow" : "Follow"}
           </button>
 
           <button
             disabled={!currentUser?.isVerified}
             className={`${styles.chatBtn} ${!currentUser?.isVerified && styles.disabled}`}
           >
-            {currentUser?.isVerified ? 'Chat' : 'Chat (Disabled)'}
+            {currentUser?.isVerified ? "Chat" : "Chat (Disabled)"}
           </button>
 
           <Link to="/edit-profile" className={styles.editLink}>
@@ -66,5 +75,3 @@ const Profile: React.FC = () => {
     </div>
   );
 };
-
-export default Profile;

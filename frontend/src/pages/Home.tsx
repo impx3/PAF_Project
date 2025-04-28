@@ -1,13 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
-import api from '../utils/axiosConfig';
-import { AuthContext } from '../context/AuthContext';
+import React, { useEffect, useState } from "react";
+import api from "../utils/axiosConfig";
+import { Following, useAuth } from "../context/AuthContext";
 
-import styles from '../styles/Home.module.css';
-
-interface User {
-  id: number;
-  username: string;
-}
+import styles from "../styles/Home.module.css";
 
 interface Post {
   id: number;
@@ -16,35 +11,36 @@ interface Post {
 }
 
 const Home: React.FC = () => {
-  const { currentUser } = useContext(AuthContext);
-  const [followers, setFollowers] = useState<User[]>([]);
-  const [following, setFollowing] = useState<User[]>([]);
+  const { currentUser } = useAuth();
+  const [followers, setFollowers] = useState<Following[]>([]);
+  const [following, setFollowing] = useState<Following[]>([]);
   const [feedPosts, setFeedPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchConnections = async () => {
       try {
-        const res1 = await api.get(`/users/${currentUser.id}/followers`);
-        const res2 = await api.get(`/users/${currentUser.id}/following`);
+        const res1 = await api.get(`/users/${currentUser?.id}/followers`);
+        const res2 = await api.get(`/users/${currentUser?.id}/following`);
         setFollowers(res1.data);
         setFollowing(res2.data);
       } catch (err) {
-        console.error('Error loading connections:', err);
+        console.error("Error loading connections:", err);
       }
     };
 
     const fetchFeed = async () => {
       try {
-        const res = await api.get(`/posts/feed/${currentUser.id}`);
+        if (!currentUser) return;
+        const res = await api.get(`/posts/feed/${currentUser?.id}`);
         setFeedPosts(res.data);
       } catch (err) {
-        console.error('Error loading feed:', err);
+        console.error("Error loading feed:", err);
       }
     };
 
     if (currentUser?.id) {
-      fetchConnections();
-      fetchFeed();
+      fetchConnections().then();
+      fetchFeed().then();
     }
   }, [currentUser]);
 

@@ -1,36 +1,24 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import React from "react";
+
+import { ToastContainer } from "react-toastify";
 import { AppRouting } from "@/utils/AppRouting.tsx";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
-import { AuthProvider } from './context/AuthContext';
-import PrivateRoute from './routes/PrivateRoute';
-import MainLayout from './layouts/MainLayout';
+import { AuthProvider } from "./context/AuthContext";
 
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Home from './pages/Home';
-import Profile from './pages/Profile';
-import Followers from './pages/Followers';
-import EditProfile from './pages/EditProfile';
-import DeleteAccount from './pages/DeleteAccount';
-import LandingPage from './pages/LandingPage';
-import UserList from './pages/UserList';
-
-const App: React.FC = () => {
+export const App: React.FC = () => {
   return (
     <AuthProvider>
-       <AppRouting />
+      <AppRouting />
       <ToastContainer />
-      <BrowserRouter>
+      {/* <BrowserRouter>
         <Routes>
-          {/* Public Routes */}
+           Public Routes
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Routes */}
+           Protected Routes
           <Route
             path="/home"
             element={
@@ -92,8 +80,13 @@ const App: React.FC = () => {
             }
           />
         </Routes>
-      </BrowserRouter>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />
+      </BrowserRouter>*/}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop
+      />
     </AuthProvider>
   );
 };
