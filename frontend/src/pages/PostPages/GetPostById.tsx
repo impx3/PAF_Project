@@ -18,7 +18,7 @@ const GetPostById: React.FC = () => {
   const [error, setError] = useState<string>("");
 
   const myFunction = () => {
-    let url = `http://localhost:3000/post/${id}`
+    let url = `http://localhost:5173/post/${id}`
     navigator.clipboard.writeText(url)
     alert("Link copied to clipbaord")
   }
@@ -94,8 +94,8 @@ const GetPostById: React.FC = () => {
 
           <br />
           {/* <Link to="/posts"><button style={{ marginTop: "20px" }}>Share</button></Link> */}
-          <Link to="/feed"><button style={{ marginTop: "20px" }}>Back to Posts</button></Link>
-          
+          <Link to="/post/feed"><button style={{ marginTop: "20px" }}>Back to Posts</button></Link>
+          <p></p>
           <button onClick={myFunction}>Share</button>
         </>
       ) : (

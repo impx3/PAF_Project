@@ -13,6 +13,7 @@ import GetAllPostsForUsers from "@/pages/PostPages/GetAllPostsForUsers";
 import VideoList from "@/pages/PostPages/VideoList";
 import VideoListForUsers from "@/pages/PostPages/VideoListForUsers";
 import GetPostById from "@/pages/PostPages/GetPostById";
+import CreateText from "@/pages/PostPages/CreateText";
 
 export const AppRouting = () => {
   return (
@@ -28,6 +29,8 @@ const AppRoutes = () => {
       <Route path={"/"} element={<HomePage />} />
       <Route path={"/profile"} element={<ProfilePage />} />
       <Route path={"/dashboard"} element={<DashboardPage />} />
+
+      <Route path={"/post/text"} element={<CreateText />} />
 
       <Route path={"/post/createpostselect"} element={<Home />} />
       <Route path={"/post/create"} element={<Create />} />

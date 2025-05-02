@@ -45,6 +45,75 @@ public class PostController {
         return "Homee at PC";
     }
 
+    @PostMapping("/text")
+    public ResponseEntity<EntityModel<Post>> createTextPost(
+            @RequestParam("title") String title,
+            @RequestParam("content") String content) throws IOException {
+
+        System.out.println(title + "hereyrer");
+        System.out.println(content + "hereyrer");
+        Post post = new Post();
+        post.setTitle(title);
+        post.setContent(content);
+        
+
+
+        System.out.println("----"+title);
+        System.out.println("----"+content);
+        
+
+        Post savedPost = postService.createPost(post);
+
+        // HATEOAS links
+        EntityModel<Post> resource = EntityModel.of(savedPost);
+
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+
+        return ResponseEntity
+            .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(savedPost.getId()).toUri())
+            .body(resource);
+    }
+
+
+
+        @GetMapping("/text")
+        public ResponseEntity<List<Post>> getAllTextPosts() {
+            List<Post> allposts = postService.getAllPosts();
+            List<Post> postsToSend = postService.getAllPosts();
+            postsToSend.clear();
+            for (Post post : allposts) {
+                String t =  "--"+post.getImageUrl()+"--";
+                if(t.length()==4){
+                    System.out.println("No image found");
+                    postsToSend.add(post);
+                }
+            }
+            return ResponseEntity.ok(postsToSend);
+        }
+
+        @PutMapping("/text")
+        public ResponseEntity<Post> updateTextPost(
+            @RequestParam("id") Long id,  @RequestParam("title") String title, @RequestParam("content") String content) throws IOException {
+           System.out.println("title+++"+title);
+    
+            
+            Post post = new Post();
+            post.setId(id);
+            post.setTitle(title);
+            post.setContent(content);
+
+            // return ResponseEntity.ok(postService.updatePost(id, post));
+            
+            return ResponseEntity
+            .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(post.getId()).toUri())
+            .body(postService.updatePost(id, post));
+        }
+
     @PostMapping
     public ResponseEntity<EntityModel<Post>> createPost(
             @RequestParam("title") String title,

@@ -34,6 +34,9 @@ const GetAllPosts = () => {
             <p>{post.content}</p>
 
             {/* Display each image */}
+            { post.imageUrl === null ? <p>No image</p> : 
+          
+
             <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px" }}>
                 {post.imageUrl &&
                 
@@ -60,14 +63,15 @@ const GetAllPosts = () => {
                   )
                 )
 
-           
-
-
                 
                 
                 
                 }
-              </div>
+                </div>
+
+
+            }
+
 
             {/* {post.imageUrl && <img src={`http://localhost:8080/images/${post.imageUrl.split('\\').pop()}`} alt="Post" style={{ width: "100px" }} />} */}
 

@@ -34,6 +34,8 @@ const GetAllPostsForUsers: React.FC = () => {
             <p>{post.content}</p>
 
             {/* Display each image */}
+            { post.imageUrl === null ? <p></p> : 
+            
             <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px" }}>
                 {post.imageUrl &&
                 
@@ -69,6 +71,7 @@ const GetAllPostsForUsers: React.FC = () => {
                 }
               </div>
 
+              }
               <Link to={`/post/${post.id}`}><button style={{ marginTop: "20px" }}>View</button></Link>
 
 

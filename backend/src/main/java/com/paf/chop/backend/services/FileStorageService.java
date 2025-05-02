@@ -48,6 +48,10 @@ public class FileStorageService {
             LOGGER.warning("No file extension found!");
         }
         // fileExtension = ".png";
+        if(fileExtension==""){
+            System.out.println("no file extension");
+            fileExtension = ".png";
+        }
          // generate a unique file name and include the extension
          String fileName = UUID.randomUUID().toString() + fileExtension;
  
