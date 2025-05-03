@@ -13,6 +13,7 @@ import GetAllPostsForUsers from "@/pages/PostPages/GetAllPostsForUsers";
 import VideoList from "@/pages/PostPages/VideoList";
 import VideoListForUsers from "@/pages/PostPages/VideoListForUsers";
 import GetPostById from "@/pages/PostPages/GetPostById";
+import PublicLearningPlans from "@/pages/PublicLearningPlans";
 
 export const AppRouting = () => {
   return (
@@ -28,6 +29,7 @@ const AppRoutes = () => {
       <Route path={"/"} element={<HomePage />} />
       <Route path={"/profile"} element={<Profile />} />
       <Route path={"/dashboard"} element={<DashboardPage />} />
+      <Route path={"/learningplans/public"} element={<PublicLearningPlans />} />
 
       <Route path={"/post/createpostselect"} element={<Home />} />
       <Route path={"/post/create"} element={<Create />} />
@@ -43,7 +45,6 @@ const AppRoutes = () => {
 
       <Route path="/post/feedvideo" element={<VideoListForUsers />} />
       <Route path="/post/:id" element={<GetPostById />} />
-
     </Routes>
   );
 };

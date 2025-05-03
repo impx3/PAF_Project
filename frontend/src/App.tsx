@@ -17,6 +17,7 @@ import EditProfile from './pages/EditProfile';
 import DeleteAccount from './pages/DeleteAccount';
 import LandingPage from './pages/LandingPage';
 import UserList from './pages/UserList';
+import PublicLearningPlans from './pages/PublicLearningPlans';
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/learningplans/public" element={<PublicLearningPlans />} />
 
           {/* Protected Routes */}
           <Route
