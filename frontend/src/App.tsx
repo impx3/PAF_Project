@@ -18,10 +18,10 @@ import DeleteAccount from './pages/DeleteAccount';
 import LandingPage from './pages/LandingPage';
 import UserList from './pages/UserList';
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <AuthProvider>
-       <AppRouting />
+      <AppRouting />
       <ToastContainer />
       <BrowserRouter>
         <Routes>
@@ -97,3 +97,5 @@ const App: React.FC = () => {
     </AuthProvider>
   );
 };
+
+export default App;

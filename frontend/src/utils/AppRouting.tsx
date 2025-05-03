@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HomePage } from "@/pages/HomePage.tsx";
-import { ProfilePage } from "@/pages/Profile.tsx";
+import Profile from "@/pages/Profile.tsx";
 import DashboardPage from "@/pages/dashboard/DashboardPage.tsx";
 import Home from "@/pages/PostPages/Home";
 import Create from "@/pages/PostPages/Create";
@@ -26,7 +26,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path={"/"} element={<HomePage />} />
-      <Route path={"/profile"} element={<ProfilePage />} />
+      <Route path={"/profile"} element={<Profile />} />
       <Route path={"/dashboard"} element={<DashboardPage />} />
 
       <Route path={"/post/createpostselect"} element={<Home />} />
