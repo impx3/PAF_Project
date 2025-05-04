@@ -140,6 +140,25 @@ public class LearningResourceServiceImpl implements LearningResourceService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<LearningResourceResponseDTO> getPublicPlanResources(Long planId) {
+        // Get the learning plan
+        LearningPlan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new ResourceNotFoundException("Learning plan not found"));
+
+        // Check if the plan is public
+        if (!plan.getIsPublic()) {
+            throw new UnauthorizedAccessException("This learning plan is not public");
+        }
+
+        // Get all resources and convert to DTOs
+        List<LearningResource> resources = resourceRepository.findByLearningPlanId(planId);
+        return resources.stream()
+                .map(resource -> convertToResponseDTO(resource, 
+                    plan.getCompletedResources().contains(resource.getId())))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Helper method to convert LearningResource entity to LearningResourceResponseDTO
      */

@@ -29,5 +29,11 @@ export const learningResourceService = {
     // Delete a resource
     deleteResource: async (id: number): Promise<void> => {
         await api.delete(`/learning-resources/${id}`);
+    },
+
+    // Get all resources for a public learning plan
+    getPublicPlanResources: async (planId: number): Promise<LearningResource[]> => {
+        const response = await api.get(`/learning-resources/public/plans/${planId}`);
+        return response.data;
     }
 }; 

@@ -51,4 +51,12 @@ public interface LearningResourceService {
      * @return list of learning resource responses
      */
     List<LearningResourceResponseDTO> getPlanResources(Long planId, Long userId);
+    
+    /**
+     * Gets all resources for a public learning plan
+     * 
+     * @param planId the ID of the public learning plan
+     * @return list of learning resource responses
+     */
+    List<LearningResourceResponseDTO> getPublicPlanResources(Long planId);
 } 
