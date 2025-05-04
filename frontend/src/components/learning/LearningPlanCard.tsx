@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LearningPlan } from '../../types/learningPlan';
 import { FaLock, FaLockOpen, FaClock, FaTag } from 'react-icons/fa';
 
@@ -10,8 +11,21 @@ interface LearningPlanCardProps {
 }
 
 const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDelete, readOnly = false }) => {
+    const navigate = useNavigate();
+
+    const handleCardClick = (e: React.MouseEvent) => {
+        // Don't navigate if clicking on action buttons
+        if ((e.target as HTMLElement).closest('button')) {
+            return;
+        }
+        navigate(`/learning-plans/${plan.id}/resources`);
+    };
+
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div 
+            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={handleCardClick}
+        >
             <div className="flex justify-between items-start mb-4">
                 <h3 className="text-xl font-semibold text-gray-800">{plan.title}</h3>
                 <div className="flex items-center space-x-2">
@@ -67,13 +81,19 @@ const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDel
                 {!readOnly && (
                     <div className="flex space-x-2">
                         <button
-                            onClick={() => onEdit(plan)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onEdit(plan);
+                            }}
                             className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                         >
                             Edit
                         </button>
                         <button
-                            onClick={() => onDelete(plan.id)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(plan.id);
+                            }}
                             className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                         >
                             Delete

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class LearningResourceResponseDTO {
     private Long id;
     private String title;
+    private String description;
     private ResourceType type;
     private String url;
     private Boolean completed;

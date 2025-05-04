@@ -19,6 +19,7 @@ import LandingPage from './pages/LandingPage';
 import UserList from './pages/UserList';
 import PublicLearningPlans from './pages/PublicLearningPlans';
 import LearningPlansDashboard from './pages/LearningPlansDashboard';
+import LearningPlanResources from './pages/LearningPlanResources';
 
 const App = () => {
   return (
@@ -100,6 +101,16 @@ const App = () => {
               <PrivateRoute>
                 <MainLayout>
                   <LearningPlansDashboard />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/learning-plans/:planId/resources"
+            element={
+              <PrivateRoute>
+                <MainLayout>
+                  <LearningPlanResources />
                 </MainLayout>
               </PrivateRoute>
             }

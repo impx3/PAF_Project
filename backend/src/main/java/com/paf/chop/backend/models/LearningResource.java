@@ -24,6 +24,9 @@ public class LearningResource {
     @Column(nullable = false)
     private String title;
     
+    @Column(columnDefinition = "TEXT")
+    private String description;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ResourceType type;
