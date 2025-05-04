@@ -51,6 +51,7 @@ const Create: React.FC = () => {
    const formData = new FormData();
    console.log("formData before addding",formData)
 
+   const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImlkIjoxLCJlbWFpbCI6ImVtYWlsMDkwM0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJpYXQiOjE3NDYzMzcwODQsImV4cCI6MTc0NjM0MDY4NH0.fYqXLdxYzTrMMuFAAylUBym_p-NwVxWGJknxtap8uH4";
 
    formData.append("title", title);
    formData.append("content", content);
@@ -61,6 +62,7 @@ const Create: React.FC = () => {
      const response = await axios.post("http://localhost:8080/api/posts", formData, {
        headers: {
          "Content-Type": "multipart/form-data",
+         'Authorization': `Bearer ${token}`
        },
      });
 

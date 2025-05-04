@@ -11,7 +11,7 @@ interface Post {
   imageUrl: string;
 }
 
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImlkIjoxLCJlbWFpbCI6ImVtYWlsMDkwM0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJpYXQiOjE3NDYzMzI5NjksImV4cCI6MTc0NjMzNjU2OX0.e2c4rQZdSJNuDCAmzBrZNRpqowVnb3HrtNErb8cqusI";
+const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImlkIjoxLCJlbWFpbCI6ImVtYWlsMDkwM0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJpYXQiOjE3NDYzMzcwODQsImV4cCI6MTc0NjM0MDY4NH0.fYqXLdxYzTrMMuFAAylUBym_p-NwVxWGJknxtap8uH4'
 
 const GetAllPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
