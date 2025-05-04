@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LearningPlan } from '../types/learningPlan';
 import { learningPlanService } from '../services/learningPlanService';
-import LearningPlanCard from '../components/learning/LearningPlanCard';
+import PublicLearningPlanCard from '../components/learning/PublicLearningPlanCard';
 import { FaSearch, FaTimes, FaBook } from 'react-icons/fa';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { toast } from 'react-toastify';
@@ -99,27 +99,19 @@ const PublicLearningPlans: React.FC = () => {
                             />
                             {searchQuery && (
                                 <button
-                                    onClick={() => setSearchQuery('')}
+                                    onClick={handleClear}
                                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                 >
                                     <FaTimes />
                                 </button>
                             )}
                         </div>
-                        <div className="flex space-x-3 ml-4">
-                            <button
-                                onClick={handleSearch}
-                                className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            >
-                                Search
-                            </button>
-                            <button
-                                onClick={handleClear}
-                                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                            >
-                                Clear
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleSearch}
+                            className="ml-4 px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200"
+                        >
+                            Search
+                        </button>
                     </div>
                 </div>
 
@@ -131,12 +123,9 @@ const PublicLearningPlans: React.FC = () => {
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {plans.map(plan => (
-                                <LearningPlanCard
+                                <PublicLearningPlanCard
                                     key={plan.id}
                                     plan={plan}
-                                    onEdit={() => {}} // Not allowed for public plans
-                                    onDelete={() => {}} // Not allowed for public plans
-                                    readOnly={true}
                                 />
                             ))}
                         </div>

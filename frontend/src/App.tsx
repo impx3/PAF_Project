@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { AppRouting } from "@/utils/AppRouting.tsx";
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AuthProvider } from './context/AuthContext';
@@ -18,21 +17,35 @@ import DeleteAccount from './pages/DeleteAccount';
 import LandingPage from './pages/LandingPage';
 import UserList from './pages/UserList';
 import PublicLearningPlans from './pages/PublicLearningPlans';
+import PublicLearningPlanResources from './pages/PublicLearningPlanResources';
 import LearningPlansDashboard from './pages/LearningPlansDashboard';
 import LearningPlanResources from './pages/LearningPlanResources';
 
 const App = () => {
   return (
     <AuthProvider>
-      <AppRouting />
-      <ToastContainer />
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/learningplans/public" element={<PublicLearningPlans />} />
+          <Route
+            path="/learningplans/public"
+            element={
+              <MainLayout>
+                <PublicLearningPlans />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/learningplans/public/:planId"
+            element={
+              <MainLayout>
+                <PublicLearningPlanResources />
+              </MainLayout>
+            }
+          />
 
           {/* Protected Routes */}
           <Route
@@ -116,8 +129,8 @@ const App = () => {
             }
           />
         </Routes>
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />
       </BrowserRouter>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />
     </AuthProvider>
   );
 };

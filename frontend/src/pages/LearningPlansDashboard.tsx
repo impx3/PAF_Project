@@ -1,29 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { LearningPlan, LearningPlanFormData } from '../types/learningPlan';
+import { LearningPlan } from '../types/learningPlan';
 import LearningPlanCard from '../components/learning/LearningPlanCard';
-import LearningPlanForm from '../components/learning/LearningPlanForm';
+import CreateLearningPlanForm from '../components/learning/CreateLearningPlanForm';
+import UpdateLearningPlanForm from '../components/learning/UpdateLearningPlanForm';
 import { learningPlanService } from '../services/learningPlanService';
-import { FaPlus, FaSearch, FaFilter, FaExclamationTriangle, FaEdit } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import ConfirmationModal from '../components/ui/ConfirmationModal';
 
 const LearningPlansDashboard: React.FC = () => {
     const [plans, setPlans] = useState<LearningPlan[]>([]);
-    const [showForm, setShowForm] = useState(false);
+    const [showCreateForm, setShowCreateForm] = useState(false);
     const [editingPlan, setEditingPlan] = useState<LearningPlan | undefined>();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; planId: number | null }>({
-        isOpen: false,
-        planId: null
-    });
-    const [updateModal, setUpdateModal] = useState<{ isOpen: boolean; formData: LearningPlanFormData | null }>({
-        isOpen: false,
-        formData: null
-    });
 
     useEffect(() => {
         fetchLearningPlans();
@@ -43,58 +35,26 @@ const LearningPlansDashboard: React.FC = () => {
         }
     };
 
-    const handleCreatePlan = async (formData: LearningPlanFormData) => {
-        try {
-            const newPlan = await learningPlanService.createLearningPlan(formData);
-            setPlans([newPlan, ...plans]);
-            setShowForm(false);
-            toast.success('Learning plan created successfully');
-        } catch (err) {
-            toast.error('Failed to create learning plan');
-        }
+    const handleCreateSuccess = () => {
+        setShowCreateForm(false);
+        fetchLearningPlans();
     };
 
-    const handleUpdatePlan = async (formData: LearningPlanFormData) => {
-        setUpdateModal({ isOpen: true, formData });
-    };
-
-    const confirmUpdate = async () => {
-        if (!editingPlan || !updateModal.formData) return;
-        
-        try {
-            const updatedPlan = await learningPlanService.updateLearningPlan(editingPlan.id, updateModal.formData);
-            setPlans(plans.map(plan => 
-                plan.id === editingPlan.id ? updatedPlan : plan
-            ));
-            setEditingPlan(undefined);
-            setShowForm(false);
-            toast.success('Learning plan updated successfully');
-        } catch (err) {
-            toast.error('Failed to update learning plan');
-        }
-        setUpdateModal({ isOpen: false, formData: null });
+    const handleUpdateSuccess = () => {
+        setEditingPlan(undefined);
+        fetchLearningPlans();
     };
 
     const handleDeletePlan = async (id: number) => {
-        setDeleteModal({ isOpen: true, planId: id });
-    };
-
-    const confirmDelete = async () => {
-        if (deleteModal.planId) {
+        if (window.confirm('Are you sure you want to delete this learning plan? This action cannot be undone.')) {
             try {
-                await learningPlanService.deleteLearningPlan(deleteModal.planId);
-                setPlans(plans.filter(plan => plan.id !== deleteModal.planId));
+                await learningPlanService.deleteLearningPlan(id);
+                setPlans(plans.filter(plan => plan.id !== id));
                 toast.success('Learning plan deleted successfully');
             } catch (err) {
                 toast.error('Failed to delete learning plan');
             }
         }
-        setDeleteModal({ isOpen: false, planId: null });
-    };
-
-    const handleEditPlan = (plan: LearningPlan) => {
-        setEditingPlan(plan);
-        setShowForm(true);
     };
 
     const handleSearch = async () => {
@@ -147,10 +107,7 @@ const LearningPlansDashboard: React.FC = () => {
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">Learning Plans</h1>
                     <button
-                        onClick={() => {
-                            setEditingPlan(undefined);
-                            setShowForm(true);
-                        }}
+                        onClick={() => setShowCreateForm(true)}
                         className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                     >
                         <FaPlus className="mr-2" />
@@ -158,17 +115,17 @@ const LearningPlansDashboard: React.FC = () => {
                     </button>
                 </div>
 
-                {showForm ? (
-                    <div className="mb-8">
-                        <LearningPlanForm
-                            plan={editingPlan}
-                            onSubmit={handleUpdatePlan}
-                            onCancel={() => {
-                                setShowForm(false);
-                                setEditingPlan(undefined);
-                            }}
-                        />
-                    </div>
+                {showCreateForm ? (
+                    <CreateLearningPlanForm
+                        onSuccess={handleCreateSuccess}
+                        onCancel={() => setShowCreateForm(false)}
+                    />
+                ) : editingPlan ? (
+                    <UpdateLearningPlanForm
+                        plan={editingPlan}
+                        onSuccess={handleUpdateSuccess}
+                        onCancel={() => setEditingPlan(undefined)}
+                    />
                 ) : (
                     <>
                         <div className="mb-6 flex flex-wrap gap-4">
@@ -229,7 +186,7 @@ const LearningPlansDashboard: React.FC = () => {
                                         <LearningPlanCard
                                             key={plan.id}
                                             plan={plan}
-                                            onEdit={handleEditPlan}
+                                            onEdit={(plan) => setEditingPlan(plan)}
                                             onDelete={handleDeletePlan}
                                         />
                                     ))}
@@ -246,28 +203,6 @@ const LearningPlansDashboard: React.FC = () => {
                         )}
                     </>
                 )}
-
-                <ConfirmationModal
-                    isOpen={deleteModal.isOpen}
-                    onClose={() => setDeleteModal({ isOpen: false, planId: null })}
-                    onConfirm={confirmDelete}
-                    title="Delete Learning Plan"
-                    message="Are you sure you want to delete this learning plan? This action cannot be undone."
-                    confirmButtonText="Delete"
-                    confirmButtonColor="red"
-                    icon={<FaExclamationTriangle className="h-6 w-6 text-red-600" />}
-                />
-
-                <ConfirmationModal
-                    isOpen={updateModal.isOpen}
-                    onClose={() => setUpdateModal({ isOpen: false, formData: null })}
-                    onConfirm={confirmUpdate}
-                    title="Update Learning Plan"
-                    message="Are you sure you want to update this learning plan with the new changes?"
-                    confirmButtonText="Update"
-                    confirmButtonColor="blue"
-                    icon={<FaEdit className="h-6 w-6 text-blue-600" />}
-                />
             </div>
         </div>
     );

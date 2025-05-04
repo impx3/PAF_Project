@@ -20,6 +20,12 @@ export const learningPlanService = {
         return response.data;
     },
 
+    // Get a public learning plan by ID
+    getPublicLearningPlanById: async (id: number): Promise<LearningPlan> => {
+        const response = await api.get(`/learning-plans/public/${id}`);
+        return response.data;
+    },
+
     // Create a new learning plan
     createLearningPlan: async (planData: LearningPlanFormData): Promise<LearningPlan> => {
         const response = await api.post('/learning-plans', planData);

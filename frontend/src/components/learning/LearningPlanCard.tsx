@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LearningPlan } from '../../types/learningPlan';
-import { FaLock, FaLockOpen, FaClock, FaTag } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaLock, FaLockOpen, FaClock, FaTag } from 'react-icons/fa';
 
 interface LearningPlanCardProps {
     plan: LearningPlan;
@@ -18,7 +18,21 @@ const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDel
         if ((e.target as HTMLElement).closest('button')) {
             return;
         }
-        navigate(`/learning-plans/${plan.id}/resources`);
+        // Use different routes for public and private plans
+        const route = plan.isPublic && readOnly 
+            ? `/learningplans/public/${plan.id}`
+            : `/learning-plans/${plan.id}/resources`;
+        navigate(route);
+    };
+
+    const handleEditClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onEdit(plan);
+    };
+
+    const handleDeleteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onDelete(plan.id);
     };
 
     return (
@@ -33,6 +47,24 @@ const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDel
                         <FaLockOpen className="text-green-500" title="Public" />
                     ) : (
                         <FaLock className="text-gray-500" title="Private" />
+                    )}
+                    {!readOnly && (
+                        <>
+                            <button
+                                onClick={handleEditClick}
+                                className="text-blue-500 hover:text-blue-600"
+                                title="Edit"
+                            >
+                                <FaEdit />
+                            </button>
+                            <button
+                                onClick={handleDeleteClick}
+                                className="text-red-500 hover:text-red-600"
+                                title="Delete"
+                            >
+                                <FaTrash />
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
@@ -78,28 +110,6 @@ const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDel
                 <div className="text-sm text-gray-500">
                     Created: {new Date(plan.createdAt).toLocaleDateString()}
                 </div>
-                {!readOnly && (
-                    <div className="flex space-x-2">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onEdit(plan);
-                            }}
-                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onDelete(plan.id);
-                            }}
-                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );

@@ -3,9 +3,14 @@ import { ResourceType } from './resourceType';
 export interface LearningPlan {
     id: number;
     title: string;
-    description: string;
-    isPublic: boolean;
+    description?: string;
+    category?: string;
+    estimatedDuration?: string;
+    isPublic?: boolean;
+    tags?: string[];
     progressPercentage: number;
+    createdAt: string;
+    updatedAt: string;
     resources: LearningResource[];
     completedResources: number[];
     owner: {
@@ -13,11 +18,6 @@ export interface LearningPlan {
         username: string;
         email: string;
     };
-    createdAt: string;
-    updatedAt: string;
-    category?: string;
-    tags?: string[];
-    estimatedDuration?: string;
 }
 
 export interface LearningResource {
@@ -32,8 +32,8 @@ export interface LearningResource {
 export interface LearningPlanFormData {
     title: string;
     description: string;
+    category: string;
+    estimatedDuration: string;
     isPublic: boolean;
-    category?: string;
-    tags?: string[];
-    estimatedDuration?: string;
+    tags: string[];
 } 
