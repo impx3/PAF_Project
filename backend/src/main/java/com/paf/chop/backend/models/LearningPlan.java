@@ -51,6 +51,20 @@ public class LearningPlan {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    @Column(name = "category")
+    private String category;
+    
+    @ElementCollection
+    @CollectionTable(
+        name = "learning_plan_tags",
+        joinColumns = @JoinColumn(name = "learning_plan_id")
+    )
+    @Column(name = "tag")
+    private Set<String> tags = new HashSet<>();
+    
+    @Column(name = "estimated_duration")
+    private String estimatedDuration;
+    
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
