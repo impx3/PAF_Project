@@ -13,6 +13,9 @@ export interface LearningPlan {
     };
     createdAt: string;
     updatedAt: string;
+    category?: string;
+    tags?: string[];
+    estimatedDuration?: string;
 }
 
 export interface LearningResource {
@@ -22,4 +25,13 @@ export interface LearningResource {
     url: string;
     type: string;
     completed: boolean;
+}
+
+export interface LearningPlanFormData {
+    title: string;
+    description: string;
+    isPublic: boolean;
+    category?: string;
+    tags?: string[];
+    estimatedDuration?: string;
 } 

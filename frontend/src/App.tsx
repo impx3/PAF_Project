@@ -18,6 +18,7 @@ import DeleteAccount from './pages/DeleteAccount';
 import LandingPage from './pages/LandingPage';
 import UserList from './pages/UserList';
 import PublicLearningPlans from './pages/PublicLearningPlans';
+import LearningPlansDashboard from './pages/LearningPlansDashboard';
 
 const App = () => {
   return (
@@ -93,6 +94,7 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route path="/learning-plans" element={<LearningPlansDashboard />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />
