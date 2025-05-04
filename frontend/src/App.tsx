@@ -94,7 +94,16 @@ const App = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/learning-plans" element={<LearningPlansDashboard />} />
+          <Route
+            path="/learning-plans"
+            element={
+              <PrivateRoute>
+                <MainLayout>
+                  <LearningPlansDashboard />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />

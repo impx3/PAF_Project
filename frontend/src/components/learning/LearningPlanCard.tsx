@@ -6,9 +6,10 @@ interface LearningPlanCardProps {
     plan: LearningPlan;
     onEdit: (plan: LearningPlan) => void;
     onDelete: (id: number) => void;
+    readOnly?: boolean;
 }
 
-const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDelete }) => {
+const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDelete, readOnly = false }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
             <div className="flex justify-between items-start mb-4">
@@ -63,20 +64,22 @@ const LearningPlanCard: React.FC<LearningPlanCardProps> = ({ plan, onEdit, onDel
                 <div className="text-sm text-gray-500">
                     Created: {new Date(plan.createdAt).toLocaleDateString()}
                 </div>
-                <div className="flex space-x-2">
-                    <button
-                        onClick={() => onEdit(plan)}
-                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                    >
-                        Edit
-                    </button>
-                    <button
-                        onClick={() => onDelete(plan.id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                    >
-                        Delete
-                    </button>
-                </div>
+                {!readOnly && (
+                    <div className="flex space-x-2">
+                        <button
+                            onClick={() => onEdit(plan)}
+                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        >
+                            Edit
+                        </button>
+                        <button
+                            onClick={() => onDelete(plan.id)}
+                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

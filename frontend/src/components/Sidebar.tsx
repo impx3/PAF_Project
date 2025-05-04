@@ -7,6 +7,7 @@ import {
   FiUser,
   FiLogOut,
   FiCompass,
+  FiBook,
 } from 'react-icons/fi';
 import styles from '../styles/Sidebar.module.css';
 
@@ -15,8 +16,14 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ toggleLeftPanel }) => {
-  const { currentUser, logout } = useContext(AuthContext);
+  const auth = useContext(AuthContext);
   const navigate = useNavigate();
+
+  if (!auth) {
+    return null; // or some fallback UI
+  }
+
+  const { currentUser, logout } = auth;
 
   const handleLogout = () => {
     logout();
@@ -39,6 +46,9 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleLeftPanel }) => {
           </Link>
           <Link to="/followers">
             <FiUsers /> Followers
+          </Link>
+          <Link to="/learning-plans">
+            <FiBook /> Learning Plans
           </Link>
         </nav>
       </div>

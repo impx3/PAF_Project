@@ -29,12 +29,14 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email);
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
         if (user == null) return ResponseEntity.notFound().build();
 
         UserResponseDTO dto = new UserResponseDTO();

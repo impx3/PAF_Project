@@ -1,19 +1,53 @@
-import { LearningPlan } from '../types/learningPlan';
+import api from '../utils/axiosConfig';
+import { LearningPlan, LearningPlanFormData } from '../types/learningPlan';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+export const learningPlanService = {
+    // Get all learning plans for the current user
+    getUserLearningPlans: async (): Promise<LearningPlan[]> => {
+        const response = await api.get('/learning-plans/me');
+        return response.data;
+    },
 
-export const getPublicLearningPlans = async (): Promise<LearningPlan[]> => {
-    const response = await fetch(`${API_BASE_URL}/learning-plans/public`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch public learning plans');
+    // Get all public learning plans
+    getPublicLearningPlans: async (): Promise<LearningPlan[]> => {
+        const response = await api.get('/learning-plans/public');
+        return response.data;
+    },
+
+    // Get a specific learning plan by ID
+    getLearningPlanById: async (id: number): Promise<LearningPlan> => {
+        const response = await api.get(`/learning-plans/${id}`);
+        return response.data;
+    },
+
+    // Create a new learning plan
+    createLearningPlan: async (planData: LearningPlanFormData): Promise<LearningPlan> => {
+        const response = await api.post('/learning-plans', planData);
+        return response.data;
+    },
+
+    // Update an existing learning plan
+    updateLearningPlan: async (id: number, planData: LearningPlanFormData): Promise<LearningPlan> => {
+        const response = await api.put(`/learning-plans/${id}`, planData);
+        return response.data;
+    },
+
+    // Delete a learning plan
+    deleteLearningPlan: async (id: number): Promise<void> => {
+        await api.delete(`/learning-plans/${id}`);
+    },
+
+    // Search public learning plans
+    searchPublicLearningPlans: async (keyword: string): Promise<LearningPlan[]> => {
+        const response = await api.get(`/learning-plans/search?keyword=${encodeURIComponent(keyword)}`);
+        return response.data;
+    },
+
+    // Mark a resource as completed or not completed
+    updateResourceCompletion: async (planId: number, resourceId: number, completed: boolean): Promise<LearningPlan> => {
+        const response = await api.post(
+            `/learning-plans/${planId}/resources/${resourceId}/complete?completed=${completed}`
+        );
+        return response.data;
     }
-    return response.json();
-};
-
-export const searchPublicLearningPlans = async (keyword: string): Promise<LearningPlan[]> => {
-    const response = await fetch(`${API_BASE_URL}/learning-plans/search?keyword=${encodeURIComponent(keyword)}`);
-    if (!response.ok) {
-        throw new Error('Failed to search learning plans');
-    }
-    return response.json();
 }; 
