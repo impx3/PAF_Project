@@ -57,4 +57,10 @@ public class LearningResourceController {
         List<LearningResourceResponseDTO> responseDTOs = learningResourceService.getPlanResources(planId, userId);
         return ResponseEntity.ok(responseDTOs);
     }
+
+    @GetMapping("/public/plans/{planId}")
+    public ResponseEntity<List<LearningResourceResponseDTO>> getPublicPlanResources(@PathVariable Long planId) {
+        List<LearningResourceResponseDTO> responseDTOs = learningResourceService.getPublicPlanResources(planId);
+        return ResponseEntity.ok(responseDTOs);
+    }
 } 

@@ -17,6 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,45 +39,43 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        // Auth endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                // Auth endpoints
+                .requestMatchers("/api/auth/**").permitAll()
 
-                        // Posts endpoints
-                        .requestMatchers("/api/posts/**").permitAll()
+                // Posts endpoints
+                .requestMatchers("/api/posts/**").permitAll()
 
-                        // Media endpoints
-                        .requestMatchers("/images/**").permitAll()
-                        .requestMatchers("/videos/**").permitAll()
+                // Media endpoints
+                .requestMatchers("/images/**").permitAll()
+                .requestMatchers("/videos/**").permitAll()
 
-                        // Comments endpoints
-                        .requestMatchers("/api/comments/**").authenticated()
-                        // WebSocket/SockJS endpoints
-                        .requestMatchers("/ws/**").permitAll()
+                // Comments endpoints
+                .requestMatchers("/api/comments/**").authenticated()
 
-                        // New learning plan endpoints - public access
-                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/public").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/search").permitAll()
+                // WebSocket/SockJS endpoints
+                .requestMatchers("/ws/**").permitAll()
 
-                        // Learning plan endpoints - authenticated access
-                        .requestMatchers(HttpMethod.POST, "/api/learning-plans").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/learning-plans/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
+                // Learning Plan endpoints (public)
+                .requestMatchers(HttpMethod.GET, "/api/learning-plans/public").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/learning-plans/search").permitAll()
 
-                        // Individual learning plan by ID - authenticated (actual access control in service)
-                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
+                // Learning Plan endpoints (authenticated)
+                .requestMatchers(HttpMethod.POST, "/api/learning-plans").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/learning-plans/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
 
-                        // All other requests require authentication
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
-
+                // Default: all other endpoints require authentication
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -82,12 +85,24 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        // Expose the AuthenticationManager as a Bean using AuthenticationConfiguration
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*")); // Replace with specific origins in production
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

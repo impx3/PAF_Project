@@ -44,6 +44,7 @@ public class LearningResourceServiceImpl implements LearningResourceService {
         // Create and save the resource
         LearningResource resource = LearningResource.builder()
                 .title(requestDTO.getTitle())
+                .description(requestDTO.getDescription())
                 .type(requestDTO.getType())
                 .url(requestDTO.getUrl())
                 .learningPlan(learningPlan)
@@ -61,24 +62,27 @@ public class LearningResourceServiceImpl implements LearningResourceService {
         // Basic validation
         validateResourceRequest(requestDTO);
 
-        // Get the resource and check permissions
+        // Get the resource
         LearningResource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Learning resource not found"));
 
+        // Check if user has access to the learning plan
         if (!permissionChecker.isLearningPlanOwner(resource.getLearningPlan().getId(), userId)) {
             throw new UnauthorizedAccessException("You are not authorized to update this resource");
         }
 
-        // Update the resource
+        // Update resource fields
         resource.setTitle(requestDTO.getTitle());
+        resource.setDescription(requestDTO.getDescription());
         resource.setType(requestDTO.getType());
         resource.setUrl(requestDTO.getUrl());
 
+        // Save the updated resource
         LearningResource updatedResource = resourceRepository.save(resource);
 
         // Convert to response DTO
         return convertToResponseDTO(updatedResource, 
-            resource.getLearningPlan().getCompletedResources().contains(updatedResource.getId()));
+            updatedResource.getLearningPlan().getCompletedResources().contains(updatedResource.getId()));
     }
 
     @Override
@@ -136,6 +140,25 @@ public class LearningResourceServiceImpl implements LearningResourceService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<LearningResourceResponseDTO> getPublicPlanResources(Long planId) {
+        // Get the learning plan
+        LearningPlan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new ResourceNotFoundException("Learning plan not found"));
+
+        // Check if the plan is public
+        if (!plan.getIsPublic()) {
+            throw new UnauthorizedAccessException("This learning plan is not public");
+        }
+
+        // Get all resources and convert to DTOs
+        List<LearningResource> resources = resourceRepository.findByLearningPlanId(planId);
+        return resources.stream()
+                .map(resource -> convertToResponseDTO(resource, 
+                    plan.getCompletedResources().contains(resource.getId())))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Helper method to convert LearningResource entity to LearningResourceResponseDTO
      */
@@ -143,6 +166,7 @@ public class LearningResourceServiceImpl implements LearningResourceService {
         return LearningResourceResponseDTO.builder()
                 .id(resource.getId())
                 .title(resource.getTitle())
+                .description(resource.getDescription())
                 .type(resource.getType())
                 .url(resource.getUrl())
                 .completed(completed)

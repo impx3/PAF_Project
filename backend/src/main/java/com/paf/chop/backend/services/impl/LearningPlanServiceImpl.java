@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,9 @@ public class LearningPlanServiceImpl implements LearningPlanService {
         learningPlan.setProgressPercentage(0);
         learningPlan.setCompletedResources(new HashSet<>());
         learningPlan.setUser(user);
+        learningPlan.setCategory(requestDTO.getCategory());
+        learningPlan.setTags(new HashSet<>(requestDTO.getTags() != null ? requestDTO.getTags() : new ArrayList<>()));
+        learningPlan.setEstimatedDuration(requestDTO.getEstimatedDuration());
 
         // Save the learning plan
         LearningPlan savedPlan = learningPlanRepository.save(learningPlan);
@@ -58,21 +62,16 @@ public class LearningPlanServiceImpl implements LearningPlanService {
     @Transactional
     public LearningPlanResponseDTO updateLearningPlan(Long id, LearningPlanRequestDTO requestDTO, Long userId) {
         // Get the learning plan or throw exception if not found
-        LearningPlan learningPlan = learningPlanRepository.findById(id)
+        LearningPlan learningPlan = learningPlanRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Learning plan not found"));
-
-        // Check if the user is the owner of the learning plan
-        if (!learningPlan.getUser().getId().equals(userId)) {
-            throw new UnauthorizedAccessException("You are not authorized to update this learning plan");
-        }
 
         // Update learning plan fields
         learningPlan.setTitle(requestDTO.getTitle());
         learningPlan.setDescription(requestDTO.getDescription());
-        
-        if (requestDTO.getIsPublic() != null) {
-            learningPlan.setIsPublic(requestDTO.getIsPublic());
-        }
+        learningPlan.setIsPublic(requestDTO.getIsPublic());
+        learningPlan.setCategory(requestDTO.getCategory());
+        learningPlan.setTags(new HashSet<>(requestDTO.getTags() != null ? requestDTO.getTags() : new ArrayList<>()));
+        learningPlan.setEstimatedDuration(requestDTO.getEstimatedDuration());
 
         // Save the updated learning plan
         LearningPlan updatedPlan = learningPlanRepository.save(learningPlan);
@@ -219,40 +218,26 @@ public class LearningPlanServiceImpl implements LearningPlanService {
      * Helper method to convert LearningPlan entity to LearningPlanResponseDTO
      */
     private LearningPlanResponseDTO convertToResponseDTO(LearningPlan learningPlan) {
-        // Get all resources for the learning plan
-        List<LearningResource> resources = learningResourceRepository.findByLearningPlanId(learningPlan.getId());
-
-        // Convert resources to DTOs
-        List<ResourceResponseDTO> resourceDTOs = resources.stream()
-                .map(resource -> ResourceResponseDTO.builder()
-                        .id(resource.getId())
-                        .title(resource.getTitle())
-                        .type(resource.getType())
-                        .url(resource.getUrl())
-                        .completed(learningPlan.getCompletedResources().contains(resource.getId()))
-                        .createdAt(resource.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
-
-        // Create user basic info DTO
-        User user = learningPlan.getUser();
-        UserBasicInfoDTO userBasicInfoDTO = UserBasicInfoDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .build();
-
-        // Build and return the response DTO
         return LearningPlanResponseDTO.builder()
                 .id(learningPlan.getId())
                 .title(learningPlan.getTitle())
                 .description(learningPlan.getDescription())
                 .isPublic(learningPlan.getIsPublic())
                 .progressPercentage(learningPlan.getProgressPercentage())
-                .resources(resourceDTOs)
                 .completedResources(learningPlan.getCompletedResources())
-                .owner(userBasicInfoDTO)
+                .owner(convertToUserBasicInfoDTO(learningPlan.getUser()))
                 .createdAt(learningPlan.getCreatedAt())
                 .updatedAt(learningPlan.getUpdatedAt())
+                .category(learningPlan.getCategory())
+                .tags(learningPlan.getTags())
+                .estimatedDuration(learningPlan.getEstimatedDuration())
+                .build();
+    }
+
+    private UserBasicInfoDTO convertToUserBasicInfoDTO(User user) {
+        return UserBasicInfoDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
                 .build();
     }
 }

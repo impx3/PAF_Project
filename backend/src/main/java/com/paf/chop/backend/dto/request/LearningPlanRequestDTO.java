@@ -20,4 +20,10 @@ public class LearningPlanRequestDTO {
    private Boolean isPublic;
    
    private List<Long> resourceIds;
+   
+   private String category;
+   
+   private List<String> tags;
+   
+   private String estimatedDuration;
 }

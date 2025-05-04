@@ -7,21 +7,12 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.services.UserService;
-
 
 @RestController
 @RequestMapping("/api/users")
@@ -38,8 +29,8 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email);
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
         if (user == null) return ResponseEntity.notFound().build();
 
         UserResponseDTO dto = new UserResponseDTO();
@@ -55,11 +46,11 @@ public class UserController {
         dto.setProfileImage(user.getProfileImage());
         dto.setBio(user.getBio());
         dto.setUserRole(user.getUserRole().name());
-        dto.setToken(null); // don't send token again
+        dto.setToken(null); // Don't expose token
 
         return ResponseEntity.ok(dto);
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = userService.getUser(id);
@@ -77,10 +68,7 @@ public class UserController {
     }
 
     @PostMapping("/{targetId}/follow")
-    public ResponseEntity<String> follow(
-            @PathVariable Long targetId,
-            Authentication authentication
-    ) {
+    public ResponseEntity<String> follow(@PathVariable Long targetId, Authentication authentication) {
         String currentUserEmail = authentication.getName();
         String result = userService.toggleFollowByEmail(currentUserEmail, targetId);
         return ResponseEntity.ok(result);

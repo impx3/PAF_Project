@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-@CrossOrigin(origins = "http://localhost:3000/", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:5173/", maxAge = 3600)
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {

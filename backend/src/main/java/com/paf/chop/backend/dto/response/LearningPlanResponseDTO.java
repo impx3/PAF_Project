@@ -25,4 +25,7 @@ public class LearningPlanResponseDTO {
    private UserBasicInfoDTO owner;
    private LocalDateTime createdAt;
    private LocalDateTime updatedAt;
+   private String category;
+   private Set<String> tags;
+   private String estimatedDuration;
 }

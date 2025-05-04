@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LearningResourceRequestDTO {
     private String title;
+    private String description;
     private ResourceType type;
     private String url;
 } 
