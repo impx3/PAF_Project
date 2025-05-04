@@ -11,6 +11,8 @@ interface Post {
   imageUrl: string;
 }
 
+const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImlkIjoxLCJlbWFpbCI6ImVtYWlsMDkwM0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJpYXQiOjE3NDYzMzI5NjksImV4cCI6MTc0NjMzNjU2OX0.e2c4rQZdSJNuDCAmzBrZNRpqowVnb3HrtNErb8cqusI";
+
 const GetAllPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [toupdateposts, settoupdateposts] = useState<number>(0);
@@ -18,7 +20,13 @@ const GetAllPosts = () => {
 
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/posts")
+    axios.get("http://localhost:8080/api/posts", {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+      
+    )
       .then(response => setPosts(response.data))
       .catch(error => console.error("Error fetching posts:", error));   
 
