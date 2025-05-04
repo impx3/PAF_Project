@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/axiosConfig";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 import styles from "../styles/Profile.module.css";
@@ -13,7 +13,7 @@ interface User {
 }
 
 export const Profile: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  //const { id } = useParams<{ id: string }>();
   const { currentUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -21,7 +21,7 @@ export const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await api.get(`/users/${id}`);
+        const res = await api.get(`/users/${currentUser?.id}`);
         setUser(res.data);
 
         if (currentUser?.following) {
@@ -33,11 +33,11 @@ export const Profile: React.FC = () => {
       }
     };
 
-    fetchUser();
-  }, [id, currentUser]);
+    fetchUser().then();
+  }, [currentUser]);
 
   const handleFollow = async () => {
-    await api.post(`/users/${id}/follow`);
+    await api.post(`/users/${currentUser?.id}/follow`);
     setIsFollowing(!isFollowing);
   };
 

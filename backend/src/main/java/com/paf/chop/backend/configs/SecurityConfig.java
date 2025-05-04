@@ -1,6 +1,5 @@
 package com.paf.chop.backend.configs;
 
-import com.paf.chop.backend.services.MyUserDetailsService;
 import com.paf.chop.backend.utils.FirebaseTokenFilter;
 import com.paf.chop.backend.utils.JWTFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,24 +16,30 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
+
+    private final JWTFilter jwtRequestFilter;
+    private final FirebaseTokenFilter firebaseTokenFilter;
 
     @Autowired
-    private MyUserDetailsService userDetailsService;
-
-    @Autowired
-    private JWTFilter jwtRequestFilter;
-
-    @Autowired
-    private FirebaseTokenFilter firebaseTokenFilter;
+    public SecurityConfig(JWTFilter jwtRequestFilter, FirebaseTokenFilter firebaseTokenFilter) {
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.firebaseTokenFilter = firebaseTokenFilter;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Auth endpoints
@@ -49,30 +54,24 @@ public class SecurityConfig {
 
                         // Comments endpoints
                         .requestMatchers("/api/comments/**").authenticated()
+
                         // WebSocket/SockJS endpoints
                         .requestMatchers("/ws/**").permitAll()
 
-                        // New learning plan endpoints - public access
+                        // Learning plan endpoints
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/public").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/search").permitAll()
-
-                        // Learning plan endpoints - authenticated access
                         .requestMatchers(HttpMethod.POST, "/api/learning-plans").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/learning-plans/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
-
-                        // Individual learning plan by ID - authenticated (actual access control in service)
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
 
-                        // All other requests require authentication
+                        // Any other request requires authentication
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
-
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -81,9 +80,21 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        // Expose the AuthenticationManager as a Bean using AuthenticationConfiguration
-        return authenticationConfiguration.getAuthenticationManager();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean

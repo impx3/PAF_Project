@@ -31,6 +31,7 @@ interface AuthContextType {
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   fetchCurrentUser: () => Promise<void>;
   logout: () => void;
+  loading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -43,14 +44,26 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchCurrentUser = async () => {
     try {
       const res = await api.get("/users/me");
       setCurrentUser(res.data.result);
-    } catch (err) {
-      localStorage.removeItem("token");
-      setCurrentUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //method to save the user to local storage
+  const saveUserToLocalStorage = (user: User) => {
+    localStorage.setItem("currentUser", JSON.stringify(user));
+  };
+
+  const loadUserFromLocalStorage = () => {
+    const user = localStorage.getItem("currentUser");
+    if (user) {
+      setCurrentUser(JSON.parse(user));
     }
   };
 
@@ -58,17 +71,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const token = localStorage.getItem("token");
     if (token) {
       fetchCurrentUser().then();
+    } else {
+      setLoading(false); // Even if no token, we are done loading
     }
+
+    loadUserFromLocalStorage();
   }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      saveUserToLocalStorage(currentUser);
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+  }, [currentUser]);
 
   const logout = () => {
     localStorage.removeItem("token");
     setCurrentUser(null);
+    localStorage.removeItem("currentUser");
   };
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, setCurrentUser, fetchCurrentUser, logout }}
+      value={{ currentUser, setCurrentUser, fetchCurrentUser, logout, loading }}
     >
       {children}
     </AuthContext.Provider>

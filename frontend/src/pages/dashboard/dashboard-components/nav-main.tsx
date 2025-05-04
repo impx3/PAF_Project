@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Bot, SquareTerminal } from "lucide-react";
+import { Bot, House, User, UsersRound } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -12,12 +12,12 @@ const navMain = [
   {
     title: "Home",
     url: "/home",
-    icon: SquareTerminal,
+    icon: House,
   },
   {
     title: "Profile",
     url: "/profile",
-    icon: Bot,
+    icon: User,
   },
   {
     title: "Delete Profile",
@@ -27,7 +27,7 @@ const navMain = [
   {
     title: "User List",
     url: "/explore",
-    icon: Bot,
+    icon: UsersRound,
   },
 ];
 
@@ -40,7 +40,7 @@ export function NavMain() {
           <SidebarMenuItem key={item.title}>
             <NavLink to={item.url}>
               <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon className="h-4 w-4" />}
+                {item.icon && <item.icon className="h-6 w-6" />}
                 {/* this span will automatically be hidden by Sidebar when collapsed */}
                 <span className="ml-2">{item.title}</span>
               </SidebarMenuButton>
