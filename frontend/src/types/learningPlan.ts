@@ -1,3 +1,5 @@
+import { ResourceType } from './resourceType';
+
 export interface LearningPlan {
     id: number;
     title: string;
@@ -23,7 +25,7 @@ export interface LearningResource {
     title: string;
     description: string;
     url: string;
-    type: string;
+    type: ResourceType;
     completed: boolean;
 }
 
