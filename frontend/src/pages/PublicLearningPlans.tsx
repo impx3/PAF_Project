@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LearningPlan } from '../types/learningPlan';
 import { learningPlanService } from '../services/learningPlanService';
 import LearningPlanCard from '../components/learning/LearningPlanCard';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaBook } from 'react-icons/fa';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { toast } from 'react-toastify';
 
@@ -49,15 +49,20 @@ const PublicLearningPlans: React.FC = () => {
         }
     };
 
+    const handleClear = () => {
+        setSearchQuery('');
+        fetchPublicPlans();
+    };
+
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 py-8">
+            <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center py-12">
                         <p className="text-red-500 text-lg">{error}</p>
                         <button
                             onClick={fetchPublicPlans}
-                            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                            className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transform transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         >
                             Try Again
                         </button>
@@ -68,23 +73,53 @@ const PublicLearningPlans: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Public Learning Plans</h1>
+                <div className="text-center mb-12">
+                    <div className="flex items-center justify-center mb-4">
+                        <FaBook className="text-4xl text-blue-500 mr-3" />
+                        <h1 className="text-4xl font-bold text-gray-900">Public Learning Plans</h1>
+                    </div>
+                    <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                        Discover and explore learning plans shared by the community. Find the perfect plan to enhance your skills.
+                    </p>
                 </div>
 
-                <div className="mb-6">
-                    <div className="relative max-w-md">
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search public plans..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                <div className="max-w-2xl mx-auto mb-10">
+                    <div className="relative flex items-center">
+                        <div className="relative flex-grow">
+                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search public plans..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    <FaTimes />
+                                </button>
+                            )}
+                        </div>
+                        <div className="flex space-x-3 ml-4">
+                            <button
+                                onClick={handleSearch}
+                                className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                Search
+                            </button>
+                            <button
+                                onClick={handleClear}
+                                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                            >
+                                Clear
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -94,7 +129,7 @@ const PublicLearningPlans: React.FC = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {plans.map(plan => (
                                 <LearningPlanCard
                                     key={plan.id}
@@ -107,9 +142,13 @@ const PublicLearningPlans: React.FC = () => {
                         </div>
 
                         {plans.length === 0 && (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500 text-lg">
-                                    No public learning plans found.
+                            <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+                                <FaSearch className="mx-auto text-4xl text-gray-300 mb-4" />
+                                <p className="text-gray-500 text-lg mb-2">
+                                    No public learning plans found
+                                </p>
+                                <p className="text-gray-400">
+                                    Try adjusting your search or check back later for new plans
                                 </p>
                             </div>
                         )}
