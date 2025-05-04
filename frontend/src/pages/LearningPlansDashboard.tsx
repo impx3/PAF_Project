@@ -3,9 +3,10 @@ import { LearningPlan, LearningPlanFormData } from '../types/learningPlan';
 import LearningPlanCard from '../components/learning/LearningPlanCard';
 import LearningPlanForm from '../components/learning/LearningPlanForm';
 import { learningPlanService } from '../services/learningPlanService';
-import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFilter, FaExclamationTriangle, FaEdit } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import ConfirmationModal from '../components/ui/ConfirmationModal';
 
 const LearningPlansDashboard: React.FC = () => {
     const [plans, setPlans] = useState<LearningPlan[]>([]);
@@ -15,6 +16,14 @@ const LearningPlansDashboard: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; planId: number | null }>({
+        isOpen: false,
+        planId: null
+    });
+    const [updateModal, setUpdateModal] = useState<{ isOpen: boolean; formData: LearningPlanFormData | null }>({
+        isOpen: false,
+        formData: null
+    });
 
     useEffect(() => {
         fetchLearningPlans();
@@ -46,10 +55,14 @@ const LearningPlansDashboard: React.FC = () => {
     };
 
     const handleUpdatePlan = async (formData: LearningPlanFormData) => {
-        if (!editingPlan) return;
+        setUpdateModal({ isOpen: true, formData });
+    };
+
+    const confirmUpdate = async () => {
+        if (!editingPlan || !updateModal.formData) return;
         
         try {
-            const updatedPlan = await learningPlanService.updateLearningPlan(editingPlan.id, formData);
+            const updatedPlan = await learningPlanService.updateLearningPlan(editingPlan.id, updateModal.formData);
             setPlans(plans.map(plan => 
                 plan.id === editingPlan.id ? updatedPlan : plan
             ));
@@ -59,18 +72,24 @@ const LearningPlansDashboard: React.FC = () => {
         } catch (err) {
             toast.error('Failed to update learning plan');
         }
+        setUpdateModal({ isOpen: false, formData: null });
     };
 
     const handleDeletePlan = async (id: number) => {
-        if (window.confirm('Are you sure you want to delete this learning plan?')) {
+        setDeleteModal({ isOpen: true, planId: id });
+    };
+
+    const confirmDelete = async () => {
+        if (deleteModal.planId) {
             try {
-                await learningPlanService.deleteLearningPlan(id);
-                setPlans(plans.filter(plan => plan.id !== id));
+                await learningPlanService.deleteLearningPlan(deleteModal.planId);
+                setPlans(plans.filter(plan => plan.id !== deleteModal.planId));
                 toast.success('Learning plan deleted successfully');
             } catch (err) {
                 toast.error('Failed to delete learning plan');
             }
         }
+        setDeleteModal({ isOpen: false, planId: null });
     };
 
     const handleEditPlan = (plan: LearningPlan) => {
@@ -143,7 +162,7 @@ const LearningPlansDashboard: React.FC = () => {
                     <div className="mb-8">
                         <LearningPlanForm
                             plan={editingPlan}
-                            onSubmit={editingPlan ? handleUpdatePlan : handleCreatePlan}
+                            onSubmit={handleUpdatePlan}
                             onCancel={() => {
                                 setShowForm(false);
                                 setEditingPlan(undefined);
@@ -227,6 +246,28 @@ const LearningPlansDashboard: React.FC = () => {
                         )}
                     </>
                 )}
+
+                <ConfirmationModal
+                    isOpen={deleteModal.isOpen}
+                    onClose={() => setDeleteModal({ isOpen: false, planId: null })}
+                    onConfirm={confirmDelete}
+                    title="Delete Learning Plan"
+                    message="Are you sure you want to delete this learning plan? This action cannot be undone."
+                    confirmButtonText="Delete"
+                    confirmButtonColor="red"
+                    icon={<FaExclamationTriangle className="h-6 w-6 text-red-600" />}
+                />
+
+                <ConfirmationModal
+                    isOpen={updateModal.isOpen}
+                    onClose={() => setUpdateModal({ isOpen: false, formData: null })}
+                    onConfirm={confirmUpdate}
+                    title="Update Learning Plan"
+                    message="Are you sure you want to update this learning plan with the new changes?"
+                    confirmButtonText="Update"
+                    confirmButtonColor="blue"
+                    icon={<FaEdit className="h-6 w-6 text-blue-600" />}
+                />
             </div>
         </div>
     );
