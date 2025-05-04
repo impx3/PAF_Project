@@ -8,6 +8,7 @@ import {
   FiLogOut,
   FiCompass,
   FiBook,
+  FiFileText,
 } from 'react-icons/fi';
 import styles from '../styles/Sidebar.module.css';
 
@@ -47,8 +48,14 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleLeftPanel }) => {
           <Link to="/followers">
             <FiUsers /> Followers
           </Link>
+          <Link to="/post/createpostselect">
+            <FiFileText /> Posts
+          </Link>
           <Link to="/learning-plans">
-            <FiBook /> Learning Plans
+            <FiBook /> Learning Plans Management
+          </Link>
+          <Link to="/learningplans/public">
+            <FiBook /> Public Learning Plans
           </Link>
         </nav>
       </div>
