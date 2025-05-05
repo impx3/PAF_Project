@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 
-const Login: React.FC = () => {
+export const Login: React.FC = () => {
 const [username, setUsername] = useState<string>("");
 const [password, setPassword] = useState<string>("password");
  

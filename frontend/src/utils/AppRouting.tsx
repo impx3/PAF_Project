@@ -3,7 +3,6 @@ import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../routes/PrivateRoute";
 import MainLayout from "../layouts/MainLayout";
 
-
 // Page Imports
 import LandingPage from "../pages/LandingPage";
 import Login from "../pages/Login";
@@ -33,7 +32,9 @@ import {
   GetPostById,
   Home as PostHome,
 } from "../pages/PostPages";
-
+import CreateText from "@/pages/PostPages/CreateText";
+import {Login as PostLogin} from "@/pages/PostPages/Login";
+import {Logout as PostLogout} from "@/pages/PostPages/Logout";
 
 // Route Configurations
 const publicRoutes = [
@@ -71,7 +72,7 @@ const protectedRoutes = [
 
 // Post-related Routes
 const postRoutes = [
-  { path: "/post/posts", element: <GetAllPosts /> },
+  { path: "/post/text", element:<CreateText />},
   { path: "/post/createpostselect", element: <PostHome /> },
   { path: "/post/create", element: <CreatePost /> },
   { path: "/post/CreateWithMultipleImages", element: <CreateWithMultipleImages /> },
@@ -82,6 +83,9 @@ const postRoutes = [
   { path: "/post/videos", element: <VideoList /> },
   { path: "/post/feedvideo", element: <VideoListForUsers /> },
   { path: "/post/:id", element: <GetPostById /> },
+  { path: "/post/posts", element: <GetAllPosts /> },
+  { path: "/post/login", element: <PostLogin /> },
+  { path: "/post/logout", element: <PostLogout /> },
 ];
 
 export const AppRoutes = () => {
