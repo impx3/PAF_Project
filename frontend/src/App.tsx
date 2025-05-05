@@ -1,11 +1,19 @@
-import { AppRouting } from "@/utils/AppRouting.tsx";
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AuthProvider } from './context/AuthContext';
+import { AppRoutes } from './utils/AppRouting';
 
-function App() {
+const App = () => {
   return (
-    <>
-      <AppRouting />
-    </>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />
+      </BrowserRouter>
+    </AuthProvider>
   );
-}
+};
 
 export default App;

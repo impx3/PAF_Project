@@ -1,11 +1,14 @@
 package com.paf.chop.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.paf.chop.backend.configs.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
+// import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,6 +19,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    // private String id = UUID.randomUUID().toString();
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -48,15 +52,20 @@ public class User {
 
     private String bio;
 
+    @JsonIgnore
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole userRole = UserRole.USER;
+
+    @Column(name = "firebase_uid")
+    private String firebaseUid;
 
     @PrePersist
     public void prePersist() {
@@ -69,10 +78,15 @@ public class User {
         updatedAt = LocalDateTime.now();
     }
 
+    @ManyToMany
+    @JoinTable(
+        name = "user_followers",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers = new HashSet<>();
 
-
-
-
-
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> following = new HashSet<>();
 
 }

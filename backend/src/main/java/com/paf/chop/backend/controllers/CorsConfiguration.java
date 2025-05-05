@@ -1,6 +1,5 @@
 package com.paf.chop.backend.controllers;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -14,12 +13,14 @@ public class CorsConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                // allow all origins to access our service
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
+
+                        .allowedOrigins("http://localhost:5173") // Allow frontend origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH")
+                        .allowedHeaders("*")
                         .allowCredentials(true)
-                        .allowedHeaders("*");
+                        .maxAge(3600); // Cache preflight requests for 1 hour
+
             }
         };
     }

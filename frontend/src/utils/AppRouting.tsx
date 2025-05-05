@@ -1,57 +1,124 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { HomePage } from "@/pages/HomePage.tsx";
-import { ProfilePage } from "@/pages/Profile.tsx";
-import DashboardPage from "@/pages/dashboard/DashboardPage.tsx";
-import Home from "@/pages/PostPages/Home";
-import Create from "@/pages/PostPages/Create";
-import GetAllPosts from "@/pages/PostPages/GetAllPosts";
-import CreateWithMultipleImages from "@/pages/PostPages/CreateWithMultipleImages";
-import Update from "@/pages/PostPages/Update";
-import Delete from "@/pages/PostPages/Delete";
-import VideoUploadForm from "@/pages/PostPages/VideoUploadForm";
-import GetAllPostsForUsers from "@/pages/PostPages/GetAllPostsForUsers";
-import VideoList from "@/pages/PostPages/VideoList";
-import VideoListForUsers from "@/pages/PostPages/VideoListForUsers";
-import GetPostById from "@/pages/PostPages/GetPostById";
-import CreateText from "@/pages/PostPages/CreateText";
-import Login from "@/pages/PostPages/Login";
-import Logout from "@/pages/PostPages/Logout";
 
-export const AppRouting = () => {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  );
-};
+import { Route, Routes } from "react-router-dom";
+import PrivateRoute from "../routes/PrivateRoute";
+import MainLayout from "../layouts/MainLayout";
 
-const AppRoutes = () => {
+
+// Page Imports
+import LandingPage from "../pages/LandingPage";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import Home from "../pages/Home";
+import Profile from "../pages/Profile";
+import Followers from "../pages/Followers";
+import EditProfile from "../pages/EditProfile";
+import DeleteAccount from "../pages/DeleteAccount";
+import UserList from "../pages/UserList";
+import PublicLearningPlans from "../pages/PublicLearningPlans";
+import PublicLearningPlanResources from "../pages/PublicLearningPlanResources";
+import LearningPlansDashboard from "../pages/LearningPlansDashboard";
+import LearningPlanResources from "../pages/LearningPlanResources";
+
+// Post-related Imports
+import {
+  GetAllPosts,
+  Create as CreatePost,
+  CreateWithMultipleImages,
+  Update as UpdatePost,
+  Delete as DeletePost,
+  VideoUploadForm,
+  GetAllPostsForUsers,
+  VideoList,
+  VideoListForUsers,
+  GetPostById,
+  Home as PostHome,
+} from "../pages/PostPages";
+
+
+// Route Configurations
+const publicRoutes = [
+  { path: "/", element: <LandingPage /> },
+  { path: "/login", element: <Login /> },
+  { path: "/register", element: <Register /> },
+  {
+    path: "/learningplans/public",
+    element: (
+      <MainLayout>
+        <PublicLearningPlans />
+      </MainLayout>
+    ),
+  },
+  {
+    path: "/learningplans/public/:planId",
+    element: (
+      <MainLayout>
+        <PublicLearningPlanResources />
+      </MainLayout>
+    ),
+  },
+];
+
+const protectedRoutes = [
+  { path: "/home", element: <Home /> },
+  { path: "/profile/:id", element: <Profile /> },
+  { path: "/followers", element: <Followers /> },
+  { path: "/edit-profile", element: <EditProfile /> },
+  { path: "/delete-account", element: <DeleteAccount /> },
+  { path: "/explore", element: <UserList /> },
+  { path: "/learning-plans", element: <LearningPlansDashboard /> },
+  { path: "/learning-plans/:planId/resources", element: <LearningPlanResources /> },
+];
+
+// Post-related Routes
+const postRoutes = [
+  { path: "/post/posts", element: <GetAllPosts /> },
+  { path: "/post/createpostselect", element: <PostHome /> },
+  { path: "/post/create", element: <CreatePost /> },
+  { path: "/post/CreateWithMultipleImages", element: <CreateWithMultipleImages /> },
+  { path: "/post/update/:id", element: <UpdatePost /> },
+  { path: "/post/delete/:id", element: <DeletePost /> },
+  { path: "/post/createvid", element: <VideoUploadForm /> },
+  { path: "/post/feed", element: <GetAllPostsForUsers /> },
+  { path: "/post/videos", element: <VideoList /> },
+  { path: "/post/feedvideo", element: <VideoListForUsers /> },
+  { path: "/post/:id", element: <GetPostById /> },
+];
+
+export const AppRoutes = () => {
   return (
     <Routes>
-      <Route path={"/"} element={<HomePage />} />
-      <Route path={"/profile"} element={<ProfilePage />} />
-      <Route path={"/dashboard"} element={<DashboardPage />} />
+      {/* Public Routes */}
+      {publicRoutes.map(({ path, element }) => (
+        <Route key={path} path={path} element={element} />
+      ))}
 
-      <Route path={"/post/text"} element={<CreateText />} />
+      {/* Protected Routes */}
+      {protectedRoutes.map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <PrivateRoute>
+              <MainLayout>{element}</MainLayout>
+            </PrivateRoute>
+          }
+        />
+      ))}
 
-      <Route path={"/post/createpostselect"} element={<Home />} />
-      <Route path={"/post/create"} element={<Create />} />
-      <Route path={"/post/posts"} element={<GetAllPosts />} />
-      <Route path="/post/CreateWithMultipleImages" element={<CreateWithMultipleImages />} />
-      <Route path="/post/update/:id" element={<Update />} />
-      <Route path="/post/delete/:id" element={<Delete />} />
 
-      <Route path="/post/createvid" element={<VideoUploadForm />} />
-
-      <Route path="/post/feed" element={<GetAllPostsForUsers />} />
-      <Route path="/post/videos" element={<VideoList />} />
-
-      <Route path="/post/feedvideo" element={<VideoListForUsers />} />
-      <Route path="/post/:id" element={<GetPostById />} />
-
-      <Route path={"/post/login"} element={<Login />} />
-      <Route path={"/post/logout"} element={<Logout />} />
+      {/* Post Routes */}
+      {postRoutes.map(({ path, element }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <PrivateRoute>
+              <MainLayout>{element}</MainLayout>
+            </PrivateRoute>
+          }
+        />
+      ))}
 
     </Routes>
   );
-};
+}; 
