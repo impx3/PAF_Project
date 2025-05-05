@@ -9,7 +9,12 @@ const Delete = () => {
   useEffect(() => {
     const confirmDelete = window.confirm("Are you sure you want to delete this post?");
     if (confirmDelete) {
-      axios.delete(`http://localhost:8080/api/posts/${id}`)
+      const token = localStorage.getItem('token');
+      axios.delete(`http://localhost:8080/api/posts/${id}`,{
+        headers: {
+           'Authorization': `Bearer ${token}`
+        },
+      })
         .then(() => {
           alert("Post deleted successfully!");
           navigate("/post/posts");

@@ -17,11 +17,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
 
 @Configuration
 @EnableWebSecurity
@@ -39,6 +44,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+
+
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
@@ -47,10 +54,17 @@ public class SecurityConfig {
 
                 // Posts endpoints
                 .requestMatchers("/api/posts/**").permitAll()
-
+                .requestMatchers("/api/posts**").authenticated()
+                .requestMatchers("/api/posts/**").authenticated()  
                 // Media endpoints
                 .requestMatchers("/images/**").permitAll()
                 .requestMatchers("/videos/**").permitAll()
+                                   
+                .requestMatchers("/images/*").permitAll()
+                .requestMatchers("/videos*").permitAll()  //
+                .requestMatchers("/videos/*").permitAll()
+                .requestMatchers("/videos/upload-video").permitAll()
+                .requestMatchers("/videos*").permitAll()                                   
 
                 // Comments endpoints
                 .requestMatchers("/api/comments/**").authenticated()
@@ -76,6 +90,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             );
+
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class);

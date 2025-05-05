@@ -1,6 +1,8 @@
+
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../routes/PrivateRoute";
 import MainLayout from "../layouts/MainLayout";
+
 
 // Page Imports
 import LandingPage from "../pages/LandingPage";
@@ -31,6 +33,7 @@ import {
   GetPostById,
   Home as PostHome,
 } from "../pages/PostPages";
+
 
 // Route Configurations
 const publicRoutes = [
@@ -102,6 +105,7 @@ export const AppRoutes = () => {
         />
       ))}
 
+
       {/* Post Routes */}
       {postRoutes.map(({ path, element }) => (
         <Route
@@ -114,6 +118,7 @@ export const AppRoutes = () => {
           }
         />
       ))}
+
     </Routes>
   );
 }; 

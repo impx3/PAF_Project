@@ -12,16 +12,25 @@ interface Post {
   imageUrl: string;
 }
 
+
 const GetAllPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/posts")
+    const token = localStorage.getItem('token');
+    axios.get("http://localhost:8080/api/posts/user", {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+      
+    )
       .then(response => setPosts(response.data))
       .catch(error => console.error("Error fetching posts:", error));   
   }, []);
+
 
   const handleSaveClick = (post: Post) => {
     setSelectedPost(post);
@@ -105,6 +114,7 @@ const GetAllPosts = () => {
             ))
           )}
         </div>
+
 
         {selectedPost && (
           <LearningPlanSelectionModal
