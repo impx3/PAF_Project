@@ -14,7 +14,28 @@ const EditProfile: React.FC = () => {
     profileImage: currentUser?.profileImage || ''
   });
 
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setUploading(true);
+    try {
+      const res = await api.post('/users/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setForm(prev => ({ ...prev, profileImage: res.data }));
+      toast.success('Image uploaded');
+    } catch (err) {
+      toast.error('Upload failed');
+    }
+    setUploading(false);
+  };
 
   const handleUpdate = async () => {
     try {
@@ -46,13 +67,10 @@ const EditProfile: React.FC = () => {
         onChange={(e) => setForm({ ...form, bio: e.target.value })}
       />
 
-      <label className={styles.label}>Profile Image URL</label>
-      <input
-        type="text"
-        className={styles.input}
-        value={form.profileImage}
-        onChange={(e) => setForm({ ...form, profileImage: e.target.value })}
-      />
+      <label className={styles.label}>Profile Picture</label>
+      <input type="file" accept="image/*" onChange={handleFileUpload} />
+      {uploading && <p>Uploading...</p>}
+      {form.profileImage && <img src={form.profileImage} alt="Preview" width={100} />}
 
       <button onClick={handleUpdate} className={styles.saveBtn}>
         Save Changes
