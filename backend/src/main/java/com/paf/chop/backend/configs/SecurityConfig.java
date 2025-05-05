@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/posts**").authenticated()
                         .requestMatchers("/api/posts/**").authenticated()    
                         .requestMatchers("/images/*").permitAll()
-                        .requestMatchers("/videos*").permitAll()
+                        .requestMatchers("/videos*").permitAll()  //
                         .requestMatchers("/videos/*").permitAll()
                         .requestMatchers("/videos/upload-video").permitAll()
                         .requestMatchers("/videos*").permitAll()
