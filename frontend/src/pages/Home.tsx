@@ -16,10 +16,19 @@ interface Post {
 }
 
 const Home: React.FC = () => {
-  const { currentUser } = useContext(AuthContext);
+  // const { currentUser } = useContext(AuthContext);
   const [followers, setFollowers] = useState<User[]>([]);
   const [following, setFollowing] = useState<User[]>([]);
   const [feedPosts, setFeedPosts] = useState<Post[]>([]);
+
+  const auth = useContext(AuthContext);
+
+  if (!auth) {
+     return <div>Loading...</div>; // or redirect to login, etc.
+  }
+
+  const { currentUser } = auth;
+
 
   useEffect(() => {
     const fetchConnections = async () => {
