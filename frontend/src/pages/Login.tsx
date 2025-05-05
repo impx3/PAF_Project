@@ -17,9 +17,11 @@ const Login: React.FC = () => {
     try {
       const res = await api.post('/auth/login', form);
   
-      if (res.data?.token) {
-        localStorage.setItem('token', res.data.token);
-        if (auth?.setCurrentUser) auth.setCurrentUser(res.data); 
+      const user = res.data?.result;
+  
+      if (user?.token) {
+        localStorage.setItem('token', user.token);
+        if (auth?.setCurrentUser) auth.setCurrentUser(user);
         toast.success('Login successful!');
         navigate('/home');
       } else {
@@ -29,6 +31,7 @@ const Login: React.FC = () => {
       toast.error('Login failed');
     }
   };
+  
   
 
 
