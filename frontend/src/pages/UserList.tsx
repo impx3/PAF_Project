@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../utils/axiosConfig';
 import { AuthContext } from '../context/AuthContext';
 import FollowButton from '../components/FollowButton';
@@ -15,34 +16,25 @@ interface User {
 const UserList = () => {
   const { currentUser } = useContext(AuthContext);
   const [users, setUsers] = useState<User[]>([]);
-  const [followStatus, setFollowStatus] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
     const fetchUsers = async () => {
       const res = await api.get('/users');
-      const otherUsers = res.data.filter((u: User) => u.id !== currentUser.id);
+      const otherUsers = res.data.filter((u: User) => u.id !== currentUser?.id);
       setUsers(otherUsers);
     };
     fetchUsers();
   }, [currentUser]);
-
-  const toggleFollow = async (targetId: number) => {
-    await api.post(`/users/${targetId}/follow`);
-    setFollowStatus((prev) => ({
-      ...prev,
-      [targetId]: !prev[targetId],
-    }));
-  };
 
   return (
     <div className={styles.container}>
       <h2 className={styles.heading}>Discover Other Chef Enthusiasts!</h2>
       {users.map((user) => (
         <div key={user.id} className={styles.card}>
-          <div>
+          <Link to={`/profile/${user.id}`} className={styles.profileLink}>
             <p className={styles.name}>{user.firstName} {user.lastName}</p>
             <p className={styles.username}>@{user.username}</p>
-          </div>
+          </Link>
           <FollowButton targetId={user.id} />
         </div>
       ))}
