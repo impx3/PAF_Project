@@ -1,0 +1,11 @@
+export { default as GetAllPosts } from './GetAllPosts';
+export { default as Create } from './Create';
+export { default as CreateWithMultipleImages } from './CreateWithMultipleImages';
+export { default as Update } from './Update';
+export { default as Delete } from './Delete';
+export { default as VideoUploadForm } from './VideoUploadForm';
+export { default as GetAllPostsForUsers } from './GetAllPostsForUsers';
+export { default as VideoList } from './VideoList';
+export { default as VideoListForUsers } from './VideoListForUsers';
+export { default as GetPostById } from './GetPostById';
+export { default as Home } from './Home'; 
