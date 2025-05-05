@@ -18,9 +18,15 @@ const Update: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
   const [imageurlincase___, setimageurlincase___] = useState<string>("");
-
+  const token = localStorage.getItem('token');
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/posts/${id}`)
+             
+    axios.get(`http://localhost:8080/api/posts/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+      )
       .then(response => {
         setTitle(response.data.title);
         setContent(response.data.content);
@@ -60,8 +66,10 @@ const Update: React.FC = () => {
     formData.append("imageURLinCaseUserDidnotREUPLOAD", imageurlincase___)
 
     try {
+      const token = localStorage.getItem('token');
+
       await axios.put(`http://localhost:8080/api/posts/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data" , 'Authorization': `Bearer ${token}`},
       });
 
       setMessage("Post updated successfully!");
@@ -75,10 +83,11 @@ const Update: React.FC = () => {
   return (
     <div style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
       <h2>Update Post</h2>
+      title is{title}
       {message && <p style={{ color: "green" }}>{message}</p>}
       <form onSubmit={handleSubmit}>
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        <textarea value={content} onChange={(e) => setContent(e.target.value)} required />
+        title<input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        content<textarea value={content} onChange={(e) => setContent(e.target.value)} required />
         <input type="file" accept="image/*" onChange={handleImageChange}  />
         {preview && <img src={preview} alt="Preview" style={{ width: "100px" }} />}
         <button type="submit" >Update</button>

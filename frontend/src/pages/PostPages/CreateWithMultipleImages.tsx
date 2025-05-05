@@ -47,8 +47,11 @@ const CreateWithMultipleImages: React.FC = () => {
     
 
     try {
+        const token = localStorage.getItem('token');
         const response = await axios.post("http://localhost:8080/api/posts/multi", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data",
+                   'Authorization': `Bearer ${token}`
+        },
       });
 
       navigate("/post/posts");

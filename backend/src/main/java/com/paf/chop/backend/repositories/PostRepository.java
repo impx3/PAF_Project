@@ -3,7 +3,6 @@ package com.paf.chop.backend.repositories;
 
 import com.paf.chop.backend.models.*;
 
-import com.paf.chop.backend.models.Post;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -32,9 +32,11 @@ const CreateText: React.FC = () => {
    console.log("formData",formData)
    
    try {
+     const token = localStorage.getItem('token');
      const response = await axios.post("http://localhost:8080/api/posts/text", formData, {
        headers: {
          "Content-Type": "multipart/form-data",
+          'Authorization': `Bearer ${token}`
        },
      });
 

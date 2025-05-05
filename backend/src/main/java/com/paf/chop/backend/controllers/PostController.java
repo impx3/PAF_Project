@@ -52,7 +52,11 @@ public class PostController {
     @PostMapping("/text")
     public ResponseEntity<EntityModel<Post>> createTextPost(
             @RequestParam("title") String title,
-            @RequestParam("content") String content) throws IOException {
+            @RequestParam("content") String content,
+            @AuthenticationPrincipal UserDetails userDetails
+            ) throws IOException {
+
+        User user = userRepository.findByUsername(userDetails.getUsername());
 
         System.out.println(title + "hereyrer");
         System.out.println(content + "hereyrer");
@@ -60,7 +64,7 @@ public class PostController {
         post.setTitle(title);
         post.setContent(content);
         
-
+        post.setUser(user);
 
         System.out.println("----"+title);
         System.out.println("----"+content);
@@ -76,8 +80,8 @@ public class PostController {
         //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).updateTextPost(savedPost.getId(), savedPost.getTitle(), savedPost.getContent())).withRel("put"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+        // resource.add(WebMvcLinkBuilder.linkTo(
+                // WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
         return ResponseEntity
             .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(savedPost.getId()).toUri())
@@ -117,14 +121,14 @@ public class PostController {
         Post savedPost = postService.updatePost(id, post);
 
         EntityModel<Post> resource = EntityModel.of(savedPost);
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).createTextPost(savedPost.getTitle(),savedPost.getContent())).withRel("post"));
+        // resource.add(WebMvcLinkBuilder.linkTo(
+                // WebMvcLinkBuilder.methodOn(PostController.class).createTextPost(savedPost.getTitle(),savedPost.getContent())).withRel("post"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
         // resource.add(WebMvcLinkBuilder.linkTo(
         //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+        // resource.add(WebMvcLinkBuilder.linkTo(
+                // WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
         return ResponseEntity
             .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(savedPost.getId()).toUri())
@@ -175,16 +179,16 @@ public class PostController {
 
         // HATEOAS links
         EntityModel<Post> resource = EntityModel.of(savedPost);
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).updatePost(savedPost.getId(), savedPost.getTitle(),
-                        savedPost.getContent(), image, imageUrl))
-                .withRel("put"));
+        // resource.add(WebMvcLinkBuilder.linkTo(
+        //         WebMvcLinkBuilder.methodOn(PostController.class).updatePost(savedPost.getId(), savedPost.getTitle(),
+        //                 savedPost.getContent(), image, imageUrl))
+        //         .withRel("put"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
         // resource.add(WebMvcLinkBuilder.linkTo(
         //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+        // resource.add(WebMvcLinkBuilder.linkTo(
+                // WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
         return ResponseEntity
             .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(savedPost.getId()).toUri())
@@ -195,7 +199,11 @@ public class PostController {
     public ResponseEntity<Post> createPostWithMultipleImages(
             @RequestParam("title") String title,
             @RequestParam("content") String content,
-            @RequestParam("images") List<MultipartFile> images) throws IOException {
+            @RequestParam("images") List<MultipartFile> images,
+            @AuthenticationPrincipal UserDetails userDetails
+            ) throws IOException {
+
+        User user = userRepository.findByUsername(userDetails.getUsername());
 
         System.out.println(title + "hereyrer");
         System.out.println(content + "hereyrer");
@@ -204,6 +212,7 @@ public class PostController {
         Post post = new Post();
         post.setTitle(title);
         post.setContent(content);
+        post.setUser(user);
         System.out.println("\n\n\n\n\n" + post);
 
         List<String> savedImageFilenames = fileStorageService.saveFiles(images);
@@ -221,7 +230,9 @@ public class PostController {
     public ResponseEntity<Post> updatePost(
             @PathVariable Long id, @RequestParam("title") String title, @RequestParam("content") String content,
             @RequestParam(value = "image", required = false) MultipartFile image,
-            @RequestParam("imageURLinCaseUserDidnotREUPLOAD") String imageurlincase___) throws IOException {
+            @RequestParam("imageURLinCaseUserDidnotREUPLOAD") String imageurlincase___,
+            @AuthenticationPrincipal UserDetails userDetails
+            ) throws IOException {
         System.out.println(imageurlincase___ + " incase thing");
         Pattern pattern = Pattern.compile(".png", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(imageurlincase___);
@@ -232,6 +243,7 @@ public class PostController {
             System.out.println("Match not found");
         }
 
+        User user = userRepository.findByUsername(userDetails.getUsername());
         String imageUrl = image != null ? fileStorageService.storeFile(image) : imageurlincase___;
         System.out.println(imageUrl + "hey");
         Post post = new Post();
@@ -239,6 +251,7 @@ public class PostController {
         post.setTitle(title);
         post.setContent(content);
         post.setImageUrl(imageUrl);
+        post.setUser(user);
 
         // return ResponseEntity.ok(postService.updatePost(id, post));
         
@@ -265,18 +278,19 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Post>> getPostById(@PathVariable Long id) {
-
-        Post savedPost = postService.getPostById(id);
-
+    public ResponseEntity<EntityModel<Post>> getPostById(@PathVariable Long id,
+    @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User user = userRepository.findByUsername(userDetails.getUsername());
+        Post savedPost = postService.getPostByIdUser(id,user);
         // HATEOAS links
         EntityModel<Post> resource = EntityModel.of(savedPost);
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
         // resource.add(WebMvcLinkBuilder.linkTo(
         //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+        // resource.add(WebMvcLinkBuilder.linkTo(
+                // WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
         return ResponseEntity.ok(resource);
     }
