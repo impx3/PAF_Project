@@ -75,7 +75,7 @@ const Home: React.FC = () => {
       </div>
 
       <div className={styles.box}>
-        <h2 className={styles.sectionTitle}>Your followers:</h2>
+        {/* <h2 className={styles.sectionTitle}>Your followers:</h2>
         {followers.length > 0 ? (
           <ul className={styles.userList}>
             {followers.map((u) => (
@@ -84,7 +84,7 @@ const Home: React.FC = () => {
           </ul>
         ) : (
           <p>No followers</p>
-        )}
+        )} */}
       </div>
 
       <div>
