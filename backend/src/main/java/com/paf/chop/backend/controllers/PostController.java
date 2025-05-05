@@ -64,13 +64,14 @@ public class PostController {
 
         Post savedPost = postService.createPost(post);
 
-        // HATEOAS links
         EntityModel<Post> resource = EntityModel.of(savedPost);
 
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).updateTextPost(savedPost.getId(), savedPost.getTitle(), savedPost.getContent())).withRel("put"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
@@ -97,7 +98,7 @@ public class PostController {
         }
 
         @PutMapping("/text")
-        public ResponseEntity<Post> updateTextPost(
+        public ResponseEntity<EntityModel<Post>> updateTextPost(
             @RequestParam("id") Long id,  @RequestParam("title") String title, @RequestParam("content") String content) throws IOException {
            System.out.println("title+++"+title);
     
@@ -108,10 +109,38 @@ public class PostController {
             post.setContent(content);
 
             // return ResponseEntity.ok(postService.updatePost(id, post));
+
+        Post savedPost = postService.updatePost(id, post);
+
+        EntityModel<Post> resource = EntityModel.of(savedPost);
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).createTextPost(savedPost.getTitle(),savedPost.getContent())).withRel("post"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+
+        return ResponseEntity
+            .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(savedPost.getId()).toUri())
+            .body(resource);
+
+
+
+
+
+
+
             
-            return ResponseEntity
-            .created(WebMvcLinkBuilder.linkTo(PostController.class).slash(post.getId()).toUri())
-            .body(postService.updatePost(id, post));
+
+
+
+
+
+
+
+
         }
 
     @PostMapping
