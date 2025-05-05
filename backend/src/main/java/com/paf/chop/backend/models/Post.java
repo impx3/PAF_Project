@@ -22,4 +22,8 @@ public class Post {
 
     @Column(nullable = true, name="imageurl" , length=500)
     private String imageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user; // <-- ADD THIS
 }

@@ -1,7 +1,9 @@
 package com.paf.chop.backend.services;
 
 import com.paf.chop.backend.models.Post;
+import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.PostRepository;
+import com.paf.chop.backend.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,11 +31,17 @@ public class PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
 
+    public List<Post> getAllPostsByUser(User user) {
+        List <Post> posts = postRepository.findByUser(user);
+        return posts;
+    }
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
     }

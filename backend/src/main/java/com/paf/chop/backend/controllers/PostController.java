@@ -7,10 +7,14 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import java.util.stream.Collectors;
 
 import com.paf.chop.backend.models.Post;
+import com.paf.chop.backend.models.User;
+import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.services.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.paf.chop.backend.services.FileStorageService;
@@ -68,8 +72,8 @@ public class PostController {
 
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        // resource.add(WebMvcLinkBuilder.linkTo(
+        //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).updateTextPost(savedPost.getId(), savedPost.getTitle(), savedPost.getContent())).withRel("put"));
         resource.add(WebMvcLinkBuilder.linkTo(
@@ -117,8 +121,8 @@ public class PostController {
                 WebMvcLinkBuilder.methodOn(PostController.class).createTextPost(savedPost.getTitle(),savedPost.getContent())).withRel("post"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        // resource.add(WebMvcLinkBuilder.linkTo(
+        //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
@@ -142,23 +146,29 @@ public class PostController {
 
 
         }
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping
     public ResponseEntity<EntityModel<Post>> createPost(
             @RequestParam("title") String title,
             @RequestParam("content") String content,
-            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal UserDetails userDetails
+            ) throws IOException {
 
         System.out.println(title + "hereyrer");
         System.out.println(content + "hereyrer");
         System.out.println(image + "hereyrer");
 
+        User user = userRepository.findByUsername(userDetails.getUsername());
         String imageUrl = image != null ? fileStorageService.storeFile(image) : null;
 
         Post post = new Post();
         post.setTitle(title);
         post.setContent(content);
         post.setImageUrl(imageUrl);
+        post.setUser(user);
         System.out.println("\n\n\n\n\n" + post);
 
         Post savedPost = postService.createPost(post);
@@ -171,8 +181,8 @@ public class PostController {
                 .withRel("put"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        // resource.add(WebMvcLinkBuilder.linkTo(
+        //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
@@ -248,6 +258,12 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPosts());
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<Post>> getAllPostsByUser(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername());
+        List<Post> posts = postService.getAllPostsByUser(user);
+        return ResponseEntity.ok(posts);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Post>> getPostById(@PathVariable Long id) {
 
@@ -257,8 +273,8 @@ public class PostController {
         EntityModel<Post> resource = EntityModel.of(savedPost);
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
-        resource.add(WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        // resource.add(WebMvcLinkBuilder.linkTo(
+        //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 

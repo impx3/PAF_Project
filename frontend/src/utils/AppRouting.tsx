@@ -15,6 +15,7 @@ import VideoListForUsers from "@/pages/PostPages/VideoListForUsers";
 import GetPostById from "@/pages/PostPages/GetPostById";
 import CreateText from "@/pages/PostPages/CreateText";
 import Login from "@/pages/PostPages/Login";
+import Logout from "@/pages/PostPages/Logout";
 
 export const AppRouting = () => {
   return (
@@ -49,6 +50,7 @@ const AppRoutes = () => {
       <Route path="/post/:id" element={<GetPostById />} />
 
       <Route path={"/post/login"} element={<Login />} />
+      <Route path={"/post/logout"} element={<Logout />} />
 
     </Routes>
   );

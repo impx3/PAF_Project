@@ -20,7 +20,7 @@ const GetAllPosts = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    axios.get("http://localhost:8080/api/posts", {
+    axios.get("http://localhost:8080/api/posts/user", {
       headers: {
         'Authorization': `Bearer ${token}`
       }
