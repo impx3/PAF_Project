@@ -11,7 +11,6 @@ interface Post {
   imageUrl: string;
 }
 
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImlkIjoxLCJlbWFpbCI6ImVtYWlsMDkwM0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJpYXQiOjE3NDYzMzcwODQsImV4cCI6MTc0NjM0MDY4NH0.fYqXLdxYzTrMMuFAAylUBym_p-NwVxWGJknxtap8uH4'
 
 const GetAllPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -20,6 +19,7 @@ const GetAllPosts = () => {
 
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     axios.get("http://localhost:8080/api/posts", {
       headers: {
         'Authorization': `Bearer ${token}`
