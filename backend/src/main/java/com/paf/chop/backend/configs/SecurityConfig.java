@@ -1,5 +1,7 @@
 package com.paf.chop.backend.configs;
 
+import org.springframework.security.config.Customizer;
+
 import com.paf.chop.backend.services.MyUserDetailsService;
 import com.paf.chop.backend.utils.JWTFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +32,17 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+		        .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
 
-			    .requestMatchers("/api/auth/register").permitAll()
-			    .requestMatchers("/api/auth/login").permitAll()
-
+			            .requestMatchers("/api/auth/**").permitAll()
+				        .requestMatchers("/api/auth/register").permitAll()
+			            .requestMatchers("/api/auth/login").permitAll()
+			            .requestMatchers("/uploads/**").permitAll()
+			            .requestMatchers("/api/users/**").permitAll()
+					.requestMatchers("/api/users*").permitAll()
+				        .requestMatchers("/api/users/me").authenticated()
+        		        .requestMatchers("/api/users/upload").authenticated() 
                         .requestMatchers("/api/auth/*").permitAll()
                         .requestMatchers("/api/posts*").permitAll()
                         .requestMatchers("/api/posts/*").permitAll()
@@ -43,8 +51,6 @@ public class SecurityConfig {
                         .requestMatchers("/videos/*").permitAll()
                         .requestMatchers("/videos/upload-video").permitAll()
                         .requestMatchers("/videos*").permitAll()
-
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/comments/**").authenticated()
 
 
