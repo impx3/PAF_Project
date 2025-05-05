@@ -30,14 +30,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const fetchCurrentUser = async () => {
-    try {
-      const res = await api.get('/users/me');
+  try {
+    const res = await api.get('/users/me');
+    if (res.data?.result) {
       setCurrentUser(res.data.result);
-    } catch (err) {
-      localStorage.removeItem('token');
-      setCurrentUser(null);
+    } else {
+      throw new Error('Invalid response: missing result');
     }
-  };
+  } catch (err) {
+    console.error('Auth fetch error:', err);
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+  }
+};
 
   useEffect(() => {
     const token = localStorage.getItem('token');

@@ -1,5 +1,7 @@
 package com.paf.chop.backend.configs;
 
+import org.springframework.security.config.Customizer;
+
 import com.paf.chop.backend.services.MyUserDetailsService;
 import com.paf.chop.backend.utils.FirebaseTokenFilter;
 import com.paf.chop.backend.utils.JWTFilter;
@@ -44,13 +46,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
-
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 // Auth endpoints
                 .requestMatchers("/api/auth/**").permitAll()
+				        .requestMatchers("/api/auth/register").permitAll()
+			          .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/*").permitAll()
+                 
+                 // User endpoints                  
+                .requestMatchers("/uploads/**").permitAll()
+				        .requestMatchers("/api/users/**").authenticated()                      
+                .requestMatchers("/api/users/me").authenticated()
+        		    .requestMatchers("/api/users/upload").authenticated() 
 
                 // Posts endpoints
                 .requestMatchers("/api/posts/**").permitAll()
@@ -68,6 +77,7 @@ public class SecurityConfig {
 
                 // Comments endpoints
                 .requestMatchers("/api/comments/**").authenticated()
+
 
                 // WebSocket/SockJS endpoints
                 .requestMatchers("/ws/**").permitAll()

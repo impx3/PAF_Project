@@ -1,5 +1,6 @@
 package com.paf.chop.backend.controllers;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
@@ -7,12 +8,18 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.multipart.MultipartFile;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.services.UserService;
+import java.io.File;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,12 +27,12 @@ public class UserController {
 
     private final UserService userService;
     private final UserRepository userRepository;
-
-    @Autowired
+  
     public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
     }
+
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {
@@ -48,14 +55,26 @@ public class UserController {
         dto.setUserRole(user.getUserRole().name());
         dto.setToken(null); // Don't expose token
 
+	dto.setFollowerCount(user.getFollowers().size());
+	dto.setFollowingCount(user.getFollowing().size());
+
+
+	// HATEOAS links
+        dto.add(linkTo(methodOn(UserController.class).getCurrentUser(authentication)).withSelfRel());
+        dto.add(linkTo(methodOn(UserController.class).getFollowers(user.getId())).withRel("followers"));
+        dto.add(linkTo(methodOn(UserController.class).getFollowing(user.getId())).withRel("following"));
+        dto.add(linkTo(methodOn(UserController.class).updateProfile(null, authentication)).withRel("update-profile"));
+        dto.add(linkTo(methodOn(UserController.class).deleteCurrentUser(authentication)).withRel("delete-account"));
+
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = userService.getUser(id);
-        return (user != null) ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        return (user != null) ? ResponseEntity.ok(user) : 	ResponseEntity.notFound().build();
     }
+
 
     @GetMapping("/{id}/followers")
     public Set<User> getFollowers(@PathVariable Long id) {
@@ -65,6 +84,28 @@ public class UserController {
     @GetMapping("/{id}/following")
     public Set<User> getFollowing(@PathVariable Long id) {
         return userService.getFollowing(id);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("No file uploaded");
+        }
+
+        try {
+            String uploadDir = "uploads/profilePictures/";
+            File directory = new File(uploadDir);
+            if (!directory.exists()) directory.mkdirs();
+
+            String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            String filepath = uploadDir + filename;
+
+            file.transferTo(new File(filepath));
+
+            return ResponseEntity.ok("/" + filepath.replace("\\", "/"));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("File upload failed");
+        }
     }
 
     @PostMapping("/{targetId}/follow")

@@ -8,6 +8,7 @@ import { AppRoutes } from './utils/AppRouting';
 const App = () => {
   return (
     <AuthProvider>
+      <ToastContainer />
       <BrowserRouter>
         <AppRoutes />
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar newestOnTop />
@@ -15,5 +16,6 @@ const App = () => {
     </AuthProvider>
   );
 };
+
 
 export default App;

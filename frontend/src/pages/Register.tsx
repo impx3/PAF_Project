@@ -61,11 +61,11 @@ const Register = () => {
       // if (res.data.success) {
       //  localStorage.setItem('token', res.data.result.token);
 
-      if (res.data?.token) {
-          localStorage.setItem('token', res.data.token);
-            toast.success('Registration successful!');
-            navigate('/login');
-          } else {
+        if (res.data?.result?.token) {
+          localStorage.setItem('token', res.data.result.token);
+          toast.success('Registration successful!');
+          navigate('/login'); 
+        } else {
             toast.error(res.data.message || 'Registration failed!');
           }
         } catch (err) {

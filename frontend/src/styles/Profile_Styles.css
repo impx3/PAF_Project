@@ -16,7 +16,7 @@
   @apply text-2xl font-semibold mb-4 text-gray-800;
 }
 
-/* src/styles/LandingPage.css */
+/*LandingPage */
 
 .landing-page {
   display: flex;
@@ -27,7 +27,7 @@
   text-align: center;
 }
 
-/* src/styles/Register.css */
+/* Register */
 
 .register-form {
   max-width: 500px;
@@ -38,7 +38,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* src/styles/Login.css */
+/* Login */
 
 .login-form {
   max-width: 400px;
@@ -49,7 +49,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* src/styles/Home.css */
+/* Home*/
 
 .home-page {
   padding: 20px;
@@ -61,7 +61,7 @@
   gap: 20px;
 }
 
-/* src/styles/Sidebar.css */
+/* Sidebar*/
 
 .sidebar {
   height: 100%;
@@ -72,7 +72,7 @@
   border-right: 1px solid #e5e7eb;
 }
 
-/* src/styles/LeftPanel.css */
+/*LeftPanel */
 
 .left-panel {
   background-color: #f9fafb;
@@ -82,7 +82,7 @@
   border-right: 1px solid #e5e7eb;
 }
 
-/* src/styles/MainLayout.css */
+/* MainLayout */
 
 .main-layout {
   display: flex;
@@ -90,7 +90,7 @@
   background-color: #f3f4f6;
 }
 
-/* src/styles/Profile.css */
+/* Profile */
 
 .profile-page {
   padding: 30px;
@@ -103,7 +103,7 @@
   margin-bottom: 15px;
 }
 
-/* src/styles/UserList.css */
+/* UserList */
 
 .user-list {
   padding: 30px;
@@ -116,7 +116,7 @@
   border-radius: 8px;
 }
 
-/* src/styles/EditProfile.css */
+/* EditProfile */
 
 .edit-profile {
   padding: 20px;
@@ -131,7 +131,7 @@
   margin-top: 10px;
 }
 
-/* src/styles/Followers.css */
+/* Followers */
 
 .followers-page {
   display: flex;
@@ -150,7 +150,7 @@
   cursor: pointer;
 }
 
-/* src/styles/FollowButton.css */
+/* FollowButton */
 
 .follow-btn {
   padding: 6px 14px;
@@ -169,7 +169,7 @@
   color: #92400e;
 }
 
-/* src/styles/DeleteAccount.css */
+/*DeleteAccount */
 
 .delete-account {
   padding: 40px;
@@ -183,7 +183,7 @@
   border-radius: 8px;
 }
 
-/* src/styles/ChatPopup.css */
+/*ChatPopup*/
 
 .chat-popup {
   position: fixed;
@@ -215,3 +215,4 @@
   border-top: 1px solid #e5e7eb;
   padding: 5px;
 }
+
