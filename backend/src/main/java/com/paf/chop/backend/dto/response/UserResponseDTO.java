@@ -1,10 +1,10 @@
 package com.paf.chop.backend.dto.response;
 
-
+import org.springframework.hateoas.RepresentationModel;
 import lombok.Data;
 
 @Data
-public class UserResponseDTO {
+public class UserResponseDTO extends RepresentationModel<UserResponseDTO> {
 
     private Long id;
     private String username;
@@ -19,5 +19,9 @@ public class UserResponseDTO {
     private String bio;
     private String userRole;
     private String token;
+
+    private Integer followerCount;
+    private Integer followingCount;
+
 
 }
