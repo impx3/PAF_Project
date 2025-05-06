@@ -29,6 +29,11 @@ const navMain = [
     url: "/explore",
     icon: UsersRound,
   },
+  {
+    title: "Chat",
+    url: "/chat",
+    icon: UsersRound,
+  },
 ];
 
 export function NavMain() {

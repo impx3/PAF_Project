@@ -11,6 +11,7 @@ import { HomePage } from "@/pages/HomePage.tsx";
 import { Profile } from "@/pages/Profile.tsx";
 import Login from "@/pages/Login.tsx";
 import Register from "@/pages/Register.tsx";
+import { TestProfile } from "@/pages/TestProfile.tsx";
 
 export function AppRouting() {
   return (
@@ -35,6 +36,7 @@ export function AppRouting() {
             <Route path="edit-profile" element={<EditProfile />} />
             <Route path="followers" element={<Followers />} />
             <Route path="delete-account" element={<DeleteAccount />} />
+            <Route path="chat" element={<TestProfile />} />
 
             {/* catch-all for “/anything-else” inside dashboard */}
             <Route path="*" element={<h1>Page not found</h1>} />
