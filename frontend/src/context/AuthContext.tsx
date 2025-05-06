@@ -13,6 +13,9 @@ export interface Following {
 }
 
 export interface User {
+  followers: ReactNode;
+  totalPosts: ReactNode;
+  bio: string;
   id: number;
   firstName: string;
   lastName: string;

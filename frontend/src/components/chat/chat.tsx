@@ -1,15 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth, User } from "@/context/AuthContext.tsx";
+import { useAuth } from "@/context/AuthContext.tsx";
 import { ChatResponse, getPreviousMessages } from "@/service/chat.service.ts";
 import { ChatFooter } from "@/components/chat/chat-footer.tsx";
 import { X, Minus, MessageSquare } from "lucide-react";
+import { PublicUser } from "@/pages/UserList.tsx";
 
 type ChatDialogProps = {
   isOpen: boolean;
   onClose: () => void;
-  recipient: User;
+  recipient: PublicUser;
 };
 
 export const ChatDialog = ({ isOpen, onClose, recipient }: ChatDialogProps) => {
@@ -22,12 +23,12 @@ export const ChatDialog = ({ isOpen, onClose, recipient }: ChatDialogProps) => {
     const loadMessages = async () => {
       const history = await getPreviousMessages(
         currentUser?.id as number,
-        recipient.id,
+        recipient?.id,
       );
       setMessages(history);
     };
     if (isOpen) loadMessages();
-  }, [recipient.id, currentUser?.id, isOpen]);
+  }, [recipient?.id, currentUser?.id, isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -47,11 +48,13 @@ export const ChatDialog = ({ isOpen, onClose, recipient }: ChatDialogProps) => {
           <div className="flex justify-between items-center p-4 border-b">
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={recipient.profileImage} />
-                <AvatarFallback>{recipient.firstName[0]}</AvatarFallback>
+                <AvatarImage src={recipient?.profileImage} />
+                <AvatarFallback>{recipient?.firstName[0]}</AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold text-sm">{recipient.firstName}</h2>
+                <h2 className="font-semibold text-sm">
+                  {recipient?.firstName}
+                </h2>
                 <p className="text-xs text-gray-500">Online</p>
               </div>
             </div>
@@ -115,7 +118,7 @@ export const ChatDialog = ({ isOpen, onClose, recipient }: ChatDialogProps) => {
                   ...prev,
                   {
                     id: Date.now(),
-                    senderName: recipient.firstName,
+                    senderName: recipient?.firstName,
                     recipientName: currentUser?.firstName || "",
                     content,
                     timestamp: new Date().toISOString(),
@@ -131,7 +134,7 @@ export const ChatDialog = ({ isOpen, onClose, recipient }: ChatDialogProps) => {
                   {
                     id: Date.now(),
                     senderName: currentUser?.firstName || "",
-                    recipientName: recipient.firstName,
+                    recipientName: recipient?.firstName,
                     content,
                     timestamp: new Date().toISOString(),
                     seen: false,

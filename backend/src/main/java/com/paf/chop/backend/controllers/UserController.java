@@ -2,9 +2,12 @@ package com.paf.chop.backend.controllers;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.paf.chop.backend.dto.response.user.PublicUserResponseDTO;
+import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +32,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserRepository userRepository;
-  
+
     public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
@@ -57,11 +60,11 @@ public class UserController {
         dto.setUserRole(user.getUserRole().name());
         dto.setToken(null); // Don't expose token
 
-	dto.setFollowerCount(user.getFollowers().size());
-	dto.setFollowingCount(user.getFollowing().size());
+        dto.setFollowerCount(user.getFollowers().size());
+        dto.setFollowingCount(user.getFollowing().size());
 
 
-	// HATEOAS links
+        // HATEOAS links
         dto.add(linkTo(methodOn(UserController.class).getCurrentUser(authentication)).withSelfRel());
         dto.add(linkTo(methodOn(UserController.class).getFollowers(user.getId())).withRel("followers"));
         dto.add(linkTo(methodOn(UserController.class).getFollowing(user.getId())).withRel("following"));
@@ -74,12 +77,12 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = userService.getUser(id);
-        return (user != null) ? ResponseEntity.ok(user) : 	ResponseEntity.notFound().build();
+        return (user != null) ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{id}/followers")
     public Set<User> getFollowers(@PathVariable Long id) {
-        log.info( "Get Followers for user with ID: {}", id);
+        log.info("Get Followers for user with ID: {}", id);
         return userService.getFollowers(id);
     }
 
@@ -142,4 +145,16 @@ public class UserController {
         }
         return ResponseEntity.status(404).body("User not found");
     }
+
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<PublicUserResponseDTO>>> getAllUsers() {
+        ApiResponse<List<PublicUserResponseDTO>> response = userService.getAllUsers();
+        if (response.isSuccess()) {
+           return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
 }

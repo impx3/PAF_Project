@@ -10,16 +10,6 @@ import {
 
 const navMain = [
   {
-    title: "Posts",
-    url: "/posts",
-    icon: House,
-  },
-  {
-    title: "Create Post",
-    url: "/post/createpostselect",
-    icon: House,
-  },
-  {
     title: "Post Feed",
     url: "/post/feed",
     icon: House,
@@ -45,15 +35,11 @@ const navMain = [
     icon: Bot,
   },
   {
-    title: "User List",
+    title: "Explore Users",
     url: "/explore",
     icon: UsersRound,
   },
-  {
-    title: "Chat",
-    url: "/chat",
-    icon: UsersRound,
-  },
+
   {
     title: "Learning Plans",
     url: "/learning-plans",
