@@ -16,7 +16,15 @@ import PublicLearningPlans from "@/pages/PublicLearningPlans.tsx";
 import PublicLearningPlanResources from "@/pages/PublicLearningPlanResources.tsx";
 import LearningPlansDashboard from "@/pages/LearningPlansDashboard.tsx";
 import LearningPlanResources from "@/pages/LearningPlanResources.tsx";
-import {CreateWithMultipleImages, GetAllPosts} from "@/pages/PostPages";
+import {
+  CreateWithMultipleImages,
+  GetAllPosts,
+  GetAllPostsForUsers,
+  GetPostById,
+  VideoList,
+  VideoListForUsers,
+  VideoUploadForm,
+} from "@/pages/PostPages";
 
 export function AppRouting() {
   return (
@@ -26,8 +34,14 @@ export function AppRouting() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-          <Route path={"/learningplans/public"} element={<PublicLearningPlans />}/>
-          <Route path={"/learningplans/public/:planId"} element={<PublicLearningPlanResources/>}/>
+        <Route
+          path={"/learningplans/public"}
+          element={<PublicLearningPlans />}
+        />
+        <Route
+          path={"/learningplans/public/:planId"}
+          element={<PublicLearningPlanResources />}
+        />
 
         {/* everything inside here requires auth */}
         <Route element={<PrivateRoute />}>
@@ -44,19 +58,28 @@ export function AppRouting() {
             <Route path="followers" element={<Followers />} />
             <Route path="delete-account" element={<DeleteAccount />} />
             <Route path="chat" element={<TestProfile />} />
-            <Route path={"learning-plans"} element={<LearningPlansDashboard/>}/>
-              <Route path={"learning-plans/:planId/resources"} element={<LearningPlanResources/>}/>
-              <Route path={"post/posts"} element={<GetAllPosts/>}/>
-              <Route path={"post/createpostselect"} element={<PostHome/>}/>
-              <Route path={"post/create"} element={<CreatePost/>}/>
-              <Route path={"post/CreateWithMultipleImages"} element={<CreateWithMultipleImages/>}/>
-              <Route path={"post/update/:id"} element={<UpdatePost/>}/>
-              <Route path={"post/delete/:id"} element={<DeletePost/>}/>
-              <Route path={"post/createvid"} element={<VideoUploadForm/>}/>
-              <Route path={"post/feed"} element={<GetAllPostsForUsers/>}/>
-              <Route path={"post/videos"} element={<VideoList/>}/>
-              <Route path={"post/feedvideo"} element={<VideoListForUsers/>}/>
-              <Route path={"post/:id"} element={<GetPostById/>}/>
+            <Route
+              path={"learning-plans"}
+              element={<LearningPlansDashboard />}
+            />
+            <Route
+              path={"learning-plans/:planId/resources"}
+              element={<LearningPlanResources />}
+            />
+            <Route path={"post/posts"} element={<GetAllPosts />} />
+            {/* <Route path={"post/createpostselect"} element={<PostHome/>}/>
+              <Route path={"post/create"} element={<CreatePost/>}/>*/}
+            <Route
+              path={"post/CreateWithMultipleImages"}
+              element={<CreateWithMultipleImages />}
+            />
+            {/* <Route path={"post/update/:id"} element={<UpdatePost/>}/>
+              <Route path={"post/delete/:id"} element={<DeletePost/>}/>*/}
+            <Route path={"post/createvid"} element={<VideoUploadForm />} />
+            <Route path={"post/feed"} element={<GetAllPostsForUsers />} />
+            <Route path={"post/videos"} element={<VideoList />} />
+            <Route path={"post/feedvideo"} element={<VideoListForUsers />} />
+            <Route path={"post/:id"} element={<GetPostById />} />
             {/* catch-all for “/anything-else” inside dashboard */}
             <Route path="*" element={<h1>Page not found</h1>} />
           </Route>
