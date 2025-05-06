@@ -33,7 +33,9 @@ import {
   GetPostById,
   Home as PostHome,
 } from "../pages/PostPages";
-
+import CreateText from "@/pages/PostPages/CreateText";
+ import {Login as PostLogin} from "@/pages/PostPages/Login";
+ import {Logout as PostLogout} from "@/pages/PostPages/Logout";
 
 // Route Configurations
 const publicRoutes = [
@@ -82,6 +84,10 @@ const postRoutes = [
   { path: "/post/videos", element: <VideoList /> },
   { path: "/post/feedvideo", element: <VideoListForUsers /> },
   { path: "/post/:id", element: <GetPostById /> },
+
+  { path: "/post/text", element:<CreateText />},
+  { path: "/post/login", element: <PostLogin /> },
+  { path: "/post/logout", element: <PostLogout /> },
 ];
 
 export const AppRoutes = () => {

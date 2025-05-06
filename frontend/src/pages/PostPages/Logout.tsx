@@ -2,7 +2,7 @@ import { FormEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const Logout: React.FC = () => {
+export const Logout: React.FC = () => {
  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

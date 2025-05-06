@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 
-const CreateText: React.FC = () => {
+export const CreateText: React.FC = () => {
  // State for title, content, and image
  const [title, setTitle] = useState<string>("");
  const [content, setContent] = useState<string>("");
