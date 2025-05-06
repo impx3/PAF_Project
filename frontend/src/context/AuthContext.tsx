@@ -70,6 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
+      setLoading(true);
       fetchCurrentUser().then();
     } else {
       setLoading(false); // Even if no token, we are done loading
@@ -82,7 +83,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (currentUser) {
       saveUserToLocalStorage(currentUser);
     } else {
-      localStorage.removeItem("currentUser");
+      if (localStorage.getItem("token")) {
+        loadUserFromLocalStorage();
+      }
     }
   }, [currentUser]);
 

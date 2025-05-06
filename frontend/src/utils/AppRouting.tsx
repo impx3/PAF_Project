@@ -49,9 +49,9 @@ export function AppRouting() {
           <Route path="/" element={<DashboardPage />}>
             {/* redirect “/” → “/home” */}
             <Route index element={<Navigate to="home" replace />} />
-
             {/* your nested pages */}
             <Route path="home" element={<HomePage />} />
+            <Route path="profile/" element={<Profile />} />
             <Route path="profile/:id" element={<Profile />} />
             <Route path="explore" element={<UserList />} />
             <Route path="edit-profile" element={<EditProfile />} />
@@ -66,9 +66,9 @@ export function AppRouting() {
               path={"learning-plans/:planId/resources"}
               element={<LearningPlanResources />}
             />
-            <Route path={"post/posts"} element={<GetAllPosts />} />
-            {/* <Route path={"post/createpostselect"} element={<PostHome/>}/>
-              <Route path={"post/create"} element={<CreatePost/>}/>*/}
+            <Route path={"posts"} element={<GetAllPosts />} />
+            {/* <Route path={"post/createpostselect"} element={<PostHome/>}/> */}
+            {/*    <Route path={"post/create"} element={<CreatePost/>}/>*/}{" "}
             <Route
               path={"post/CreateWithMultipleImages"}
               element={<CreateWithMultipleImages />}

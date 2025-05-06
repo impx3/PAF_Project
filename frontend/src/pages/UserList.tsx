@@ -1,10 +1,10 @@
-import { useEffect, useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../utils/axiosConfig';
-import { AuthContext } from '../context/AuthContext';
-import FollowButton from '../components/FollowButton';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import api from "../utils/axiosConfig";
+import { useAuth } from "../context/AuthContext";
+import FollowButton from "../components/FollowButton";
 
-import styles from '../styles/UserList.module.css';
+import styles from "../styles/UserList.module.css";
 
 interface User {
   id: number;
@@ -14,16 +14,16 @@ interface User {
 }
 
 const UserList = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await api.get('/users');
+      const res = await api.get("/users");
       const otherUsers = res.data.filter((u: User) => u.id !== currentUser?.id);
       setUsers(otherUsers);
     };
-    fetchUsers();
+    fetchUsers().then();
   }, [currentUser]);
 
   return (
@@ -32,7 +32,9 @@ const UserList = () => {
       {users.map((user) => (
         <div key={user.id} className={styles.card}>
           <Link to={`/profile/${user.id}`} className={styles.profileLink}>
-            <p className={styles.name}>{user.firstName} {user.lastName}</p>
+            <p className={styles.name}>
+              {user.firstName} {user.lastName}
+            </p>
             <p className={styles.username}>@{user.username}</p>
           </Link>
           <FollowButton targetId={user.id} />

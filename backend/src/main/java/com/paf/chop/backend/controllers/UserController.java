@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.io.File;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -75,9 +77,9 @@ public class UserController {
         return (user != null) ? ResponseEntity.ok(user) : 	ResponseEntity.notFound().build();
     }
 
-
     @GetMapping("/{id}/followers")
     public Set<User> getFollowers(@PathVariable Long id) {
+        log.info( "Get Followers for user with ID: {}", id);
         return userService.getFollowers(id);
     }
 

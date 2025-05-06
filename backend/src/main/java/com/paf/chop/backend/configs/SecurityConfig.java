@@ -53,14 +53,14 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/videos/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                 /*       .requestMatchers("/api/users/**").authenticated()*/
+                        .requestMatchers("/api/users/**").authenticated()
                         .requestMatchers("/videos/upload-video").permitAll()
 
 
 
 
                         // Comments endpoints
-                    /*    .requestMatchers("/api/comments/**").authenticated()*/
+                        .requestMatchers("/api/comments/**").authenticated()
 
                         // WebSocket/SockJS endpoints
                         .requestMatchers("/ws/**").permitAll()
@@ -68,13 +68,13 @@ public class SecurityConfig implements WebMvcConfigurer {
                         // Learning plan endpoints
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/public").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/search").permitAll()
-                      /*  .requestMatchers(HttpMethod.POST, "/api/learning-plans").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/learning-plans").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/learning-plans/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()*/
-   /*                     .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()*/
+                        .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()
 
-//                        .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
-  //                      .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
 
                         // Any other request requires authentication
                         .anyRequest().authenticated()
