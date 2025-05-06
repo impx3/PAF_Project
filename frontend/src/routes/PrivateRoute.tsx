@@ -1,14 +1,16 @@
-import React, { useContext, ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-interface PrivateRouteProps {
-  children: ReactNode;
-}
+const PrivateRoute: React.FC = () => {
+  const { currentUser, loading } = useAuth();
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { currentUser } = useContext(AuthContext);
-  return currentUser ? children : <Navigate to="/login" />;
+  // if logged in, render the child routes via <Outlet/>
+  // otherwise redirect to /login
+
+  if (loading) return <div>Loading...</div>; // Show loading state while checking auth
+
+  return currentUser ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

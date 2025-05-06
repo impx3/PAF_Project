@@ -1,8 +1,5 @@
 package com.paf.chop.backend.configs;
 
-import org.springframework.security.config.Customizer;
-
-import com.paf.chop.backend.services.MyUserDetailsService;
 import com.paf.chop.backend.utils.FirebaseTokenFilter;
 import com.paf.chop.backend.utils.JWTFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,88 +16,70 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.security.config.Customizer.withDefaults;
-
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
 import java.util.List;
-
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
+
+    private final JWTFilter jwtRequestFilter;
+    private final FirebaseTokenFilter firebaseTokenFilter;
 
     @Autowired
-    private MyUserDetailsService userDetailsService;
-
-    @Autowired
-    private JWTFilter jwtRequestFilter;
-
-    @Autowired
-    private FirebaseTokenFilter firebaseTokenFilter;
+    public SecurityConfig(JWTFilter jwtRequestFilter, FirebaseTokenFilter firebaseTokenFilter) {
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.firebaseTokenFilter = firebaseTokenFilter;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                // Auth endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-				        .requestMatchers("/api/auth/register").permitAll()
-			          .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/auth/*").permitAll()
-                 
-                 // User endpoints                  
-                .requestMatchers("/uploads/**").permitAll()
-				        .requestMatchers("/api/users/**").authenticated()                      
-                .requestMatchers("/api/users/me").authenticated()
-        		    .requestMatchers("/api/users/upload").authenticated() 
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        // Auth endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                // Posts endpoints
-                .requestMatchers("/api/posts/**").permitAll()
-                .requestMatchers("/api/posts**").authenticated()
-                .requestMatchers("/api/posts/**").authenticated()  
-                // Media endpoints
-                .requestMatchers("/images/**").permitAll()
-                .requestMatchers("/videos/**").permitAll()
-                                   
-                .requestMatchers("/images/*").permitAll()
-                .requestMatchers("/videos*").permitAll()  //
-                .requestMatchers("/videos/*").permitAll()
-                .requestMatchers("/videos/upload-video").permitAll()
-                .requestMatchers("/videos*").permitAll()                                   
+                        // Posts endpoints
+                        .requestMatchers("/api/posts/**").permitAll()
 
-                // Comments endpoints
-                .requestMatchers("/api/comments/**").authenticated()
+                        // Media endpoints
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/videos/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                 /*       .requestMatchers("/api/users/**").authenticated()*/
+                        .requestMatchers("/videos/upload-video").permitAll()
 
 
-                // WebSocket/SockJS endpoints
-                .requestMatchers("/ws/**").permitAll()
 
-                // Learning Plan endpoints (public)
-                .requestMatchers(HttpMethod.GET, "/api/learning-plans/public").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/learning-plans/search").permitAll()
 
-                // Learning Plan endpoints (authenticated)
-                .requestMatchers(HttpMethod.POST, "/api/learning-plans").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/api/learning-plans/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
+                        // Comments endpoints
+                    /*    .requestMatchers("/api/comments/**").authenticated()*/
 
-                // Default: all other endpoints require authentication
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+                        // WebSocket/SockJS endpoints
+                        .requestMatchers("/ws/**").permitAll()
 
+                        // Learning plan endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/public").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/learning-plans/search").permitAll()
+                      /*  .requestMatchers(HttpMethod.POST, "/api/learning-plans").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/learning-plans/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()*/
+   /*                     .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()*/
+
+//                        .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
+  //                      .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
+
+                        // Any other request requires authentication
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class);
@@ -109,25 +88,25 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); // Replace with specific origins in production
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 }

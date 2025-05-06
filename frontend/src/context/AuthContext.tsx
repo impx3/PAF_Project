@@ -1,7 +1,18 @@
-import React, { createContext, useEffect, useState, ReactNode } from 'react';
-import api from '../utils/axiosConfig';
+import React, {
+  createContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useContext,
+} from "react";
+import api from "../utils/axiosConfig";
 
-interface User {
+export interface Following {
+  id: number;
+  username: string;
+}
+
+export interface User {
   id: number;
   firstName: string;
   lastName: string;
@@ -10,6 +21,8 @@ interface User {
   profileImage: string;
   isVerified: boolean;
   coins: number;
+  following: Following[];
+
   // Add other user fields
 }
 
@@ -18,9 +31,12 @@ interface AuthContextType {
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   fetchCurrentUser: () => Promise<void>;
   logout: () => void;
+  loading: boolean;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -28,37 +44,67 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchCurrentUser = async () => {
-  try {
-    const res = await api.get('/users/me');
-    if (res.data?.result) {
+    try {
+      const res = await api.get("/users/me");
       setCurrentUser(res.data.result);
-    } else {
-      throw new Error('Invalid response: missing result');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Auth fetch error:', err);
-    localStorage.removeItem('token');
-    setCurrentUser(null);
-  }
-};
+  };
+
+  //method to save the user to local storage
+  const saveUserToLocalStorage = (user: User) => {
+    localStorage.setItem("currentUser", JSON.stringify(user));
+  };
+
+  const loadUserFromLocalStorage = () => {
+    const user = localStorage.getItem("currentUser");
+    if (user) {
+      setCurrentUser(JSON.parse(user));
+    }
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
-      fetchCurrentUser();
+      fetchCurrentUser().then();
+    } else {
+      setLoading(false); // Even if no token, we are done loading
     }
+
+    loadUserFromLocalStorage();
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      saveUserToLocalStorage(currentUser);
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+  }, [currentUser]);
+
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setCurrentUser(null);
+    localStorage.removeItem("currentUser");
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, setCurrentUser, fetchCurrentUser, logout }}>
+    <AuthContext.Provider
+      value={{ currentUser, setCurrentUser, fetchCurrentUser, logout, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };

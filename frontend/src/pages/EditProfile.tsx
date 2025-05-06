@@ -1,17 +1,17 @@
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import api from '../utils/axiosConfig';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/axiosConfig";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-import styles from '../styles/EditProfile.module.css';
+import styles from "../styles/EditProfile.module.css";
 
 const EditProfile: React.FC = () => {
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const { currentUser } = useAuth();
   const [form, setForm] = useState({
-    username: currentUser?.username || '',
-    bio: currentUser?.bio || '',
-    profileImage: currentUser?.profileImage || ''
+    username: currentUser?.username || "",
+    bio: currentUser?.bio || "",
+    profileImage: currentUser?.profileImage || "",
   });
 
   const [uploading, setUploading] = useState(false);
@@ -39,12 +39,12 @@ const EditProfile: React.FC = () => {
 
   const handleUpdate = async () => {
     try {
-      await api.put('/users/me', form);
-      toast.success('Profile updated successfully');
+      await api.put("/users/me", form);
+      toast.success("Profile updated successfully");
       setCurrentUser({ ...currentUser, ...form });
-      navigate(`/profile/${currentUser.id}`);
+      navigate(`/profile/${currentUser?.id}`);
     } catch (err) {
-      toast.error('Failed to update profile');
+      toast.error("Failed to update profile");
     }
   };
 

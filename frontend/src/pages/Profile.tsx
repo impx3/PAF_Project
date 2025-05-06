@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import api from '../utils/axiosConfig';
+import React, { useEffect, useState } from "react";
+import api from "../utils/axiosConfig";
+import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import { FiMessageSquare } from 'react-icons/fi';
 import styles from '../styles/Profile.module.css';
@@ -18,12 +18,12 @@ interface User {
   totalPost: number;
 }
 
-const Profile: React.FC = () => {
+export const Profile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
-  
+
   const isOwnProfile = currentUser?.id === Number(id);
 
   useEffect(() => {
@@ -32,25 +32,26 @@ const Profile: React.FC = () => {
         const res = await api.get(`/users/${id}`);
         setUser(res.data);
 
-        if (!isOwnProfile) {
-          const followingRes = await api.get(`/users/${currentUser?.id}/following`);
-          setIsFollowing(followingRes.data.some((f: { id: number }) => f.id === res.data.id));
-        }
+          if (!isOwnProfile) {
+              const followingRes = await api.get(`/users/${currentUser?.id}/following`);
+              setIsFollowing(followingRes.data.some((f: { id: number }) => f.id === res.data.id));
+          }
+
+        /*if (currentUser?.following) {
+          const followingIds = currentUser.following.map((f) => f.id);
+          setIsFollowing(followingIds.includes(res.data.id));
+        }*/
       } catch (err) {
-        console.error('Failed to load user profile:', err);
+        console.error("Failed to fetch user", err);
       }
     };
 
-    fetchUser();
+    fetchUser().then();
   }, [id, currentUser, isOwnProfile]);
 
   const handleFollow = async () => {
-    try {
-      await api.post(`/users/${id}/follow`);
-      setIsFollowing(!isFollowing);
-    } catch (err) {
-      console.error('Follow error:', err);
-    }
+    await api.post(`/users/${currentUser?.id}/follow`);
+    setIsFollowing(!isFollowing);
   };
 
   if (!user) return <div className={styles.wrapper}>Loading...</div>;
@@ -59,13 +60,12 @@ const Profile: React.FC = () => {
     <div className={styles.wrapper}>
       <div className={styles.card}>
         <h2 className={styles.username}>{user.username}</h2>
-
-        {user.isVerified && (
-  	<span className={styles.verifiedBadge}>
+          {user.isVerified && (
+              <span className={styles.verifiedBadge}>
    	 	<img src="/images/verified-badge.png" alt="Verified" 				className={styles.verifiedIcon} />
     		<span className={styles.verifiedText}>Verified 		Chef</span>
   	</span>
-	)}
+          )}
 
         <p className={styles.bio}>{user.bio || 'No bio yet.'}</p>
 
@@ -122,5 +122,3 @@ const Profile: React.FC = () => {
     </div>
   );
 };
-
-export default Profile;
