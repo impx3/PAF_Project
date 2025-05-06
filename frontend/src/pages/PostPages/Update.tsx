@@ -82,15 +82,20 @@ const Update: React.FC = () => {
 
   return (
     <div style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
-      <h2>Update Post</h2>
-      title is{title}
+      <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Update Post</h2>
+      
       {message && <p style={{ color: "green" }}>{message}</p>}
       <form onSubmit={handleSubmit}>
-        title<input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        content<textarea value={content} onChange={(e) => setContent(e.target.value)} required />
-        <input type="file" accept="image/*" onChange={handleImageChange}  />
-        {preview && <img src={preview} alt="Preview" style={{ width: "100px" }} />}
-        <button type="submit" >Update</button>
+        Title: <input className="w-full border p-2 rounded"  type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        Content: <textarea className="w-full border p-2 rounded"  value={content} onChange={(e) => setContent(e.target.value)} required />
+        <input type="file" className="w-full border p-2 rounded" accept="image/*" onChange={handleImageChange}  />
+        {preview && <img src={preview} alt="Preview" style={{ maxWidth: "300px", marginTop: '10px', marginLeft: '100px'}} />}
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-7"
+        >
+          Upload
+        </button>
       </form>
     </div>
   );

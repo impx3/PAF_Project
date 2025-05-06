@@ -47,7 +47,8 @@ const GetPostById: React.FC = () => {
     <div style={{ maxWidth: "600px", margin: "50px auto", textAlign: "center" }}>
       {post ? (
         <>
-          <h2>{post.title}</h2> {post.content}
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">{post.title}</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">{post.content}</h2> 
           
           {/* <PostContent content = {post.content}/> */}
 
@@ -62,7 +63,7 @@ const GetPostById: React.FC = () => {
                   key={idx}
                   src={`http://localhost:8080/images/${filename.trim()}`}
                   alt={`Post ${post.id} - ${idx}`}
-                  style={{ width: "100%", maxWidth: "400px" }}
+                  style={{ width: "100%", maxWidth: "400px" , marginLeft: '100px'}}
                 />
               ))
             ) : (
@@ -71,11 +72,11 @@ const GetPostById: React.FC = () => {
                   // key={idx}
                   src={`http://localhost:8080/images/${post.imageUrl}`}
                   // alt={`Post ${post.id} - ${idx}`}
-                  style={{ width: "100%", maxWidth: "400px" }}
+                  style={{ width: "100%", maxWidth: "400px", marginLeft: '100px' }}
                 />
               ) :
                 (   //This is about images who are freshly created. Ie, they did not go through Update.jsx
-                  post.imageUrl && <img src={`http://localhost:8080/images/${post.imageUrl.split('\\').pop()}`} alt="Post" style={{ width: "100%", maxWidth: "400px" }} />
+                  post.imageUrl && <img src={`http://localhost:8080/images/${post.imageUrl.split('\\').pop()}`} alt="Post" style={{ width: "100%", maxWidth: "400px", marginLeft: '100px'  }} />
                 )
             )
 
@@ -99,9 +100,9 @@ const GetPostById: React.FC = () => {
 
           <br />
           {/* <Link to="/posts"><button style={{ marginTop: "20px" }}>Share</button></Link> */}
-          <Link to="/post/feed"><button style={{ marginTop: "20px" }}>Back to Posts</button></Link>
+          <Link to="/post/posts"><button    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-7" style={{ marginTop: "20px" }}>Back to Posts</button></Link>
           <p></p>
-          <button onClick={myFunction}>Share</button>
+          <button onClick={myFunction}   className="bg-green-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-7">Share</button>
         </>
       ) : (
         <p>Loading...</p>

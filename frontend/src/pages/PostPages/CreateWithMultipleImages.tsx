@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Submit from "@/components/PostComponents/Submit";
 
 const CreateWithMultipleImages: React.FC = () => {
   const navigate = useNavigate();
@@ -63,12 +64,13 @@ const CreateWithMultipleImages: React.FC = () => {
 
   return (
     <div style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
-      <h2>Create Post with Multiple Images</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" value={title} placeholder="Title" onChange={(e) => setTitle(e.target.value)} required />
-        <textarea value={content} placeholder="Content" onChange={(e) => setContent(e.target.value)} required />
+      <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Create Post with Multiple Images</h2>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <input className="w-full border p-2 rounded" type="text" value={title} placeholder="Title" onChange={(e) => setTitle(e.target.value)} required />
+        <textarea className="w-full border p-2 rounded" value={content} placeholder="Content" onChange={(e) => setContent(e.target.value)} required />
         
         <input
+        className="w-full border p-2 rounded"
           type="file"
           accept="image/*"
           multiple
@@ -81,7 +83,12 @@ const CreateWithMultipleImages: React.FC = () => {
           ))}
         </div>
 
-        <button type="submit">Create</button>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Upload
+        </button>
       </form>
     </div>
   );

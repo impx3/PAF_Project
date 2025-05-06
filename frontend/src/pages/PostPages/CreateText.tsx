@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Submit from "@/components/PostComponents/Submit";
 
 
 export const CreateText: React.FC = () => {
@@ -51,24 +52,31 @@ export const CreateText: React.FC = () => {
 
  return (
    <div style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
-     <h2>Create Post</h2>
+     <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Create Text Post</h2>
      {message && <p style={{ color: "red" }}>{message}</p>}
      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
        <input
          type="text"
          placeholder="Title"
+        className="w-full border p-2 rounded" 
          value={title}
          onChange={(e) => setTitle(e.target.value)}
          required
        />
        <textarea
          placeholder="Content"
+        className="w-full border p-2 rounded" 
          value={content}
          onChange={(e) => setContent(e.target.value)}
          required
        />
 
-       <button type="submit">Submit</button>
+<button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Upload
+        </button>
      </form>
    </div>
  );

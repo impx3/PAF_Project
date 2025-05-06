@@ -68,7 +68,7 @@ const GetAllPosts = () => {
                   {/* Display images */}
                   {post.imageUrl && (
                     <div className="flex flex-wrap gap-4 justify-center mb-4">
-                      {post.imageUrl.length > 50 ? (
+                      {post.imageUrl.length > 50 ? (   //This is about multiple images
                         post.imageUrl.split(",").map((filename, idx) => (
                           <img
                             key={idx}
@@ -77,14 +77,14 @@ const GetAllPosts = () => {
                             className="rounded-lg shadow-sm max-w-[200px] max-h-[200px] object-cover"
                           />
                         ))
-                      ) : post.imageUrl.length === 40 ? (
+                      ) : post.imageUrl.length === 40 ? ( //This is about images who went through 1 "Edit" cycle and lost it's '.\uploads' thing  in it's '.\uploads\15few-4de...'. Ie, when go through Update.jsx
                         <img
                           src={`http://localhost:8080/images/${post.imageUrl}`}
                           alt={`Post ${post.id}`}
                           className="rounded-lg shadow-sm max-w-[200px] max-h-[200px] object-cover"
                         />
                       ) : (
-                        post.imageUrl && (
+                        post.imageUrl && (   //This is about images who are freshly created. Ie, they did not go through Update.jsx
                           <img 
                             src={`http://localhost:8080/images/${post.imageUrl.split('\\').pop()}`} 
                             alt="Post"
