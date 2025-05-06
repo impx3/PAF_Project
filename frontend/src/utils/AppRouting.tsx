@@ -1,8 +1,6 @@
-
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "../routes/PrivateRoute";
 import MainLayout from "../layouts/MainLayout";
-
 
 // Page Imports
 import LandingPage from "../pages/LandingPage";
@@ -33,7 +31,6 @@ import {
   GetPostById,
   Home as PostHome,
 } from "../pages/PostPages";
-
 
 // Route Configurations
 const publicRoutes = [
@@ -66,7 +63,10 @@ const protectedRoutes = [
   { path: "/delete-account", element: <DeleteAccount /> },
   { path: "/explore", element: <UserList /> },
   { path: "/learning-plans", element: <LearningPlansDashboard /> },
-  { path: "/learning-plans/:planId/resources", element: <LearningPlanResources /> },
+  {
+    path: "/learning-plans/:planId/resources",
+    element: <LearningPlanResources />,
+  },
 ];
 
 // Post-related Routes
@@ -74,7 +74,10 @@ const postRoutes = [
   { path: "/post/posts", element: <GetAllPosts /> },
   { path: "/post/createpostselect", element: <PostHome /> },
   { path: "/post/create", element: <CreatePost /> },
-  { path: "/post/CreateWithMultipleImages", element: <CreateWithMultipleImages /> },
+  {
+    path: "/post/CreateWithMultipleImages",
+    element: <CreateWithMultipleImages />,
+  },
   { path: "/post/update/:id", element: <UpdatePost /> },
   { path: "/post/delete/:id", element: <DeletePost /> },
   { path: "/post/createvid", element: <VideoUploadForm /> },
@@ -90,8 +93,7 @@ export const AppRoutes = () => {
       {/* Public Routes */}
       {publicRoutes.map(({ path, element }) => (
         <Route key={path} path={path} element={element} />
-      ))}
-
+      ))}{" "}
       {/* Protected Routes */}
       {protectedRoutes.map(({ path, element }) => (
         <Route
@@ -104,8 +106,6 @@ export const AppRoutes = () => {
           }
         />
       ))}
-
-
       {/* Post Routes */}
       {postRoutes.map(({ path, element }) => (
         <Route
@@ -118,7 +118,6 @@ export const AppRoutes = () => {
           }
         />
       ))}
-
     </Routes>
   );
-}; 
+};
