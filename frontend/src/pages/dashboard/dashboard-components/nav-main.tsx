@@ -15,6 +15,26 @@ const navMain = [
     icon: House,
   },
   {
+    title: "Create Post",
+    url: "/post/createpostselect",
+    icon: House,
+  },
+  {
+    title: "Post Feed",
+    url: "/post/feed",
+    icon: House,
+  },
+  {
+    title: "Videos",
+    url: "/post/videos",
+    icon: House,
+  },
+  {
+    title: "Video Feed",
+    url: "/post/feedvideo",
+    icon: House,
+  },
+  {
     title: "Profile",
     url: "/profile",
     icon: User,

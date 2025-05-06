@@ -17,10 +17,14 @@ import PublicLearningPlanResources from "@/pages/PublicLearningPlanResources.tsx
 import LearningPlansDashboard from "@/pages/LearningPlansDashboard.tsx";
 import LearningPlanResources from "@/pages/LearningPlanResources.tsx";
 import {
+  Create,
   CreateWithMultipleImages,
+  Delete,
   GetAllPosts,
   GetAllPostsForUsers,
   GetPostById,
+  Home,
+  Update,
   VideoList,
   VideoListForUsers,
   VideoUploadForm,
@@ -67,14 +71,15 @@ export function AppRouting() {
               element={<LearningPlanResources />}
             />
             <Route path={"posts"} element={<GetAllPosts />} />
-            {/* <Route path={"post/createpostselect"} element={<PostHome/>}/> */}
-            {/*    <Route path={"post/create"} element={<CreatePost/>}/>*/}{" "}
+            <Route path={"post/createpostselect"} element={<Home />} />
+            <Route path={"post/create"} element={<Create />} />
+            <Route path={"post/text"} element={<Create />} />
             <Route
               path={"post/CreateWithMultipleImages"}
               element={<CreateWithMultipleImages />}
             />
-            {/* <Route path={"post/update/:id"} element={<UpdatePost/>}/>
-              <Route path={"post/delete/:id"} element={<DeletePost/>}/>*/}
+            <Route path={"post/update/:id"} element={<Update />} />
+            <Route path={"post/delete/:id"} element={<Delete />} />
             <Route path={"post/createvid"} element={<VideoUploadForm />} />
             <Route path={"post/feed"} element={<GetAllPostsForUsers />} />
             <Route path={"post/videos"} element={<VideoList />} />
