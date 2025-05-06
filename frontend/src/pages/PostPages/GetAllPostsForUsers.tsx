@@ -16,12 +16,12 @@ const GetAllPostsForUsers: React.FC = () => {
 
 
   useEffect(() => {
-    axios.get<Post[]>("http://localhost:8080/api/posts")
+    axios.get<Post[]>("http://localhost:8080/api/posts2/foraudience")
       .then(response => setPosts(response.data))
       .catch(error => console.error("Error fetching posts:", error));   
 
       
-  }, [posts]);
+  }, []);
 
   return (
     <div style={{ maxWidth: "600px", margin: "50px auto", textAlign: "center" }}>
@@ -72,7 +72,7 @@ const GetAllPostsForUsers: React.FC = () => {
               </div>
 
               }
-              <Link to={`/post/${post.id}`}><button style={{ marginTop: "20px" }}>View</button></Link>
+              <Link to={`/post/${post.id}/all`}><button style={{ marginTop: "20px" }}>View</button></Link>
 
 
           </div>

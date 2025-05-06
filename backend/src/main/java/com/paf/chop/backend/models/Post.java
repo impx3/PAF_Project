@@ -1,5 +1,6 @@
 package com.paf.chop.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class Post {
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // <-- ADD THIS
 }

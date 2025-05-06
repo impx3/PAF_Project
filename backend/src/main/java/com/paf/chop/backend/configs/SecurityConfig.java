@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
 
                 // Posts endpoints
+                .requestMatchers("/api/posts2/**").permitAll()
                 .requestMatchers("/api/posts/**").permitAll()
                 .requestMatchers("/api/posts**").authenticated()
                 .requestMatchers("/api/posts/**").authenticated()  

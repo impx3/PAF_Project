@@ -36,6 +36,7 @@ import {
 import CreateText from "@/pages/PostPages/CreateText";
  import {Login as PostLogin} from "@/pages/PostPages/Login";
  import {Logout as PostLogout} from "@/pages/PostPages/Logout";
+ import GetPostByIdForUsers from "@/pages/PostPages/GetPostByIdForUsers";
 
 // Route Configurations
 const publicRoutes = [
@@ -84,6 +85,7 @@ const postRoutes = [
   { path: "/post/videos", element: <VideoList /> },
   { path: "/post/feedvideo", element: <VideoListForUsers /> },
   { path: "/post/:id", element: <GetPostById /> },
+  { path: "/post/:id/all", element: <GetPostByIdForUsers /> },
 
   { path: "/post/text", element:<CreateText />},
   { path: "/post/login", element: <PostLogin /> },
@@ -118,9 +120,7 @@ export const AppRoutes = () => {
           key={path}
           path={path}
           element={
-            <PrivateRoute>
               <MainLayout>{element}</MainLayout>
-            </PrivateRoute>
           }
         />
       ))}
