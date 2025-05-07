@@ -6,6 +6,8 @@ import React, {
   useContext,
 } from "react";
 import api from "../utils/axiosConfig";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/utils/firebase.config.ts";
 
 export interface Following {
   id: number;
@@ -35,6 +37,7 @@ interface AuthContextType {
   fetchCurrentUser: () => Promise<void>;
   logout: () => void;
   loading: boolean;
+  firebaseLogin: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -98,9 +101,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem("currentUser");
   };
 
+  const firebaseLogin = async () => {
+    // 1. Sign in with Google popup
+    const result = await signInWithPopup(auth, googleProvider);
+    // 2. Get the ID token from Firebase
+    const idToken = await result.user.getIdToken();
+    // 3. Call your backend
+    const res = await api.post(
+      "/auth/firebase-login",
+      {},
+      { headers: { Authorization: `Bearer ${idToken}` } },
+    );
+    if (res.data?.result.token) {
+      // 4. Save your app’s JWT, not the Firebase one
+      localStorage.setItem("token", res.data.result.token);
+      setCurrentUser(res.data.result);
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ currentUser, setCurrentUser, fetchCurrentUser, logout, loading }}
+      value={{
+        currentUser,
+        setCurrentUser,
+        fetchCurrentUser,
+        logout,
+        loading,
+        firebaseLogin,
+      }}
     >
       {children}
     </AuthContext.Provider>

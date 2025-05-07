@@ -24,6 +24,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.SAME_ORIGIN_ALLOW_POPUPS;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig implements WebMvcConfigurer {
@@ -42,9 +44,14 @@ public class SecurityConfig implements WebMvcConfigurer {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers
+                        // allow pop-ups to talk to opener.window.closed()
+                        .crossOriginOpenerPolicy(policy -> policy.policy(SAME_ORIGIN_ALLOW_POPUPS))
+                )
                 .authorizeHttpRequests(auth -> auth
                         // Auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/firebase-login").permitAll()
 
                         // Posts endpoints
                         .requestMatchers("/api/posts/**").permitAll()
@@ -78,6 +85,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
                         // Any other request requires authentication
                         .anyRequest().authenticated()
+
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -92,7 +100,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

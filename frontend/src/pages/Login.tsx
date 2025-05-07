@@ -13,7 +13,7 @@ import { ChefHat, Utensils, Leaf, Soup } from "lucide-react";
 const Login: React.FC = () => {
   const [form, setForm] = useState({ username: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const { setCurrentUser } = useAuth();
+  const { setCurrentUser, firebaseLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +26,7 @@ const Login: React.FC = () => {
         localStorage.setItem("token", res.data.result.token);
         setCurrentUser(res.data.result);
         toast.success("Welcome back! Ready to cook something delicious?");
-        navigate("/home");
+        navigate("/posts");
       }
     } catch (err) {
       toast.error("Oops! Please check your credentials and try again");
@@ -163,6 +163,19 @@ const Login: React.FC = () => {
               <Button
                 variant="outline"
                 className="w-full py-3 border border-beige-300 text-sage-700 hover:bg-beige-50 rounded-lg gap-2"
+                onClick={async () => {
+                  try {
+                    setIsLoading(true);
+                    await firebaseLogin();
+                    toast.success("Logged in via Google!");
+                    navigate("/home");
+                  } catch (err) {
+                    toast.error("Firebase login failed. Please try again.");
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                disabled={isLoading}
               >
                 <img
                   src="/icons/google-icon.png"

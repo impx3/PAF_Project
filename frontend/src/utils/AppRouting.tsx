@@ -52,9 +52,9 @@ export function AppRouting() {
           {/* DashboardLayout wraps all the “/home”, “/profile”, etc */}
           <Route path="/" element={<DashboardPage />}>
             {/* redirect “/” → “/home” */}
-            <Route index element={<Navigate to="home" replace />} />
+            <Route index element={<Navigate to="posts" replace />} />
             {/* your nested pages */}
-            <Route path="home" element={<HomePage />} />
+            {/*   <Route path="home" element={<HomePage />} />*/}
             <Route path="profile/" element={<Profile />} />
             <Route path="profile/:id" element={<Profile />} />
             <Route path="explore" element={<UserList />} />
