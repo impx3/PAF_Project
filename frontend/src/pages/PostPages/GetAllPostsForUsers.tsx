@@ -27,7 +27,7 @@ const GetAllPostsForUsers: React.FC = () => {
     
        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">All Posts</h2>
-        <p>Tip: You don't have to refresh the page. If new post came or a current post was updated, you will get it without refresh page</p>
+        {/* <p>Tip: You don't have to refresh the page. If new post came or a current post was updated, you will get it without refresh page</p> */}
       <div className="space-y-8">
       {posts.length === 0 ?  <p className="text-center text-gray-500">No posts available.</p> : (
         posts.map(post => (
