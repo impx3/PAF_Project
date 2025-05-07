@@ -1,5 +1,6 @@
 package com.paf.chop.backend.services;
 
+import com.paf.chop.backend.dto.response.PostDTO;
 import com.paf.chop.backend.models.Post;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.PostRepository;
@@ -9,12 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public Post createPost(Post post) {
         return postRepository.save(post);
@@ -32,26 +38,23 @@ public class PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
-    @Autowired
-    private UserRepository userRepository;
+
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
 
     public List<Post> getAllPostsByUser(User user) {
-        List <Post> posts = postRepository.findByUser(user);
-        return posts;
+        return postRepository.findByUser(user);
     }
     public Post getPostById(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
-        return post;
+        return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
     }
 
     public Post getPostByIdUser(Long id, User user) {
         List <Post> posts = postRepository.findByUser(user);
         for (Post post2 : posts) {
-            if ( post2.getId()==id) {
+            if (Objects.equals(post2.getId(), id)) {
                 return post2;
             }
         }

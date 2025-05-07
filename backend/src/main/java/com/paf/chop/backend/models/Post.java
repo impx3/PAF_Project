@@ -24,6 +24,7 @@ public class Post {
     @Column(nullable = true, name="imageurl" , length=500)
     private String imageUrl;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)

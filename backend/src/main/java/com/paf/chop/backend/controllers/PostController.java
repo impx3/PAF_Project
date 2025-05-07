@@ -44,6 +44,9 @@ public class PostController {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/home")
     public String HomeEndpoint() {
         return "Homee at PC";
@@ -150,8 +153,7 @@ public class PostController {
 
 
         }
-    @Autowired
-    private UserRepository userRepository;
+
 
     @PostMapping
     public ResponseEntity<EntityModel<Post>> createPost(
@@ -160,10 +162,6 @@ public class PostController {
             @RequestParam(value = "image", required = false) MultipartFile image,
             @AuthenticationPrincipal UserDetails userDetails
             ) throws IOException {
-
-        System.out.println(title + "hereyrer");
-        System.out.println(content + "hereyrer");
-        System.out.println(image + "hereyrer");
 
         User user = userRepository.findByUsername(userDetails.getUsername());
         String imageUrl = image != null ? fileStorageService.storeFile(image) : null;

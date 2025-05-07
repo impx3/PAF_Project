@@ -1,6 +1,7 @@
 package com.paf.chop.backend.services;
 
 
+import com.paf.chop.backend.dto.response.user.PublicUserResponseDTO;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
 
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +66,22 @@ public class UserService {
     public Set<User> getFollowing(Long id) {
         User user = userRepository.findById(id).orElse(null);
         return (user != null) ? user.getFollowing() : new HashSet<>();
+    }
+
+    public ApiResponse<List<PublicUserResponseDTO>> getAllUsers() {
+       try{
+           List<User> users = userRepository.findAll();
+           if (users.isEmpty()) {
+               return  ApiResponse.success(null,"Users not found");
+           }
+
+              List<PublicUserResponseDTO> userResponseDTOs = users.stream()
+                     .map(PublicUserResponseDTO::new)
+                     .toList();
+           return ApiResponse.success(userResponseDTOs, "Users found");
+       } catch (Exception e) {
+              return ApiResponse.error("Error fetching users: " + e.getMessage());
+       }
     }
 
     public User getUser(Long id) {

@@ -20,7 +20,7 @@ public class Like {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id", referencedColumnName = "comment_id")
+    @JoinColumn(name = "comment_id", referencedColumnName = "comment_id" )
     private Comment comment = null;
 
     @Column(nullable = false)

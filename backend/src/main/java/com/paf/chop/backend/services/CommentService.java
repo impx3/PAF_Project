@@ -25,17 +25,18 @@ import java.util.Optional;
 @Slf4j
 public class CommentService {
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private LikeRepository likeRepository;
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, LikeRepository likeRepository) {
+        this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
+        this.likeRepository = likeRepository;
+    }
 
     //add comment
     public ApiResponse<CommentResponseDTO> comment(CommentRequestDTO commentRequestDTO) {
@@ -90,6 +91,7 @@ public class CommentService {
 
             List<CommentResponseDTO> commentDTOs = comments.stream()
                     .map(this::getCommentResponseDTO)
+
                     .toList();
 
             log.info("Comment retrieved: {}", commentDTOs);
@@ -225,6 +227,8 @@ public class CommentService {
         commentResponseDTO.setCommentBody(comment.getCommentBody());
         commentResponseDTO.setLikeCount(comment.getLikeCount());
         commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
+        commentResponseDTO.setCommentId(comment.getCommentId());
+        commentResponseDTO.setIsLiked(isLiked(comment));
 
         return commentResponseDTO;
     }
@@ -232,6 +236,10 @@ public class CommentService {
     public User getCurrentUser() {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(currentUsername);
+    }
+
+    public Boolean isLiked(Comment comment) {
+        return likeRepository.existsByCommentAndUser( comment,  getCurrentUser());
     }
 
 }
