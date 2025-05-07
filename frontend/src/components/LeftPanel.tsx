@@ -43,31 +43,25 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ isOpen, toggleLeftPanel }) => {
         </h3>
         <p className={styles.username}>@{currentUser?.username}</p>
         <p className={styles.info}>Email: {currentUser?.email}</p>
-        <p className={styles.info}>Coins: {currentUser?.coins}</p>
 
-        <div className={styles.chatButtonWrapper}>
-          <button
-            className={`${styles.chatBtn} ${
-              currentUser?.isVerified ? styles.verified : styles.unverified
-            }`}
-            title={currentUser?.isVerified ? 'Chat unlocked' : 'Chat locked'}
-            disabled={!currentUser?.isVerified}
-          >
-            <FiMessageSquare size={20} />
-          </button>
-        </div>
+	<div className={styles.followStats}>
+  	<p>Followers: {currentUser?.followerCount ?? 0}</p>
+  	<p>Following: {currentUser?.followingCount ?? 0}</p>
+	</div>
+
+	<div className={styles.coinDisplay}>
+ 		 <img src="/images/coin2.gif" alt="Coin" className=			{styles.coinIcon} />
+  		<p className={styles.info}>{currentUser?.coins}</p>
+	</div>
+
+        <nav className={styles.navLinks}>
+         
+          <Link to="/delete-account" className={styles.deleteLink}>Delete Account</Link>
+        </nav>
 
         <button onClick={handleLogout} className={styles.logoutBtn}>
           <FiLogOut /> Logout
         </button>
-
-        <h2 className={styles.menuTitle}>Menu</h2>
-        <nav className={styles.navLinks}>
-          <Link to="/home">Home</Link>
-          <Link to={`/profile/${currentUser?.id}`}>Profile</Link>
-          <Link to="/followers">Followers</Link>
-          <Link to="/delete-account" className={styles.deleteLink}>Delete Account</Link>
-        </nav>
       </div>
     </div>
   );

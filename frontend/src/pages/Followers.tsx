@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { FiMessageSquare } from 'react-icons/fi';
-import api from '../utils/axiosConfig';
-import { AuthContext } from '../context/AuthContext';
-import ChatPopup from '../components/ChatPopup';
+import React, { useEffect, useState } from "react";
+import { FiMessageSquare } from "react-icons/fi";
+import api from "../utils/axiosConfig";
+import { useAuth } from "../context/AuthContext";
+import ChatPopup from "../components/ChatPopup";
 
-import styles from '../styles/Followers.module.css';
+import styles from "../styles/Followers.module.css";
 
 interface Follower {
   id: number;
@@ -14,9 +14,11 @@ interface Follower {
 }
 
 const Followers: React.FC = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useAuth();
   const [followers, setFollowers] = useState<Follower[]>([]);
-  const [selectedChatUser, setSelectedChatUser] = useState<Follower | null>(null);
+  const [selectedChatUser, setSelectedChatUser] = useState<Follower | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchFollowers = async () => {
@@ -56,8 +58,8 @@ const Followers: React.FC = () => {
             disabled={!currentUser?.isVerified}
             title={
               currentUser?.isVerified
-                ? 'Click to chat'
-                : 'You must be verified to chat with this user'
+                ? "Click to chat"
+                : "You must be verified to chat with this user"
             }
           >
             <FiMessageSquare size={20} />
@@ -65,7 +67,9 @@ const Followers: React.FC = () => {
         </div>
       ))}
 
-      {selectedChatUser && <ChatPopup user={selectedChatUser} onClose={closeChat} />}
+      {selectedChatUser && (
+        <ChatPopup user={selectedChatUser} onClose={closeChat} />
+      )}
     </div>
   );
 };
