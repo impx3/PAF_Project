@@ -10,7 +10,7 @@ const PrivateRoute: React.FC = () => {
 
   if (loading) return <div>Loading...</div>; // Show loading state while checking auth
 
-  return currentUser ? <Outlet /> : <Outlet />; //<Navigate to="/login" />
+  return currentUser ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;

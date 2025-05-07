@@ -1,3 +1,4 @@
+// src/context/AuthContext.tsx
 import React, {
   createContext,
   useEffect,
@@ -15,8 +16,8 @@ export interface Following {
 }
 
 export interface User {
-  followers: ReactNode;
-  totalPosts: ReactNode;
+  followers: number;
+  totalPosts: number;
   bio: string;
   id: number;
   firstName: string;
@@ -27,14 +28,11 @@ export interface User {
   isVerified: boolean;
   coins: number;
   following: Following[];
-
-  // Add other user fields
 }
 
 interface AuthContextType {
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
-  fetchCurrentUser: () => Promise<void>;
   logout: () => void;
   loading: boolean;
   firebaseLogin: () => Promise<void>;
@@ -52,53 +50,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const res = await api.get("/users/me");
-      setCurrentUser(res.data.result);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  //method to save the user to local storage
+  // Save to localStorage helper
   const saveUserToLocalStorage = (user: User) => {
     localStorage.setItem("currentUser", JSON.stringify(user));
   };
 
-  const loadUserFromLocalStorage = () => {
-    const user = localStorage.getItem("currentUser");
-    if (user) {
-      setCurrentUser(JSON.parse(user));
-    }
-  };
-
+  // Load from localStorage on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setLoading(true);
-      fetchCurrentUser().then();
-    } else {
-      setLoading(false); // Even if no token, we are done loading
+    const stored = localStorage.getItem("currentUser");
+    if (stored) {
+      setCurrentUser(JSON.parse(stored));
     }
-
-    loadUserFromLocalStorage();
+    setLoading(false);
   }, []);
-
-  useEffect(() => {
-    if (currentUser) {
-      saveUserToLocalStorage(currentUser);
-    } else {
-      if (localStorage.getItem("token")) {
-        loadUserFromLocalStorage();
-      }
-    }
-  }, [currentUser]);
 
   const logout = () => {
     localStorage.removeItem("token");
-    setCurrentUser(null);
     localStorage.removeItem("currentUser");
+    setCurrentUser(null);
   };
 
   const firebaseLogin = async () => {
@@ -106,16 +75,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const result = await signInWithPopup(auth, googleProvider);
     // 2. Get the ID token from Firebase
     const idToken = await result.user.getIdToken();
-    // 3. Call your backend
+    // 3. Exchange it at your backend
     const res = await api.post(
       "/auth/firebase-login",
       {},
       { headers: { Authorization: `Bearer ${idToken}` } },
     );
     if (res.data?.result.token) {
-      // 4. Save your app’s JWT, not the Firebase one
+      // 4. Persist *your* JWT + user profile
       localStorage.setItem("token", res.data.result.token);
       setCurrentUser(res.data.result);
+      saveUserToLocalStorage(res.data.result);
     }
   };
 
@@ -124,7 +94,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         currentUser,
         setCurrentUser,
-        fetchCurrentUser,
         logout,
         loading,
         firebaseLogin,
@@ -136,9 +105,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be inside AuthProvider");
+  return ctx;
 };

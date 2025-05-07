@@ -23,8 +23,10 @@ const Login: React.FC = () => {
     try {
       const res = await api.post("/auth/login", form);
       if (res.data?.result.token) {
+        // Save JWT + user
         localStorage.setItem("token", res.data.result.token);
         setCurrentUser(res.data.result);
+        localStorage.setItem("currentUser", JSON.stringify(res.data.result));
         toast.success("Welcome back! Ready to cook something delicious?");
         navigate("/posts");
       }

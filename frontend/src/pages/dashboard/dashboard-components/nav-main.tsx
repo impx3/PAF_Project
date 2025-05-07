@@ -51,7 +51,7 @@ export function NavMain() {
             <NavLink to={item.url}>
               <SidebarMenuButton tooltip={item.title}>
                 {item.icon && <item.icon className="h-6 w-6" />}
-                {/* this span will automatically be hidden by Sidebar when collapsed */}
+
                 <span className="ml-2">{item.title}</span>
               </SidebarMenuButton>
             </NavLink>
