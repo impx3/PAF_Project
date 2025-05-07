@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Bot, House, User, UsersRound } from "lucide-react";
+import { UserX, House, User, BookOpen, Video, Search } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -15,14 +15,19 @@ const navMain = [
     icon: House,
   },
   {
-    title: "Videos",
-    url: "/post/videos",
-    icon: House,
-  },
-  {
     title: "Video Feed",
     url: "/post/feedvideo",
-    icon: House,
+    icon: Video,
+  },
+  {
+    title: "Explore Users",
+    url: "/explore",
+    icon: Search,
+  },
+  {
+    title: "Learning Plans",
+    url: "/learning-plans",
+    icon: BookOpen,
   },
   {
     title: "Profile",
@@ -32,18 +37,7 @@ const navMain = [
   {
     title: "Delete Profile",
     url: "/delete-account",
-    icon: Bot,
-  },
-  {
-    title: "Explore Users",
-    url: "/explore",
-    icon: UsersRound,
-  },
-
-  {
-    title: "Learning Plans",
-    url: "/learning-plans",
-    icon: UsersRound,
+    icon: UserX,
   },
 ];
 

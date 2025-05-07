@@ -31,6 +31,13 @@ interface Post {
   imageUrl: string;
 }
 
+interface Video {
+  id: number;
+  title: string;
+  description: string;
+  videoUrl: string;
+}
+
 export const Profile: React.FC = () => {
   const { currentUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
@@ -38,6 +45,7 @@ export const Profile: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
   const [posts, setPosts] = useState<Post[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
 
@@ -45,6 +53,10 @@ export const Profile: React.FC = () => {
 
   const handleNavigatePostAddPage = () => {
     navigate("/post/createpostselect");
+  };
+
+  const handleNavigateVideoAddPage = () => {
+    navigate("/post/createvid");
   };
 
   useEffect(() => {
@@ -55,6 +67,8 @@ export const Profile: React.FC = () => {
 
         const postsRes = await api.get("/posts/user");
         setPosts(postsRes.data);
+
+        api.get<Video[]>("/videos").then((res) => setVideos(res.data));
 
         /* if (!isOwnProfile) {
           const followingRes = await api.get(`/users/${currentUser?.id}/following`);
@@ -172,10 +186,10 @@ export const Profile: React.FC = () => {
             Posts
           </Button>
           <Button
-            variant={activeTab === "recipes" ? "default" : "outline"}
-            onClick={() => setActiveTab("recipes")}
+            variant={activeTab === "chops" ? "default" : "outline"}
+            onClick={() => setActiveTab("chops")}
           >
-            Recipes
+            Chops
           </Button>
           <Button
             variant={activeTab === "activity" ? "default" : "outline"}
@@ -256,6 +270,77 @@ export const Profile: React.FC = () => {
                     </Button>
                     <Button variant="destructive" size="sm" asChild>
                       <Link to={`/post/delete/${post.id}`}>Delete</Link>
+                    </Button>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        )}
+        {activeTab === "chops" && (
+          <div className="space-y-6">
+            <div className={"flex flex-row justify-between items-center mb-4"}>
+              <h2 className="text-2xl font-bold ">My Chops</h2>
+              <Button variant={"outline"} onClick={handleNavigateVideoAddPage}>
+                Add Chops
+              </Button>
+            </div>
+            {videos.length === 0 ? (
+              <Card className="p-6 text-center">
+                <p className="text-muted-foreground">No posts available</p>
+              </Card>
+            ) : (
+              videos.map((videos) => (
+                <Card key={videos.id} className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold">{videos.title}</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSaveClick(videos)}
+                      title="Save to Learning Plan"
+                    >
+                      <FaBookmark className="w-5 h-5" />
+                    </Button>
+                  </div>
+
+                  <p className="text-muted-foreground mb-4">
+                    {videos?.description}
+                  </p>
+
+                  {videos.videoUrl && (
+                    <div className="flex flex-wrap gap-4 justify-center mb-4">
+                      {videos.videoUrl.length > 50 ? (
+                        videos.videoUrl
+                          .split(",")
+                          .map((filename, idx) => (
+                            <img
+                              key={idx}
+                              src={`http://localhost:8080/images/${filename.trim()}`}
+                              alt={`Post ${videos.id} - ${idx}`}
+                              className="rounded-lg object-cover w-48 h-48"
+                            />
+                          ))
+                      ) : (
+                        <img
+                          src={`http://localhost:8080/images/${
+                            videos.videoUrl.length === 40
+                              ? videos.videoUrl
+                              : videos.videoUrl.split("\\").pop()
+                          }`}
+                          alt={`Post ${videos.id}`}
+                          className="rounded-lg object-cover w-48 h-48"
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex justify-end gap-4">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/post/update/${videos.id}`}>Edit</Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" asChild>
+                      <Link to={`/post/delete/${videos.id}`}>Delete</Link>
                     </Button>
                   </div>
                 </Card>

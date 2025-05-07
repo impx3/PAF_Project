@@ -1,9 +1,13 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import api from "@/utils/axiosConfig.ts";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Card } from "@/components/ui/card";
 
-// Type for URL params
 interface RouteParams {
   id: string;
 }
@@ -25,13 +29,9 @@ const Update: React.FC = () => {
       .then((response) => {
         setTitle(response.data.title);
         setContent(response.data.content);
-        setPreview(
-          `http://localhost:8080/images/${response.data.imageUrl.split("\\").pop()}`,
-        );
-
-        let imageurlincaseTemp = `${response.data.imageUrl.split("\\").pop()}`;
-
-        setimageURLInCase(imageurlincaseTemp);
+        const imageUrl = `http://localhost:8080/images/${response.data.imageUrl.split("\\").pop()}`;
+        setPreview(imageUrl);
+        setimageURLInCase(response.data.imageUrl.split("\\").pop());
       })
       .catch((error) => console.error("Error fetching post:", error));
   }, [id]);
@@ -42,7 +42,6 @@ const Update: React.FC = () => {
       setImage(file);
       setPreview(URL.createObjectURL(file));
     }
-    console.log(file);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -51,22 +50,17 @@ const Update: React.FC = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    if (image) {
-      formData.append("image", image);
-    }
+    if (image) formData.append("image", image);
     formData.append("imageURLinCaseUserDidnotREUPLOAD", imageURLInCase);
 
     try {
       const token = localStorage.getItem("token");
-
       await api.put(`/posts/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
-
-      setMessage("Post updated successfully!");
       navigate("/posts");
     } catch (error) {
       setMessage("Error updating post.");
@@ -75,32 +69,70 @@ const Update: React.FC = () => {
   };
 
   return (
-    <div
-      style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}
-    >
-      <h2>Update Post</h2>
-      title is{title}
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      <form onSubmit={handleSubmit}>
-        title
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        content
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-        />
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-        {preview && (
-          <img src={preview} alt="Preview" style={{ width: "100px" }} />
+    <div className="container max-w-2xl mx-auto py-8 px-4">
+      <Card className="p-6">
+        <h2 className="text-3xl font-bold tracking-tight mb-6 text-center">
+          Update Post
+        </h2>
+
+        {message && (
+          <p className="text-green-500 text-center mb-4 font-medium">
+            {message}
+          </p>
         )}
-        <button type="submit">Update</button>
-      </form>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title *</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Post title"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="content">Content *</Label>
+            <Textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Post content"
+              rows={5}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image">Update Image</Label>
+            <Input
+              id="image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="cursor-pointer"
+            />
+          </div>
+
+          {preview && (
+            <div className="mx-auto max-w-md">
+              <AspectRatio ratio={4 / 3}>
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="rounded-lg object-cover w-full h-full border"
+                />
+              </AspectRatio>
+            </div>
+          )}
+
+          <div className="flex justify-center gap-4">
+            <Button type="submit" className="w-full sm:w-auto">
+              Update Post
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 };

@@ -33,12 +33,23 @@ const UserList = () => {
   };
 
   useEffect(() => {
+    // Check currentUser is being properly loaded
+    console.log("currentUser:", currentUser);
+
     const fetchUsers = async () => {
       try {
         const res = await api.get("/users/all");
+        // Log the full response to check the structure of the data
+        console.log("Fetched users:", res.data.result);
+
+        // Filter out the current user
         const otherUsers = res.data.result?.filter(
           (u: PublicUser) => u.id !== currentUser?.id,
         );
+
+        // Log the filtered list of users to ensure the current user is excluded
+        console.log("Filtered users:", otherUsers);
+
         setUsers(otherUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -46,8 +57,15 @@ const UserList = () => {
         setLoading(false);
       }
     };
-    fetchUsers();
-  }, [currentUser?.id]);
+
+    // Ensure that currentUser is available before fetching users
+    if (currentUser) {
+      console.log("Fetching users...");
+      fetchUsers();
+    } else {
+      console.error("currentUser is null or undefined, not fetching users");
+    }
+  }, [currentUser]);
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
@@ -115,13 +133,8 @@ const UserList = () => {
                     </p>
                   </div>
                 </Link>
-
                 <div className="flex items-center gap-2">
-                  <FollowButton
-                    targetId={user.id}
-                    variant="outline"
-                    size="sm"
-                  />
+                  <FollowButton targetId={user.id.toString()} />
                   <Button
                     variant="ghost"
                     size="sm"
