@@ -1,76 +1,161 @@
+// src/main/java/com/paf/chop/backend/services/UserService.java
 package com.paf.chop.backend.services;
 
-
+import com.paf.chop.backend.dto.response.UserResponseDTO;
+import com.paf.chop.backend.dto.response.user.PublicUserResponseDTO;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.paf.chop.backend.utils.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    private final  UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    /**
+     * Resolve an authenticated email to its User ID.
+     */
+    public Long findIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email))
+                .getId();
     }
 
-    public List<User> getAll() {
-        return userRepository.findAll();
+    /**
+     * Build full profile DTO for /me.
+     */
+    @Transactional(readOnly = true)
+    public UserResponseDTO buildFullProfile(Long userId) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        UserResponseDTO dto = new UserResponseDTO(u);
+        dto.setFollowerCount(u.getFollowers().size());
+        dto.setFollowingCount(u.getFollowing().size());
+
+        dto.setFollowers(
+                u.getFollowers().stream()
+                        .map(PublicUserResponseDTO::new)
+                        .collect(Collectors.toList())
+        );
+        dto.setFollowing(
+                u.getFollowing().stream()
+                        .map(PublicUserResponseDTO::new)
+                        .collect(Collectors.toList())
+        );
+        return dto;
     }
 
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
+    /**
+     * Toggle follow/unfollow between two user IDs.
+     */
+    @Transactional
+    public String toggleFollowByIds(Long currentUserId, Long targetUserId) {
+        if (currentUserId.equals(targetUserId)) {
+            return "Cannot follow yourself";
+        }
+        User current = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + currentUserId));
+        User target = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + targetUserId));
 
-    public String toggleFollowByEmail(String email, Long targetUserId) {
-        User current = userRepository.findByEmail(email);
-        User target = userRepository.findById(targetUserId).orElse(null);
-
-        if (current == null || target == null || current.equals(target)) return "Invalid users";
-
-        if (current.getFollowing().contains(target)) {
-            current.getFollowing().remove(target);
+        if (current.getFollowing().remove(target)) {
             target.getFollowers().remove(current);
+            userRepository.save(current);
+            userRepository.save(target);
+            return "Unfollowed successfully";
         } else {
             current.getFollowing().add(target);
             target.getFollowers().add(current);
-
-            // Score logic
+            // optional coin/verification logic
             current.setCoins(current.getCoins() + 10);
-            if (current.getCoins() >= 100) {
-                current.setIsVerified(true);
-            }
+            if (current.getCoins() >= 100) current.setIsVerified(true);
+
+            userRepository.save(current);
+            userRepository.save(target);
+            return "Followed successfully";
+        }
     }
 
-        userRepository.save(current);
-        userRepository.save(target);
-        return "Follow/unfollow successful";
+    /**
+     * Return public DTO list of followers.
+     */
+    @Transactional(readOnly = true)
+    public List<PublicUserResponseDTO> getFollowersDto(Long userId) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+        return u.getFollowers().stream()
+                .map(PublicUserResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
-    public Set<User> getFollowers(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        return (user != null) ? user.getFollowers() : new HashSet<>();
+    /**
+     * Return public DTO list of following.
+     */
+    @Transactional(readOnly = true)
+    public List<PublicUserResponseDTO> getFollowingDto(Long userId) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+        return u.getFollowing().stream()
+                .map(PublicUserResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
-    public Set<User> getFollowing(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        return (user != null) ? user.getFollowing() : new HashSet<>();
+    /**
+     * Update profile fields for /me.
+     */
+    @Transactional
+    public void updateProfile(Long userId, Map<String, String> updates) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        if (updates.containsKey("username"))   u.setUsername(updates.get("username"));
+        if (updates.containsKey("bio"))        u.setBio(updates.get("bio"));
+        if (updates.containsKey("profileImage")) u.setProfileImage(updates.get("profileImage"));
+        u.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(u);
     }
 
-    public User getUser(Long id) {
-        return userRepository.findById(id).orElse(null);
+    /**
+     * Delete a user by ID.
+     */
+    @Transactional
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 
-    public boolean isUserExists(Long userId) {
+    /**
+     * List all users as public DTOs.
+     */
+    @Transactional(readOnly = true)
+    public ApiResponse<List<PublicUserResponseDTO>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<PublicUserResponseDTO> dtos = users.stream()
+                .map(PublicUserResponseDTO::new)
+                .collect(Collectors.toList());
+        return ApiResponse.success(dtos, "Users fetched");
+    }
+
+    /**
+     * Get raw User entity (if ever needed).
+     */
+    @Transactional(readOnly = true)
+    public java.util.Optional<User> getUser(Long id) {
+        return userRepository.findById(id);
+    }
+
+
+    public Boolean isUserExists(Long userId) {
         return userRepository.existsById(userId);
     }
 }

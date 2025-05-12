@@ -1,10 +1,12 @@
 package com.paf.chop.backend.dto.response;
 
+import com.paf.chop.backend.dto.response.user.PublicUserResponseDTO;
 import org.springframework.hateoas.RepresentationModel;
 import lombok.Data;
 
 import com.paf.chop.backend.models.User;
 
+import java.util.List;
 
 
 @Data
@@ -23,6 +25,9 @@ public class UserResponseDTO extends RepresentationModel<UserResponseDTO> {
     private String bio;
     private String userRole;
     private String token;
+
+    private List<PublicUserResponseDTO> followers;
+    private List<PublicUserResponseDTO> following;
 
     private Integer followerCount;
     private Integer followingCount;

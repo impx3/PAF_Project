@@ -1,10 +1,10 @@
 package com.paf.chop.backend.controllers;
 
+import com.paf.chop.backend.dto.response.PostDTO;
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-import java.util.stream.Collectors;
 
 import com.paf.chop.backend.models.Post;
 import com.paf.chop.backend.models.User;
@@ -12,9 +12,11 @@ import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.services.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.web.bind.annotation.*;
 
 import com.paf.chop.backend.services.FileStorageService;
@@ -22,27 +24,28 @@ import com.paf.chop.backend.services.FileStorageService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
 
 @CrossOrigin(origins = "http://localhost:5173/", maxAge = 3600)
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
 
-    @Autowired
-    private PostService postService;
+
+    private final PostService postService;
+    private final FileStorageService fileStorageService;
+    private final UserRepository userRepository;
 
     @Autowired
-    private FileStorageService fileStorageService;
+    public PostController(PostService postService, FileStorageService fileStorageService, UserRepository userRepository) {
+        this.postService = postService;
+        this.fileStorageService = fileStorageService;
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/home")
     public String HomeEndpoint() {
@@ -150,8 +153,7 @@ public class PostController {
 
 
         }
-    @Autowired
-    private UserRepository userRepository;
+
 
     @PostMapping
     public ResponseEntity<EntityModel<Post>> createPost(
@@ -160,10 +162,6 @@ public class PostController {
             @RequestParam(value = "image", required = false) MultipartFile image,
             @AuthenticationPrincipal UserDetails userDetails
             ) throws IOException {
-
-        System.out.println(title + "hereyrer");
-        System.out.println(content + "hereyrer");
-        System.out.println(image + "hereyrer");
 
         User user = userRepository.findByUsername(userDetails.getUsername());
         String imageUrl = image != null ? fileStorageService.storeFile(image) : null;
@@ -268,7 +266,9 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<List<Post>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+         List<Post> posts= postService.getAllPosts();
+
+         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/user")
@@ -293,6 +293,18 @@ public class PostController {
                 // WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
         return ResponseEntity.ok(resource);
+    }
+
+    //post likes
+    @PostMapping("/like/{postId}")
+    public ResponseEntity<ApiResponse<PostDTO>> likePost(@PathVariable Long postId) {
+        ApiResponse<PostDTO> postResponseDTO = postService.likePost(postId);
+
+        if (postResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(postResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(postResponseDTO);
+        }
     }
 
 }

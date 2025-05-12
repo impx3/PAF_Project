@@ -1,21 +1,21 @@
-import React, { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import api from '../utils/axiosConfig';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/axiosConfig";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-import styles from '../styles/DeleteAccount.module.css';
+import styles from "../styles/DeleteAccount.module.css";
+import React from "react";
 
 const DeleteAccount: React.FC = () => {
-  const { setCurrentUser } = useContext(AuthContext);
+  const { setCurrentUser } = useAuth();
   const navigate = useNavigate();
 
   const handleDelete = async () => {
     try {
-      await api.delete('/users/delete');
-      localStorage.removeItem('token');
+      await api.delete("/users/delete");
+      localStorage.removeItem("token");
       setCurrentUser(null);
-      navigate('/login');
+      navigate("/login");
     } catch (err) {
       toast.error("Something went wrong");
     }
