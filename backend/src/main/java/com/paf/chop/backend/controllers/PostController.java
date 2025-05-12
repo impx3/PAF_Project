@@ -284,7 +284,7 @@ public class PostController {
         User user = userRepository.findByUsername(userDetails.getUsername());
         Post savedPost = postService.getPostByIdUser(id,user);
         // HATEOAS links
-        EntityModel<Post> resource = EntityModel.of(savedPost);
+        EntityModel<Post> resource = EntityModel.of(savedPost); //???
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
         // resource.add(WebMvcLinkBuilder.linkTo(

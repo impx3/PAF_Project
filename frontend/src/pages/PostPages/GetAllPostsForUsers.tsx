@@ -21,6 +21,7 @@ interface Post {
   imageUrl: string;
   likeCount: number;
   isLiked: boolean;
+  commentsCount?: number;
 }
 
 const GetAllPostsForUsers: React.FC = () => {
@@ -125,7 +126,7 @@ const GetAllPostsForUsers: React.FC = () => {
         <p className="text-center text-gray-500">No posts available.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post) => (
+          {posts?.map((post) => (
             <Card key={post.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="truncate">{post.title}</CardTitle>
@@ -182,11 +183,11 @@ const GetAllPostsForUsers: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleCommentClick(post.id)}
+                    onClick={() => handleCommentClick(post?.id)}
                     className="gap-1 text-gray-600 hover:text-blue-500"
                   >
                     <MessageCircle className="w-4 h-4" />
-                    <span>{post.commentsCount}</span>
+                    <span>{post?.commentsCount}</span>
                   </Button>
 
                   <Button
