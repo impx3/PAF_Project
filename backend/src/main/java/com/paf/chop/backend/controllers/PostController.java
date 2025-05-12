@@ -1,13 +1,10 @@
 package com.paf.chop.backend.controllers;
 
-import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.dto.response.PostDTO;
 import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-import java.util.stream.Collectors;
 
 import com.paf.chop.backend.models.Post;
 import com.paf.chop.backend.models.User;
@@ -19,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.web.bind.annotation.*;
 
 import com.paf.chop.backend.services.FileStorageService;
@@ -26,16 +24,11 @@ import com.paf.chop.backend.services.FileStorageService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
 
 @CrossOrigin(origins = "http://localhost:5173/", maxAge = 3600)
 @RestController
@@ -273,7 +266,9 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<List<Post>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+         List<Post> posts= postService.getAllPosts();
+
+         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/user")

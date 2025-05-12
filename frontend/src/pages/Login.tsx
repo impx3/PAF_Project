@@ -170,7 +170,7 @@ const Login: React.FC = () => {
                     setIsLoading(true);
                     await firebaseLogin();
                     toast.success("Logged in via Google!");
-                    navigate("/home");
+                    navigate("/post/feed");
                   } catch (err) {
                     toast.error("Firebase login failed. Please try again.");
                   } finally {

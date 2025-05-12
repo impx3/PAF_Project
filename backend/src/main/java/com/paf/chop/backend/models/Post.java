@@ -32,6 +32,8 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // <-- ADD THIS
 
+
+    @JsonIgnore
     //post like
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();

@@ -7,7 +7,7 @@ import DeleteAccount from "@/pages/DeleteAccount";
 import EditProfile from "@/pages/EditProfile";
 import UserList from "@/pages/UserList";
 import PrivateRoute from "@/routes/PrivateRoute";
-import { HomePage } from "@/pages/HomePage.tsx";
+
 import { Profile } from "@/pages/Profile.tsx";
 import Login from "@/pages/Login.tsx";
 import Register from "@/pages/Register.tsx";
@@ -35,7 +35,7 @@ export function AppRouting() {
     <BrowserRouter>
       <Routes>
         {/* public landing/login */}
-        <Route path="/" element={<HomePage />} />
+        {/* <Route index path="/" element={<GetAllPostsForUsers />} />*/}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
@@ -81,7 +81,7 @@ export function AppRouting() {
             <Route path={"post/update/:id"} element={<Update />} />
             <Route path={"post/delete/:id"} element={<Delete />} />
             <Route path={"post/createvid"} element={<VideoUploadForm />} />
-            <Route path={"post/feed"} element={<GetAllPostsForUsers />} />
+            <Route index path={"post/feed"} element={<GetAllPostsForUsers />} />
             <Route path={"post/videos"} element={<VideoList />} />
             <Route path={"post/feedvideo"} element={<VideoListForUsers />} />
             <Route path={"post/:id"} element={<GetPostById />} />

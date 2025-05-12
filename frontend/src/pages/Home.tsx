@@ -1,3 +1,5 @@
+//ts-ignore
+
 import React, { useEffect, useState } from "react";
 import api from "../utils/axiosConfig";
 import { Following, useAuth } from "../context/AuthContext";

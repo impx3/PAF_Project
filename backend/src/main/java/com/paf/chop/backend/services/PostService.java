@@ -57,7 +57,12 @@ public class PostService {
 
 
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
+       try{
+           return postRepository.findAll();
+       } catch (Exception e) {
+           log.error(e.getMessage());
+           throw new RuntimeException(e);
+       }
     }
 
     public List<Post> getAllPostsByUser(User user) {
