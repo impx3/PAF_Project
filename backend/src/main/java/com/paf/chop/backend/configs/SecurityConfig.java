@@ -79,7 +79,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers(HttpMethod.PUT, "/api/learning-plans/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/learning-plans/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/me").authenticated()
-
                         .requestMatchers(HttpMethod.POST, "/api/learning-plans/*/resources/*/complete").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/learning-plans/*").authenticated()
 

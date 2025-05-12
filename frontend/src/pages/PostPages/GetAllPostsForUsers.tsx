@@ -216,7 +216,9 @@ const GetAllPostsForUsers: React.FC = () => {
           postId={selectedPostId}
         />
       )}
+      </div>
     </div>
+    
   );
 };
 

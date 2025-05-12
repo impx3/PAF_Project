@@ -52,39 +52,41 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 
 
   return (
-    <div className="max-w-lg mx-auto p-6 shadow-lg rounded-xl mt-10 bg-white">
-      <h2 className="text-2xl font-semibold mb-4">Upload Short Video (Max 30 seconds)</h2>
+    <div  style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
+      <h2  className="text-3xl font-bold text-center text-gray-900 mb-8">Upload Short Video (Max 30 seconds)</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block font-medium">Title</label>
+
           <input
             type="text"
             className="w-full border p-2 rounded"
             value={title}
+            placeholder='Title'
             onChange={(e) => setTitle(e.target.value)}
             required
           />
         </div>
 
         <div>
-          <label className="block font-medium">Description</label>
+
           <textarea
             className="w-full border p-2 rounded"
             value={description}
+            placeholder='Content'
             onChange={(e) => setDescription(e.target.value)}
             required
           ></textarea>
         </div>
 
-        <div>
-          <label className="block font-medium">Video File</label>
+        <div> 
           <input
             type="file"
             accept="video/mp4,video/mov"
             onChange={handleFileChange}
-            className="w-full"
+            className="w-full border p-2 rounded"
             required
+
           />
         </div>
 
