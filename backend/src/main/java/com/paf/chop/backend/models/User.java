@@ -80,13 +80,13 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-        name = "user_followers",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "follower_id")
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> followers = new HashSet<>();
-
-    @ManyToMany(mappedBy = "followers")
     private Set<User> following = new HashSet<>();
+
+    @ManyToMany(mappedBy = "following")
+    private Set<User> followers = new HashSet<>();
 
 }

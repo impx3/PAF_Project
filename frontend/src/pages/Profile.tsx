@@ -1,29 +1,33 @@
 import React, { useEffect, useState } from "react";
-import api from "../utils/axiosConfig";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FaBookmark } from "react-icons/fa";
+import { Trash2, Edit, UserPlus, UserMinus } from "lucide-react";
 import LearningPlanSelectionModal from "@/components/ui/LearningPlanSelectionModal.tsx";
 
-interface User {
-  id: number;
-  username: string;
-  firstName?: string;
-  lastName?: string;
-  isVerified: boolean;
-  bio?: string;
-  coins: number;
-  totalLikes: number;
-  totalPosts: number;
-  followers: number;
-  following: number;
-}
+import api from "@/utils/axiosConfig";
 
+import {
+  deleteCurrentUser,
+  getFollowers,
+  getFollowing,
+  getUserById,
+  PublicUser,
+  toggleFollow,
+  updateProfile,
+  uploadProfileImage,
+  UserProfile,
+} from "@/service/user.service";
+import { toast } from "react-toastify";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_BASE_URL;
 interface Post {
   id: number;
   title: string;
@@ -39,8 +43,8 @@ interface Video {
 }
 
 export const Profile: React.FC = () => {
-  const { currentUser } = useAuth();
-  const [user, setUser] = useState<User | null>(null);
+  const { currentUser, logout } = useAuth();
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
@@ -48,8 +52,8 @@ export const Profile: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
-
-  const navigate = useNavigate();
+  const [followers, setFollowers] = useState<PublicUser[]>([]);
+  const [following, setFollowing] = useState<PublicUser[]>([]);
 
   const handleNavigatePostAddPage = () => {
     navigate("/post/createpostselect");
@@ -59,38 +63,102 @@ export const Profile: React.FC = () => {
     navigate("/post/createvid");
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userRes = await api.get(`/users/${currentUser?.id}`);
-        setUser(userRes.data);
-
-        const postsRes = await api.get("/posts/user");
-        setPosts(postsRes.data);
-
-        api.get<Video[]>("/videos").then((res) => setVideos(res.data));
-
-        /* if (!isOwnProfile) {
-          const followingRes = await api.get(`/users/${currentUser?.id}/following`);
-          setIsFollowing(followingRes.data.some((f: { id: number }) => f.id === userRes.data.id));
-        }*/
-      } catch (err) {
-        console.error("Failed to fetch data", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData().then();
-  }, [currentUser]);
-
   const handleSaveClick = (post: Post) => {
     setSelectedPost(post);
     setShowSaveModal(true);
   };
 
-  /*  const isOwnProfile = currentUser?.id === Number(id);*/
+  const navigate = useNavigate();
+  const isOwnProfile = currentUser?.id === user?.id;
 
+  useEffect(() => {
+    const loadData = async () => {
+      if (!currentUser) return;
+
+      try {
+        setIsLoading(true);
+        const userData = await getUserById(currentUser.id);
+        if (userData) {
+          setUser(userData);
+          setFollowers(await getFollowers(currentUser.id));
+          setFollowing(await getFollowing(currentUser.id));
+        }
+
+        // Load posts and videos (keep existing implementation)
+        const postsRes = await api.get("/posts/user");
+        setPosts(postsRes.data);
+        const videosRes = await axios.get<Video[]>(`${API_URL}/videos`);
+        setVideos(videosRes.data);
+      } catch (error) {
+        toast.error("Failed to load profile data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [currentUser]);
+
+  const handleFollow = async () => {
+    if (!currentUser || !user) return;
+
+    try {
+      const result = await toggleFollow(currentUser.id, user.id);
+      if (result) {
+        setIsFollowing(!isFollowing);
+        toast.success(
+          isFollowing ? "Unfollowed successfully" : "Followed successfully",
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to update follow status");
+    }
+  };
+
+  const handleProfileUpdate = async (updates: {
+    bio?: string;
+    profileImage?: string;
+  }) => {
+    if (!user) return;
+
+    try {
+      const success = await updateProfile(updates);
+      if (success) {
+        setUser((prev) => (prev ? { ...prev, ...updates } : null));
+        toast.success("Profile updated successfully");
+      }
+    } catch (error) {
+      toast.error("Failed to update profile");
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      const imageUrl = await uploadProfileImage(file);
+      if (imageUrl) {
+        await handleProfileUpdate({ profileImage: imageUrl });
+      }
+    } catch (error) {
+      toast.error("Failed to upload image");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm("Are you sure you want to delete your account?")) {
+      try {
+        const success = await deleteCurrentUser();
+        if (success) {
+          logout();
+          navigate("/");
+          toast.success("Account deleted successfully");
+        }
+      } catch (error) {
+        toast.error("Failed to delete account");
+      }
+    }
+  };
+
+  // Loading state
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -112,31 +180,48 @@ export const Profile: React.FC = () => {
     );
   }
 
-  if (!currentUser)
+  if (!currentUser || !user) {
     return <div className="text-center py-8">User not found</div>;
+  }
 
+  // @ts-ignore
   return (
     <div className="p-4">
       <Card className="p-8">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-center gap-8 mb-8">
-          <Avatar className="h-32 w-32">
-            <AvatarImage
-              src={currentUser.profileImage || "/default-avatar.png"}
-              alt={currentUser.username}
-            />
-            <AvatarFallback>
-              {currentUser.firstName?.[0]}
-              {currentUser.lastName?.[0]}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative group">
+            <Avatar className="h-32 w-32">
+              <AvatarImage
+                src={(user.profileImage as string) || "/default-avatar.png"}
+                alt={user.username as string}
+              />
+              <AvatarFallback>
+                {user?.firstName?.[0] as string}
+                {user?.lastName?.[0] as string}
+              </AvatarFallback>
+            </Avatar>
+            {isOwnProfile && (
+              <label className="absolute bottom-0 right-0 bg-background p-2 rounded-full cursor-pointer shadow-sm">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    e.target.files?.[0] && handleImageUpload(e.target.files[0])
+                  }
+                  className="hidden"
+                />
+                <Edit className="h-5 w-5" />
+              </label>
+            )}
+          </div>
 
           <div className="flex-1 space-y-4">
             <div className="flex items-center gap-4">
               <h1 className="text-3xl font-bold">
-                {currentUser.firstName} {currentUser.lastName}
+                {user?.firstName} {user?.lastName}
               </h1>
-              {currentUser.isVerified && (
+              {user?.isVerified && (
                 <Badge className="gap-2 px-4 py-1.5">
                   <img
                     src="/images/verified-badge.png"
@@ -146,37 +231,68 @@ export const Profile: React.FC = () => {
                   Verified Chef
                 </Badge>
               )}
+              {!isOwnProfile && (
+                <Button
+                  variant={isFollowing ? "outline" : "default"}
+                  onClick={handleFollow}
+                >
+                  {isFollowing ? (
+                    <UserMinus className="mr-2" />
+                  ) : (
+                    <UserPlus className="mr-2" />
+                  )}
+                  {isFollowing ? "Following" : "Follow"}
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card className="p-4 text-center">
-                <p className="text-2xl font-bold">{currentUser.totalPosts}</p>
+                <p className="text-2xl font-bold">{user.totalPost}</p>
                 <p className="text-sm text-muted-foreground">Posts</p>
               </Card>
               <Card className="p-4 text-center">
-                <p className="text-2xl font-bold">{currentUser.followers}</p>
+                <p className="text-2xl font-bold">{user.followerCount}</p>
                 <p className="text-sm text-muted-foreground">Followers</p>
               </Card>
               <Card className="p-4 text-center">
-                <p className="text-2xl font-bold">
-                  {currentUser?.following?.length}
-                </p>
+                <p className="text-2xl font-bold">{user.followingCount}</p>
                 <p className="text-sm text-muted-foreground">Following</p>
               </Card>
               <Card className="p-4 text-center">
-                <p className="text-2xl font-bold">{currentUser.coins}</p>
+                <p className="text-2xl font-bold">{user.coins}</p>
                 <p className="text-sm text-muted-foreground">Coins</p>
               </Card>
             </div>
           </div>
         </div>
+
         {/* Bio Section */}
         <Card className="p-6 mb-8">
-          <h3 className="text-xl font-semibold mb-4">About Me</h3>
-          <p className="text-muted-foreground">
-            {currentUser.bio || "No bio provided"}
-          </p>
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold mb-4">About Me</h3>
+              <p className="text-muted-foreground">
+                {user.bio || "No bio provided"}
+              </p>
+            </div>
+            {isOwnProfile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const newBio = prompt("Enter new bio", user.bio);
+                  if (newBio !== null) {
+                    handleProfileUpdate({ bio: newBio });
+                  }
+                }}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </Card>
+
         {/* Navigation Tabs */}
         <div className="flex gap-4 mb-8">
           <Button
@@ -198,15 +314,19 @@ export const Profile: React.FC = () => {
             Activity
           </Button>
         </div>
-        {/* Action Buttons
-        <div className="flex gap-4">
-          <Button asChild variant="outline" size="lg">
-            <Link to="/edit-profile">Edit Profile</Link>
-          </Button>
-          <Button variant="outline" size="lg">
-            Settings
-          </Button>
-        </div>*/}
+
+        {/* Action Buttons */}
+        {isOwnProfile && (
+          <div className="flex gap-4 mb-8">
+            <Button asChild variant="outline">
+              <Link to="/edit-profile">Edit Profile</Link>
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteAccount}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Account
+            </Button>
+          </div>
+        )}
         {/* Content Tabs */}
         {activeTab === "posts" && (
           <div className="space-y-6">

@@ -1,160 +1,117 @@
 package com.paf.chop.backend.controllers;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.dto.response.user.PublicUserResponseDTO;
+import com.paf.chop.backend.services.UserService;
 import com.paf.chop.backend.utils.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.web.bind.annotation.*;
-
-import com.paf.chop.backend.dto.response.UserResponseDTO;
-import com.paf.chop.backend.models.User;
-import com.paf.chop.backend.repositories.UserRepository;
-import com.paf.chop.backend.services.UserService;
 import java.io.File;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
-    public UserController(UserService userService, UserRepository userRepository) {
-        this.userService = userService;
-        this.userRepository = userRepository;
-    }
-
-
+    // ─── Get current user full profile (with follower/following lists) ───
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username);
-        if (user == null) return ResponseEntity.notFound().build();
-
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setIsVerified(user.getIsVerified());
-        dto.setCoins(user.getCoins());
-        dto.setTotalLikes(user.getTotalLikes());
-        dto.setTotalPost(user.getTotalPost());
-        dto.setProfileImage(user.getProfileImage());
-        dto.setBio(user.getBio());
-        dto.setUserRole(user.getUserRole().name());
-        dto.setToken(null); // Don't expose token
-
-        dto.setFollowerCount(user.getFollowers().size());
-        dto.setFollowingCount(user.getFollowing().size());
-
-
-        // HATEOAS links
-        dto.add(linkTo(methodOn(UserController.class).getCurrentUser(authentication)).withSelfRel());
-        dto.add(linkTo(methodOn(UserController.class).getFollowers(user.getId())).withRel("followers"));
-        dto.add(linkTo(methodOn(UserController.class).getFollowing(user.getId())).withRel("following"));
-        dto.add(linkTo(methodOn(UserController.class).updateProfile(null, authentication)).withRel("update-profile"));
-        dto.add(linkTo(methodOn(UserController.class).deleteCurrentUser(authentication)).withRel("delete-account"));
-
+    public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication auth) {
+        Long userId = userService.findIdByEmail(auth.getName());
+        UserResponseDTO dto = userService.buildFullProfile(userId);
         return ResponseEntity.ok(dto);
     }
 
+    // ─── Get any user’s raw entity (if you still need it) ───
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userService.getUser(id);
-        return (user != null) ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    public ResponseEntity<?> getUser(@PathVariable Long id) {
+        return userService.getUser(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // ─── Toggle follow/unfollow ───
+    @PostMapping("/{currentUserId}/follow/{targetUserId}")
+    public ResponseEntity<ApiResponse<String>> toggleFollow(
+            @PathVariable Long currentUserId,
+            @PathVariable Long targetUserId
+    ) {
+        String msg = userService.toggleFollowByIds(currentUserId, targetUserId);
+        return ResponseEntity.ok(ApiResponse.success(msg, "Followed User Successfully"));
+    }
+
+    // ─── List of public profiles following you ───
     @GetMapping("/{id}/followers")
-    public Set<User> getFollowers(@PathVariable Long id) {
-        log.info("Get Followers for user with ID: {}", id);
-        return userService.getFollowers(id);
+    public ResponseEntity<List<PublicUserResponseDTO>> getFollowers(@PathVariable Long id) {
+        List<PublicUserResponseDTO> list = userService.getFollowersDto(id);
+        return ResponseEntity.ok(list);
     }
 
+    // ─── List of public profiles you are following ───
     @GetMapping("/{id}/following")
-    public Set<User> getFollowing(@PathVariable Long id) {
-        return userService.getFollowing(id);
+    public ResponseEntity<List<PublicUserResponseDTO>> getFollowing(@PathVariable Long id) {
+        List<PublicUserResponseDTO> list = userService.getFollowingDto(id);
+        return ResponseEntity.ok(list);
     }
 
+    // ─── Upload profile image ───
     @PostMapping("/upload")
     public ResponseEntity<String> uploadProfileImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("No file uploaded");
         }
-
         try {
             String uploadDir = "uploads/profilePictures/";
-            File directory = new File(uploadDir);
-            if (!directory.exists()) directory.mkdirs();
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
 
             String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             String filepath = uploadDir + filename;
-
             file.transferTo(new File(filepath));
 
             return ResponseEntity.ok("/" + filepath.replace("\\", "/"));
         } catch (IOException e) {
+            log.error("Failed to upload profile image", e);
             return ResponseEntity.status(500).body("File upload failed");
         }
     }
 
-    @PostMapping("/{targetId}/follow")
-    public ResponseEntity<String> follow(@PathVariable Long targetId, Authentication authentication) {
-        String currentUserEmail = authentication.getName();
-        String result = userService.toggleFollowByEmail(currentUserEmail, targetId);
-        return ResponseEntity.ok(result);
-    }
-
+    // ─── Update own profile ───
     @PutMapping("/me")
-    public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> updates, Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email);
-        if (user == null) return ResponseEntity.status(404).body("User not found");
-
-        if (updates.containsKey("username")) user.setUsername(updates.get("username"));
-        if (updates.containsKey("bio")) user.setBio(updates.get("bio"));
-        if (updates.containsKey("profileImage")) user.setProfileImage(updates.get("profileImage"));
-        user.setUpdatedAt(LocalDateTime.now());
-
-        userRepository.save(user);
-        return ResponseEntity.ok("Profile updated successfully");
+    public ResponseEntity<?> updateProfile(
+            @RequestBody Map<String, String> updates,
+            Authentication auth
+    ) {
+        Long userId = userService.findIdByEmail(auth.getName());
+        System.out.println("Update request received: " + updates);
+        userService.updateProfile(userId, updates);
+        return ResponseEntity.ok(ApiResponse.success(true,"Profile updated"));
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCurrentUser(Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email);
-        if (user != null) {
-            userRepository.delete(user);
-            return ResponseEntity.ok("User deleted");
-        }
-        return ResponseEntity.status(404).body("User not found");
+    // ─── Delete own account ───
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteCurrentUser(Authentication auth) {
+        Long userId = userService.findIdByEmail(auth.getName());
+        userService.deleteUser(userId);
+        return ResponseEntity.ok(ApiResponse.success(true,"User deleted"));
     }
 
-
+    // ─── List all users (public DTO) ───
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<PublicUserResponseDTO>>> getAllUsers() {
-        ApiResponse<List<PublicUserResponseDTO>> response = userService.getAllUsers();
-        if (response.isSuccess()) {
-           return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
-        }
+        ApiResponse<List<PublicUserResponseDTO>> resp = userService.getAllUsers();
+        return resp.isSuccess()
+                ? ResponseEntity.ok(resp)
+                : ResponseEntity.badRequest().body(resp);
     }
-
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/axiosConfig";
 import { toast } from "react-toastify";
@@ -9,10 +9,20 @@ import styles from "../styles/EditProfile.module.css";
 const EditProfile: React.FC = () => {
   const { currentUser } = useAuth();
   const [form, setForm] = useState({
-    username: currentUser?.username || "",
-    bio: currentUser?.bio || "",
-    profileImage: currentUser?.profileImage || "",
+    username: "",
+    bio: "",
+    profileImage: "",
   });
+
+  useEffect(() => {
+    if (currentUser) {
+      setForm({
+        username: currentUser.username || "",
+        bio: currentUser.bio || "",
+        profileImage: currentUser.profileImage || "",
+      });
+    }
+  }, [currentUser]);
 
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
@@ -22,28 +32,36 @@ const EditProfile: React.FC = () => {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
+
+    console.log("Uploading file:", file);
 
     setUploading(true);
     try {
-      const res = await api.post('/users/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const res = await api.post("/users/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      setForm(prev => ({ ...prev, profileImage: res.data }));
-      toast.success('Image uploaded');
-    } catch (err) {
-      toast.error('Upload failed');
+      console.log("Upload response:", res.data);
+      setForm((prev) => ({ ...prev, profileImage: res.data }));
+      toast.success("Image uploaded");
+    } catch (err: any) {
+      console.error("Upload failed:", err.response?.data || err.message);
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const handleUpdate = async () => {
+    console.log("Attempting profile update with data:", form);
+
     try {
-      await api.put("/users/me", form);
+      const res = await api.put("/users/me", form);
+      console.log("Profile update success:", res.data);
       toast.success("Profile updated successfully");
-      setCurrentUser({ ...currentUser, ...form });
       navigate(`/profile/${currentUser?.id}`);
-    } catch (err) {
+    } catch (err: any) {
+      console.error("Update failed:", err.response?.data || err.message);
       toast.error("Failed to update profile");
     }
   };
@@ -70,7 +88,9 @@ const EditProfile: React.FC = () => {
       <label className={styles.label}>Profile Picture</label>
       <input type="file" accept="image/*" onChange={handleFileUpload} />
       {uploading && <p>Uploading...</p>}
-      {form.profileImage && <img src={form.profileImage} alt="Preview" width={100} />}
+      {form.profileImage && (
+        <img src={form.profileImage} alt="Preview" width={100} />
+      )}
 
       <button onClick={handleUpdate} className={styles.saveBtn}>
         Save Changes

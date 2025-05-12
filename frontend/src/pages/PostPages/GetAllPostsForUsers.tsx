@@ -19,8 +19,8 @@ interface Post {
   title: string;
   content: string;
   imageUrl: string;
-  likes: number;
-  commentsCount: number;
+  likeCount: number;
+  isLiked: boolean;
 }
 
 const GetAllPostsForUsers: React.FC = () => {
@@ -30,32 +30,53 @@ const GetAllPostsForUsers: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .get<Post[]>("/posts")
-      .then((response) => {
-        setPosts(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
+    const fetchPosts = async () => {
+      try {
+        const response = await api.get("/posts");
+
+        const transformedPosts = response.data.map((post: Post) => ({
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          imageUrl: post.imageUrl || "",
+          likes: post.likeCount || 0,
+          isLiked: false,
+        }));
+        setPosts(transformedPosts);
+      } catch (error) {
         console.error("Error fetching posts:", error);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchPosts().then();
   }, []);
 
   const handleLike = async (postId: number) => {
     try {
+      const response = await api.post(`/posts/like/${postId}`);
+      const updatedPost = response.data.data;
+
       const updatedPosts = posts.map((post) => {
         if (post.id === postId) {
-          const newLikes = post.likes + 1;
-          return { ...post, likes: newLikes };
+          return {
+            ...post,
+            likes: updatedPost.likeCount,
+            isLiked: updatedPost.isLiked,
+          };
         }
         return post;
       });
-      setPosts(updatedPosts);
 
-      await api.post(`/posts/${postId}/like`);
-    } catch (error) {
-      console.error("Error updating like:", error);
+      setPosts(updatedPosts);
+    } catch (error: any) {
+      // Extract error message from the API response
+      const message =
+        error.response?.data?.message ||
+        "An error occurred while liking the post.";
+      alert(message);
+      console.error("Error updating like:", message);
     }
   };
 
@@ -155,7 +176,7 @@ const GetAllPostsForUsers: React.FC = () => {
                     className="gap-1 text-gray-600 hover:text-red-500"
                   >
                     <Heart className="w-4 h-4" />
-                    <span>{post.likes}</span>
+                    <span>{post.likeCount}</span>
                   </Button>
 
                   <Button

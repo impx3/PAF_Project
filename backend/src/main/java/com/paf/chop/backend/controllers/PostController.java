@@ -1,5 +1,8 @@
 package com.paf.chop.backend.controllers;
 
+import com.paf.chop.backend.dto.response.CommentResponseDTO;
+import com.paf.chop.backend.dto.response.PostDTO;
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -12,6 +15,7 @@ import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.services.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,14 +42,17 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    @Autowired
-    private PostService postService;
+
+    private final PostService postService;
+    private final FileStorageService fileStorageService;
+    private final UserRepository userRepository;
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
-    private UserRepository userRepository;
+    public PostController(PostService postService, FileStorageService fileStorageService, UserRepository userRepository) {
+        this.postService = postService;
+        this.fileStorageService = fileStorageService;
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/home")
     public String HomeEndpoint() {
@@ -291,6 +298,18 @@ public class PostController {
                 // WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
 
         return ResponseEntity.ok(resource);
+    }
+
+    //post likes
+    @PostMapping("/like/{postId}")
+    public ResponseEntity<ApiResponse<PostDTO>> likePost(@PathVariable Long postId) {
+        ApiResponse<PostDTO> postResponseDTO = postService.likePost(postId);
+
+        if (postResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(postResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(postResponseDTO);
+        }
     }
 
 }

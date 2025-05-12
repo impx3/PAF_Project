@@ -60,7 +60,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/videos/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/api/users/**").authenticated()
+                        .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/videos/upload-video").permitAll()
 
 
