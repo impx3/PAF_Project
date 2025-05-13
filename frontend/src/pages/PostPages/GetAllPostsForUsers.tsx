@@ -40,8 +40,8 @@ const GetAllPostsForUsers: React.FC = () => {
           title: post.title,
           content: post.content,
           imageUrl: post.imageUrl || "",
-          likes: post.likeCount || 0,
-          isLiked: false,
+          likeCount: post.likeCount || 0,
+          isLiked: post.isLiked || false,
         }));
         setPosts(transformedPosts);
       } catch (error) {
@@ -57,27 +57,27 @@ const GetAllPostsForUsers: React.FC = () => {
   const handleLike = async (postId: number) => {
     try {
       const response = await api.post(`/posts/like/${postId}`);
-      const updatedPost = response.data.data;
+      const updatedPost = response.data.result;
 
-      const updatedPosts = posts.map((post) => {
-        if (post.id === postId) {
-          return {
-            ...post,
-            likes: updatedPost.likeCount,
-            isLiked: updatedPost.isLiked,
-          };
-        }
-        return post;
-      });
+      // Update the post in the local state
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                likeCount: updatedPost.likeCount,
+                isLiked: updatedPost.isLiked,
+              }
+            : post,
+        ),
+      );
 
-      setPosts(updatedPosts);
-    } catch (error: any) {
-      // Extract error message from the API response
-      const message =
-        error.response?.data?.message ||
-        "An error occurred while liking the post.";
-      alert(message);
-      console.error("Error updating like:", message);
+      console.log(updatedPost);
+    } catch (e: any) {
+      const errorMessage =
+        e.response?.data?.message || "An unexpected error occurred.";
+      alert(errorMessage);
+      console.error("Like error:", errorMessage);
     }
   };
 
@@ -176,7 +176,11 @@ const GetAllPostsForUsers: React.FC = () => {
                     onClick={() => handleLike(post.id)}
                     className="gap-1 text-gray-600 hover:text-red-500"
                   >
-                    <Heart className="w-4 h-4" />
+                    {post?.isLiked ? (
+                      <Heart className="text-red-500 fill-red-500 w-4 h-4" />
+                    ) : (
+                      <Heart className="w-4 h-4 text-red-500" />
+                    )}
                     <span>{post.likeCount}</span>
                   </Button>
 
