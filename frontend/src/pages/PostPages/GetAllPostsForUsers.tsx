@@ -200,7 +200,7 @@ const GetAllPostsForUsers: React.FC = () => {
                   </Button>
                 </div>
 
-                <Link to={`/post/${post.id}`}>
+                <Link to={`/post/${post.id}/all`}>
                   <Button variant="outline" size="sm">
                     View
                   </Button>

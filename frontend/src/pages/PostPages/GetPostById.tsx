@@ -163,7 +163,7 @@ const GetPostById: React.FC = () => {
                 </Button>
               </div>
 
-              <Link to="/post/feed">
+              <Link to="/post/posts">
                 <Button variant="outline" size="sm">
                   Back to Feed
                 </Button>

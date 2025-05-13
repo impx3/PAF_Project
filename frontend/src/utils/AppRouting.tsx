@@ -29,6 +29,8 @@ import {
   VideoListForUsers,
   VideoUploadForm,
 } from "@/pages/PostPages";
+import CreateText from "@/pages/PostPages/CreateText";
+import GetPostByIdForUsers from "@/pages/PostPages/GetPostByIdForUsers";
 
 export function AppRouting() {
   return (
@@ -46,6 +48,9 @@ export function AppRouting() {
           path={"/learningplans/public/:planId"}
           element={<PublicLearningPlanResources />}
         />
+        <Route index path={"post/feed"} element={<GetAllPostsForUsers />} />
+        <Route path={"post/feedvideo"} element={<VideoListForUsers />} />
+        <Route path={"post/:id/all"} element={<GetPostByIdForUsers />} />
 
         {/* everything inside here requires auth */}
         <Route element={<PrivateRoute />}>
@@ -70,10 +75,10 @@ export function AppRouting() {
               path={"learning-plans/:planId/resources"}
               element={<LearningPlanResources />}
             />
-            <Route path={"posts"} element={<GetAllPosts />} />
+            <Route path={"post/posts"} element={<GetAllPosts />} />
             <Route path={"post/createpostselect"} element={<Home />} />
             <Route path={"post/create"} element={<Create />} />
-            <Route path={"post/text"} element={<Create />} />
+            <Route path={"post/text"} element={<CreateText />} />
             <Route
               path={"post/CreateWithMultipleImages"}
               element={<CreateWithMultipleImages />}
@@ -81,9 +86,8 @@ export function AppRouting() {
             <Route path={"post/update/:id"} element={<Update />} />
             <Route path={"post/delete/:id"} element={<Delete />} />
             <Route path={"post/createvid"} element={<VideoUploadForm />} />
-            <Route index path={"post/feed"} element={<GetAllPostsForUsers />} />
             <Route path={"post/videos"} element={<VideoList />} />
-            <Route path={"post/feedvideo"} element={<VideoListForUsers />} />
+            
             <Route path={"post/:id"} element={<GetPostById />} />
             {/* catch-all for “/anything-else” inside dashboard */}
             <Route path="*" element={<h1>Page not found</h1>} />
