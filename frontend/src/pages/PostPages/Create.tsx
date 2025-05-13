@@ -46,7 +46,7 @@ const Create: React.FC = () => {
       await api.post("/posts", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      navigate("/posts");
+      navigate("/post/posts");
     } catch (error) {
       setMessage("Error creating post.");
       console.error(error);
