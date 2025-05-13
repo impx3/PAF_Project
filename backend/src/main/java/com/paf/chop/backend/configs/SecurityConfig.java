@@ -54,6 +54,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/api/auth/firebase-login").permitAll()
 
                         // Posts endpoints
+                        .requestMatchers("/api/posts2/**").permitAll()
                         .requestMatchers("/api/posts/**").permitAll()
 
                         // Media endpoints
