@@ -48,9 +48,6 @@ export function AppRouting() {
           path={"/learningplans/public/:planId"}
           element={<PublicLearningPlanResources />}
         />
-        <Route index path={"post/feed"} element={<GetAllPostsForUsers />} />
-        <Route path={"post/feedvideo"} element={<VideoListForUsers />} />
-        <Route path={"post/:id/all"} element={<GetPostByIdForUsers />} />
 
         {/* everything inside here requires auth */}
         <Route element={<PrivateRoute />}>
@@ -83,6 +80,11 @@ export function AppRouting() {
               path={"post/CreateWithMultipleImages"}
               element={<CreateWithMultipleImages />}
             />
+
+            <Route index path={"post/feed"} element={<GetAllPostsForUsers />} />
+            <Route path={"post/feedvideo"} element={<VideoListForUsers />} />
+            <Route path={"post/:id/all"} element={<GetPostByIdForUsers />} />
+
             <Route path={"post/update/:id"} element={<Update />} />
             <Route path={"post/delete/:id"} element={<Delete />} />
             <Route path={"post/createvid"} element={<VideoUploadForm />} />
