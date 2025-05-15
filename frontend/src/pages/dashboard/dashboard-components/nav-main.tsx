@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { House, User, BookOpen, Video, Search, Globe } from "lucide-react";
+import { House, User, BookOpen, Video, Search, Globe, Users } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -38,6 +38,11 @@ const navMain = [
     title: "Profile",
     url: "/profile",
     icon: User,
+  },
+  {
+    title: "Followers",
+    url: "/followers", 
+    icon: Users, 
   },
 ];
 
