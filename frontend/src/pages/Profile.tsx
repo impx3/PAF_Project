@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+import coinGif from "@/images/coin2.gif";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -98,22 +98,6 @@ export const Profile: React.FC = () => {
 
     loadData();
   }, [currentUser]);
-
-  // const handleFollow = async () => {
-  //   if (!currentUser || !user) return;
-
-  //   try {
-  //     const result = await toggleFollow(currentUser.id, user.id);
-  //     if (result) {
-  //       setIsFollowing(!isFollowing);
-  //       toast.success(
-  //         isFollowing ? "Unfollowed successfully" : "Followed successfully",
-  //       );
-  //     }
-  //   } catch (error) {
-  //     toast.error("Failed to update follow status");
-  //   }
-  // };
 
   const handleProfileUpdate = async (updates: {
     bio?: string;
@@ -231,19 +215,7 @@ export const Profile: React.FC = () => {
                   Verified Chef
                 </Badge>
               )}
-              {/* {!isOwnProfile && (
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  onClick={handleFollow}
-                >
-                  {isFollowing ? (
-                    <UserMinus className="mr-2" />
-                  ) : (
-                    <UserPlus className="mr-2" />
-                  )}
-                  {isFollowing ? "Following" : "Follow"}
-                </Button>
-              )} */}
+              
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -259,9 +231,11 @@ export const Profile: React.FC = () => {
                 <p className="text-2xl font-bold">{user.followingCount}</p>
                 <p className="text-sm text-muted-foreground">Following</p>
               </Card>
-              <Card className="p-4 text-center">
+              <Card className="p-4">
+                <div className="flex justify-center items-center gap-2">
                 <p className="text-2xl font-bold">{user.coins}</p>
-                <p className="text-sm text-muted-foreground">Coins</p>
+                <img src={coinGif} alt="Coin" className="w-14 h-14"/> 
+                </div>
               </Card>
             </div>
           </div>
