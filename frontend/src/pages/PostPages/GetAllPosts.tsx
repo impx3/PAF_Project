@@ -123,7 +123,7 @@ const GetAllPosts = () => {
             }}
             postTitle={selectedPost.title}
             postContent={selectedPost.content}
-            postUrl={`http://localhost:3000/post/${selectedPost.id}`}
+            postUrl={`http://localhost:5173/post/${selectedPost.id}/all`}
           />
         )}
       </div>

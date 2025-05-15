@@ -56,7 +56,7 @@ const PublicLearningPlans: React.FC = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
+            <div className="min-h-screen bg-gray-50 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center py-12">
                         <p className="text-red-500 text-lg">{error}</p>
@@ -73,7 +73,7 @@ const PublicLearningPlans: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
+        <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
                     <div className="flex items-center justify-center mb-4">

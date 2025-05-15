@@ -40,14 +40,9 @@ export function AppRouting() {
         {/* <Route index path="/" element={<GetAllPostsForUsers />} />*/}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route
-          path={"/learningplans/public"}
-          element={<PublicLearningPlans />}
-        />
-        <Route
-          path={"/learningplans/public/:planId"}
-          element={<PublicLearningPlanResources />}
-        />
+        {/* Remove the top-level /learningplans/public route */}
+        {/* <Route path={"/learningplans/public"} element={<PublicLearningPlans />} /> */}
+        {/* <Route path={"/learningplans/public/:planId"} element={<PublicLearningPlanResources />} /> */}
 
         {/* everything inside here requires auth */}
         <Route element={<PrivateRoute />}>
@@ -72,6 +67,8 @@ export function AppRouting() {
               path={"learning-plans/:planId/resources"}
               element={<LearningPlanResources />}
             />
+            <Route path={"learningplans/public"} element={<PublicLearningPlans />} />
+            <Route path={"learningplans/public/:planId"} element={<PublicLearningPlanResources />} />
             <Route path={"post/posts"} element={<GetAllPosts />} />
             <Route path={"post/createpostselect"} element={<Home />} />
             <Route path={"post/create"} element={<Create />} />

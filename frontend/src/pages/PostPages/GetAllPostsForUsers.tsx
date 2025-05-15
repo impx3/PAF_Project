@@ -11,8 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { FaBookmark } from "react-icons/fa";
 import { CommentComponent } from "@/components/comment/comment.tsx";
 import { Skeleton } from "@/components/ui/skeleton";
+import LearningPlanSelectionModal from "../../components/ui/LearningPlanSelectionModal";
 
 interface Post {
   id: number;
@@ -29,6 +31,8 @@ const GetAllPostsForUsers: React.FC = () => {
   const [showComments, setShowComments] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -92,6 +96,11 @@ const GetAllPostsForUsers: React.FC = () => {
     alert("Link copied to clipboard");
   };
 
+  const handleSaveClick = (post: Post) => {
+    setSelectedPost(post);
+    setShowSaveModal(true);
+  };
+
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
       <div className="text-center mb-8">
@@ -129,7 +138,16 @@ const GetAllPostsForUsers: React.FC = () => {
           {posts?.map((post) => (
             <Card key={post.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle className="truncate">{post.title}</CardTitle>
+                <div className="flex justify-between items-start">
+                  <CardTitle className="truncate">{post.title}</CardTitle>
+                  <button
+                    onClick={() => handleSaveClick(post)}
+                    className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                    title="Save to Learning Plan"
+                  >
+                    <FaBookmark className="w-5 h-5" />
+                  </button>
+                </div>
               </CardHeader>
 
               <CardContent className="space-y-4">
@@ -215,6 +233,19 @@ const GetAllPostsForUsers: React.FC = () => {
         <CommentComponent
           onClose={() => setShowComments(false)}
           postId={selectedPostId}
+        />
+      )}
+
+      {selectedPost && (
+        <LearningPlanSelectionModal
+          isOpen={showSaveModal}
+          onClose={() => {
+            setShowSaveModal(false);
+            setSelectedPost(null);
+          }}
+          postTitle={selectedPost.title}
+          postContent={selectedPost.content}
+          postUrl={`http://localhost:5173/post/${selectedPost.id}/all`}
         />
       )}
     </div>
