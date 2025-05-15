@@ -20,8 +20,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-@Slf4j//like post
+
+
+@Slf4j
 @Service
 public class PostService {
 
@@ -65,6 +66,19 @@ public class PostService {
        }
     }
 
+    public List<PostDTO> getAllPostResponses() {
+        try{
+            List<Post> posts =  postRepository.findAll();
+
+            return posts.stream()
+                    .map(post -> new PostDTO(post.getId(), post.getTitle(), post.getContent(), post.getImageUrl(), post.getLikeCount(), isLiked(post)))
+                    .toList();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Post> getAllPostsByUser(User user) {
         return postRepository.findByUser(user);
     }
@@ -101,7 +115,7 @@ public class PostService {
                 likeRepository.delete(existingLike.get());
                 post.setLikeCount(post.getLikeCount() - 1);
                 postRepository.save(post);
-                log.info("Like post {}", postId);
+                log.info("Post unliked {}", postId);
 
                 return ApiResponse.success(getPostResponseDTO(post), "Post unliked successfully");
 
@@ -145,5 +159,5 @@ public class PostService {
     //like post
     public Boolean isLiked(Post post) {
         return likeRepository.existsByPostAndUser( post,  getCurrentUser());
-    }
+    } //me
 }

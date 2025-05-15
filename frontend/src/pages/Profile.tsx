@@ -23,7 +23,7 @@ import {
   updateProfile,
   uploadProfileImage,
   UserProfile,
-} from "@/service/user.service";
+} from "@/services/user.service.ts";
 import { toast } from "react-toastify";
 import axios from "axios";
 

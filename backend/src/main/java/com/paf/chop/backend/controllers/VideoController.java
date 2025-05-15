@@ -7,9 +7,13 @@ import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.paf.chop.backend.dto.response.CommentResponseDTO;
+import com.paf.chop.backend.dto.response.VideoResponseDTO;
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +29,7 @@ import com.paf.chop.backend.services.FileStorageService;
 import com.paf.chop.backend.services.VideoService;
 
 @RestController
-@RequestMapping("/videos")
+@RequestMapping("/api/videos")
 public class VideoController {
 
     @Autowired
@@ -131,5 +135,16 @@ public ResponseEntity<EntityModel<Video>> uploadShortVideo(
     public ResponseEntity<Void> deleteVideo(@PathVariable Long id) {
         videoService.deleteVideo(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/like/{videoId}")
+    public ResponseEntity<ApiResponse<VideoResponseDTO>> likeVideo(@PathVariable Long videoId) {
+        ApiResponse<VideoResponseDTO> videoResponseDTO = videoService.likeVideo(videoId);
+
+        if (videoResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(videoResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(videoResponseDTO);
+        }
     }
 }

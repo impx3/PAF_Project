@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 @Data
 public class CommentResponseDTO {
     private Long postId;
+    private Long videoId;
     private Long commentId;
     private Long createdUserId;
     private String createdUserName;

@@ -28,7 +28,7 @@ const Login: React.FC = () => {
         setCurrentUser(res.data.result);
         localStorage.setItem("currentUser", JSON.stringify(res.data.result));
         toast.success("Welcome back! Ready to cook something delicious?");
-        navigate("/posts");
+        navigate("/post/feed");
       }
     } catch (err) {
       toast.error("Oops! Please check your credentials and try again");

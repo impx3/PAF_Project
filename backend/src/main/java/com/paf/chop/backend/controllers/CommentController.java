@@ -26,7 +26,7 @@ public class CommentController {
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<CommentResponseDTO>> addComment(@RequestBody CommentRequestDTO commentRequestDTO) {
-        log.info("Adding comment for post : {}", commentRequestDTO.getPostId());
+
         ApiResponse<CommentResponseDTO> commentResponseDTO = commentService.comment(commentRequestDTO);
 
         if (commentResponseDTO.isSuccess()) {
@@ -36,10 +36,22 @@ public class CommentController {
         }
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<List<CommentResponseDTO>>> getComments(@PathVariable Long postId) {
+    @GetMapping("/post/{postId}")
+    public ResponseEntity<ApiResponse<List<CommentResponseDTO>>> getPostComments(@PathVariable Long postId) {
 
-        ApiResponse<List<CommentResponseDTO>> comments = commentService.getComments(postId);
+        ApiResponse<List<CommentResponseDTO>> comments = commentService.getComments(postId, null);
+
+        if (comments.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(comments);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(comments);
+        }
+    }
+
+    @GetMapping("/video/{videoId}")
+    public ResponseEntity<ApiResponse<List<CommentResponseDTO>>> getVideoComments(@PathVariable Long videoId) {
+
+        ApiResponse<List<CommentResponseDTO>> comments = commentService.getComments(null, videoId);
 
         if (comments.isSuccess()) {
             return ResponseEntity.status(HttpStatus.OK).body(comments);

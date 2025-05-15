@@ -31,8 +31,8 @@ public class Like {
     private Post post = null;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe", referencedColumnName = "recipe_id")
-    private Recipe recipe = null;
+    @JoinColumn(name = "video", referencedColumnName = "id")
+    private Video video = null;
 
 
 }

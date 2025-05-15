@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext.tsx";
-import { ChatResponse, getPreviousMessages } from "@/service/chat.service.ts";
+import { ChatResponse, getPreviousMessages } from "@/services/chat.service.ts";
 import { ChatFooter } from "@/components/chat/chat-footer.tsx";
 import { X, Minus, MessageSquare } from "lucide-react";
 import { PublicUser } from "@/pages/UserList.tsx";
