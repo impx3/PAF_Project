@@ -1,20 +1,20 @@
 package com.paf.chop.backend.services;
 
-import com.paf.chop.backend.configs.Category;
+
 import com.paf.chop.backend.configs.CommentType;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.models.*;
 import com.paf.chop.backend.repositories.*;
+import com.paf.chop.backend.services.impl.LikeService;
 import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 @Slf4j
@@ -23,16 +23,18 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final LikeRepository likeRepository;
     private final VideoRepository videoRepository;
+    private final UserService userService;
+    private final LikeService likeService;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, LikeRepository likeRepository, VideoRepository videoRepository) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, VideoRepository videoRepository, UserService userService, LikeService likeService) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
-        this.likeRepository = likeRepository;
         this.videoRepository = videoRepository;
+        this.userService = userService;
+        this.likeService = likeService;
     }
 
     //add comment
@@ -144,7 +146,7 @@ public class CommentService {
 
         try {
             log.info("Received request to update comment: {}", commentRequestDTO);
-            Long userId = getCurrentUser().getId();
+            Long userId = userService.getCurrentUser().getId();
             Comment comment = commentRepository.findById(commentId).orElse(null);
 
             if(comment == null){
@@ -183,7 +185,7 @@ public class CommentService {
         try {
             log.info("Received request to delete comment: {}", commentId);
             // Get the logged-in user
-            Long userId = getCurrentUser().getId();
+            Long userId = userService.getCurrentUser().getId();
 
             // Find the comment
             Comment comment = commentRepository.findById(commentId).orElse(null);
@@ -209,50 +211,6 @@ public class CommentService {
         }
     }
 
-    //like and unlike comment
-    public ApiResponse<CommentResponseDTO> likeComment(Long commentId) {
-       try{
-           log.info("Received request to like/unlike comment: {}", commentId);
-           User currentUser = getCurrentUser();
-           Comment comment = commentRepository.findById(commentId).orElse(null);
-
-           if (comment == null) {
-                log.error("likeComment: Comment not found with ID: {}", commentId);
-               return ApiResponse.error("Comment not found");
-           }
-           // Check if user already liked the comment
-           Optional<Like> existingLike = likeRepository.findByUserAndComment(currentUser, comment);
-
-           if (existingLike.isPresent()) {
-
-                // User already liked the comment, so remove the like
-                likeRepository.delete(existingLike.get());
-                comment.setLikeCount(comment.getLikeCount() - 1);
-                commentRepository.save(comment);
-                log.info("Comment unliked: {}", commentId);
-
-               return ApiResponse.success(getCommentResponseDTO(comment), "Comment unliked successfully");
-
-              } else {
-
-                // User has not liked the comment yet, so add a new like
-                Like newLike = new Like();
-                newLike.setUser(currentUser);
-                newLike.setComment(comment);
-                newLike.setCategory(Category.COMMENT);
-                likeRepository.save(newLike);
-                comment.setLikeCount(comment.getLikeCount() + 1);
-               commentRepository.save(comment);
-                log.info("Comment liked: {}", commentId);
-
-               return ApiResponse.success(getCommentResponseDTO(comment), "Comment liked successfully");
-           }
-
-       } catch (Exception e) {
-           throw new RuntimeException(e);
-       }
-    }
-
 
     public CommentResponseDTO getCommentResponseDTO(Comment comment) {
         CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
@@ -264,7 +222,7 @@ public class CommentService {
         commentResponseDTO.setLikeCount(comment.getLikeCount());
         commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
         commentResponseDTO.setCommentId(comment.getCommentId());
-        commentResponseDTO.setIsLiked(isLiked(comment));
+        commentResponseDTO.setIsLiked(likeService.isCommentLiked(comment));
 
         if (comment.getPost() != null) {
             //response dto data
@@ -279,13 +237,5 @@ public class CommentService {
         return commentResponseDTO;
     }
 
-    public User getCurrentUser() {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(currentUsername);
-    }
-
-    public Boolean isLiked(Comment comment) {
-        return likeRepository.existsByCommentAndUser( comment,  getCurrentUser());
-    }
 
 }

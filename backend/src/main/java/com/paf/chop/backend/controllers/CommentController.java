@@ -3,6 +3,7 @@ package com.paf.chop.backend.controllers;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.services.CommentService;
+import com.paf.chop.backend.services.impl.LikeService;
 import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,12 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
+    private final LikeService likeService;
 
     @Autowired
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, LikeService likeService) {
         this.commentService = commentService;
+        this.likeService = likeService;
     }
 
     @PostMapping("/add")
@@ -84,7 +87,7 @@ public class CommentController {
 
     @PostMapping("/like/{commentId}")
     public ResponseEntity<ApiResponse<CommentResponseDTO>> likeComment(@PathVariable Long commentId) {
-        ApiResponse<CommentResponseDTO> commentResponseDTO = commentService.likeComment(commentId);
+        ApiResponse<CommentResponseDTO> commentResponseDTO = likeService.likeComment(commentId);
 
         if (commentResponseDTO.isSuccess()) {
             return ResponseEntity.status(HttpStatus.OK).body(commentResponseDTO);

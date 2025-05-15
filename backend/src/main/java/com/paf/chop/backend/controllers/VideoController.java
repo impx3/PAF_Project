@@ -10,6 +10,7 @@ import java.util.List;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.dto.response.PostDTO;
 import com.paf.chop.backend.dto.response.VideoResponseDTO;
+import com.paf.chop.backend.services.impl.LikeService;
 import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
@@ -33,11 +34,18 @@ import com.paf.chop.backend.services.VideoService;
 @RequestMapping("/api/videos")
 public class VideoController {
 
-    @Autowired
-    private VideoService videoService;
+
+    private final VideoService videoService;
+    private final FileStorageService fileStorageService;
+    private final LikeService likeService;
 
     @Autowired
-    private FileStorageService fileStorageService;
+    public VideoController(VideoService videoService, FileStorageService fileStorageService, LikeService likeService) {
+        this.videoService = videoService;
+        this.fileStorageService = fileStorageService;
+        this.likeService = likeService;
+    }
+
 
     public Long getVideoDurationInSeconds(MultipartFile file) throws IOException {
     File tempFile = File.createTempFile("video", file.getOriginalFilename());
@@ -140,7 +148,7 @@ public ResponseEntity<EntityModel<Video>> uploadShortVideo(
 
     @PostMapping("/like/{videoId}")
     public ResponseEntity<ApiResponse<VideoResponseDTO>> likeVideo(@PathVariable Long videoId) {
-        ApiResponse<VideoResponseDTO> videoResponseDTO = videoService.likeVideo(videoId);
+        ApiResponse<VideoResponseDTO> videoResponseDTO = likeService.likeVideo(videoId);
 
         if (videoResponseDTO.isSuccess()) {
             return ResponseEntity.status(HttpStatus.OK).body(videoResponseDTO);

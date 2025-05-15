@@ -11,6 +11,7 @@ import com.paf.chop.backend.repositories.LikeRepository;
 import com.paf.chop.backend.repositories.PostRepository;
 import com.paf.chop.backend.repositories.UserRepository;
 
+import com.paf.chop.backend.services.impl.LikeService;
 import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,15 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+    private final LikeService likeService;
 
     //post like
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository, LikeService likeService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
+        this.likeService = likeService;
     }
 
     public Post createPost(Post post) {
@@ -71,7 +74,7 @@ public class PostService {
             List<Post> posts =  postRepository.findAll();
 
             return posts.stream()
-                    .map(post -> new PostDTO(post.getId(), post.getTitle(), post.getContent(), post.getImageUrl(), post.getLikeCount(), isLiked(post)))
+                    .map(post -> new PostDTO(post.getId(), post.getTitle(), post.getContent(), post.getImageUrl(), post.getLikeCount(), likeService.isPostLiked(post)))
                     .toList();
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -96,48 +99,7 @@ public class PostService {
         return null;        
     }
 
-    //like post
-    public ApiResponse<PostDTO> likePost(Long postId) {
-        try{
-            log.info("Like post {}", postId);
-            User currentUser = getCurrentUser();
-            Post post = postRepository.findById(postId).orElse(null);
 
-            if (post == null) {
-                log.info("Post not found");
-                return ApiResponse.error("Post not found");
-            }
-            // Check if user already liked the comment
-            Optional<Like> existingLike = likeRepository.findByUserAndPost(currentUser, post);
-
-            if (existingLike.isPresent()) {
-                // User already liked the comment, so remove the like
-                likeRepository.delete(existingLike.get());
-                post.setLikeCount(post.getLikeCount() - 1);
-                postRepository.save(post);
-                log.info("Post unliked {}", postId);
-
-                return ApiResponse.success(getPostResponseDTO(post), "Post unliked successfully");
-
-            } else {
-
-                // User has not liked the comment yet, so add a new like
-                Like newLike = new Like();
-                newLike.setUser(currentUser);
-                newLike.setPost(post);
-                newLike.setCategory(Category.POST);
-                likeRepository.save(newLike);
-                post.setLikeCount(post.getLikeCount() + 1);
-                postRepository.save(post);
-                log.info("Post liked {}", postId);
-
-                return ApiResponse.success(getPostResponseDTO(post), "Post liked successfully");
-            }
-
-        } catch (Exception e) {
-            return ApiResponse.error("Error liking post: " + e.getMessage());
-        }
-    }
 
     //like post
     public PostDTO getPostResponseDTO(Post post) {
@@ -147,17 +109,10 @@ public class PostService {
         postResponseDTO.setTitle(post.getTitle());
         postResponseDTO.setContent(post.getContent());
         postResponseDTO.setLikeCount(post.getLikeCount());
-        postResponseDTO.setIsLiked(isLiked(post));
+        postResponseDTO.setIsLiked(likeService.isPostLiked(post));
 
         return postResponseDTO;
     }
-    //like post
-    public User getCurrentUser() {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(currentUsername);
-    }
-    //like post
-    public Boolean isLiked(Post post) {
-        return likeRepository.existsByPostAndUser( post,  getCurrentUser());
-    } //me
+
+
 }

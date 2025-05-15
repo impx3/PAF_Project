@@ -1,6 +1,7 @@
 package com.paf.chop.backend.controllers;
 
 import com.paf.chop.backend.dto.response.PostDTO;
+import com.paf.chop.backend.services.impl.LikeService;
 import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -39,12 +40,14 @@ public class PostController {
     private final PostService postService;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+    private final LikeService likeService;
 
     @Autowired
-    public PostController(PostService postService, FileStorageService fileStorageService, UserRepository userRepository) {
+    public PostController(PostService postService, FileStorageService fileStorageService, UserRepository userRepository, LikeService likeService) {
         this.postService = postService;
         this.fileStorageService = fileStorageService;
         this.userRepository = userRepository;
+        this.likeService = likeService;
     }
 
     @GetMapping("/home")
@@ -297,7 +300,7 @@ public class PostController {
     //post likes
     @PostMapping("/like/{postId}")
     public ResponseEntity<ApiResponse<PostDTO>> likePost(@PathVariable Long postId) {
-        ApiResponse<PostDTO> postResponseDTO = postService.likePost(postId);
+        ApiResponse<PostDTO> postResponseDTO = likeService.likePost(postId);
 
         if (postResponseDTO.isSuccess()) {
             return ResponseEntity.status(HttpStatus.OK).body(postResponseDTO);
