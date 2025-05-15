@@ -99,21 +99,21 @@ export const Profile: React.FC = () => {
     loadData();
   }, [currentUser]);
 
-  const handleFollow = async () => {
-    if (!currentUser || !user) return;
+  // const handleFollow = async () => {
+  //   if (!currentUser || !user) return;
 
-    try {
-      const result = await toggleFollow(currentUser.id, user.id);
-      if (result) {
-        setIsFollowing(!isFollowing);
-        toast.success(
-          isFollowing ? "Unfollowed successfully" : "Followed successfully",
-        );
-      }
-    } catch (error) {
-      toast.error("Failed to update follow status");
-    }
-  };
+  //   try {
+  //     const result = await toggleFollow(currentUser.id, user.id);
+  //     if (result) {
+  //       setIsFollowing(!isFollowing);
+  //       toast.success(
+  //         isFollowing ? "Unfollowed successfully" : "Followed successfully",
+  //       );
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to update follow status");
+  //   }
+  // };
 
   const handleProfileUpdate = async (updates: {
     bio?: string;
@@ -231,7 +231,7 @@ export const Profile: React.FC = () => {
                   Verified Chef
                 </Badge>
               )}
-              {!isOwnProfile && (
+              {/* {!isOwnProfile && (
                 <Button
                   variant={isFollowing ? "outline" : "default"}
                   onClick={handleFollow}
@@ -243,7 +243,7 @@ export const Profile: React.FC = () => {
                   )}
                   {isFollowing ? "Following" : "Follow"}
                 </Button>
-              )}
+              )} */}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
