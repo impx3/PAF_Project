@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
+import com.paf.chop.backend.dto.response.PostDTO;
 import com.paf.chop.backend.dto.response.VideoResponseDTO;
 import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,8 +128,8 @@ public ResponseEntity<EntityModel<Video>> uploadShortVideo(
     }
 
     @GetMapping
-    public ResponseEntity<List<Video>> getAllVideos() {
-        return ResponseEntity.ok(videoService.getAllVideos());
+    public ResponseEntity<List<VideoResponseDTO>> getAllVideos() {
+        return ResponseEntity.ok(videoService.getAllVideoResponses());
     }
 
     @DeleteMapping("/{id}")
@@ -147,4 +148,5 @@ public ResponseEntity<EntityModel<Video>> uploadShortVideo(
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(videoResponseDTO);
         }
     }
+
 }
