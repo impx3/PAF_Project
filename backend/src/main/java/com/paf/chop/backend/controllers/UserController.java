@@ -35,10 +35,14 @@ public class UserController {
     // ─── Get any user’s raw entity (if you still need it) ───
     @GetMapping("/{id}")
     public ResponseEntity<?> getUser(@PathVariable Long id) {
-        return userService.getUser(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            UserResponseDTO dto = userService.buildFullProfile(id);
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body("User not found");
+        }
     }
+
 
     // ─── Toggle follow/unfollow ───
     @PostMapping("/{currentUserId}/follow/{targetUserId}")
