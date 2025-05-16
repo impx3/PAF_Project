@@ -62,18 +62,7 @@ public class VideoService {
         }
     }
 
-    public VideoResponseDTO getVideoResponseDTO(Video video) {
-        VideoResponseDTO videoResponseDTO = new VideoResponseDTO();
-        //response dto data
-        videoResponseDTO.setId(video.getId());
-        videoResponseDTO.setTitle(video.getTitle());
-        videoResponseDTO.setDescription(video.getDescription());
-        videoResponseDTO.setVideoUrl(video.getVideoUrl());
-        videoResponseDTO.setLikeCount(video.getLikeCount());
-        videoResponseDTO.setIsLiked(likeService.isVideoLiked(video));
 
-        return videoResponseDTO;
-    }
 
 
 

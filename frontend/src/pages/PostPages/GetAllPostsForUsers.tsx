@@ -127,89 +127,95 @@ const GetAllPostsForUsers: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts?.map((post) => (
-            <Card key={post.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="truncate">{post.title}</CardTitle>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <p className="text-gray-600 line-clamp-3">{post.content}</p>
-
-                {post.imageUrl && (
-                  <div className="grid grid-cols-2 gap-2">
+            <Card
+              key={post.id}
+              className="hover:shadow-lg transition-shadow overflow-hidden"
+            >
+              {/* Image section taking majority of space */}
+              {post.imageUrl && (
+                <div className="relative">
+                  <AspectRatio ratio={16 / 9}>
                     {post.imageUrl.length > 50 ? (
-                      post.imageUrl.split(",").map((filename, idx) => (
-                        <div key={idx} className="overflow-hidden rounded-lg">
-                          <AspectRatio ratio={16 / 9}>
-                            <img
-                              src={`http://localhost:8080/images/${filename.trim()}`}
-                              alt={`Post ${post.id} - ${idx}`}
-                              className="object-cover w-full h-full"
-                            />
-                          </AspectRatio>
-                        </div>
-                      ))
+                      <img
+                        src={`http://localhost:8080/images/${post.imageUrl.split(",")[0].trim()}`}
+                        alt={`Post ${post.id}`}
+                        className="object-cover w-full h-full"
+                      />
                     ) : (
-                      <div className="overflow-hidden rounded-lg">
-                        <AspectRatio ratio={16 / 9}>
-                          <img
-                            src={`http://localhost:8080/images/${
-                              post.imageUrl.length === 40
-                                ? post.imageUrl
-                                : post.imageUrl.split("\\").pop()
-                            }`}
-                            className="object-cover w-full h-full"
-                            alt="Post content"
-                          />
-                        </AspectRatio>
-                      </div>
+                      <img
+                        src={`http://localhost:8080/images/${
+                          post.imageUrl.length === 40
+                            ? post.imageUrl
+                            : post.imageUrl.split("\\").pop()
+                        }`}
+                        className="object-cover w-full h-full"
+                        alt="Post content"
+                      />
                     )}
-                  </div>
-                )}
-              </CardContent>
-
-              <CardFooter className="flex justify-between items-center">
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleLike(post.id)}
-                    className="gap-1 text-gray-600 hover:text-red-500"
-                  >
-                    {post?.isLiked ? (
-                      <Heart className="text-red-500 fill-red-500 w-4 h-4" />
-                    ) : (
-                      <Heart className="w-4 h-4 text-red-500" />
-                    )}
-                    <span>{post.likeCount}</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleCommentClick(post?.id)}
-                    className="gap-1 text-gray-600 hover:text-blue-500"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>{post?.commentsCount}</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleShare(post.id)}
-                    className="gap-1 text-gray-600 hover:text-green-500"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
+                  </AspectRatio>
+                  {/* Gradient overlay for better text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 </div>
+              )}
 
-                <Link to={`/post/${post.id}/all`}>
-                  <Button variant="outline" size="sm">
-                    View
-                  </Button>
-                </Link>
-              </CardFooter>
+              {/* Content section at bottom */}
+              <div className="p-4 space-y-3">
+                <CardHeader className="p-0">
+                  <CardTitle className="text-lg font-semibold line-clamp-2">
+                    {post.title}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-0">
+                  <p className="text-gray-600 line-clamp-3 text-sm">
+                    {post.content}
+                  </p>
+                </CardContent>
+
+                {/* Action buttons */}
+                <CardFooter className="p-0 flex justify-between items-center">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(post.id)}
+                      className="gap-1 text-gray-600 hover:text-red-500 px-2"
+                    >
+                      {post?.isLiked ? (
+                        <Heart className="text-red-500 fill-red-500 w-4 h-4" />
+                      ) : (
+                        <Heart className="w-4 h-4 text-red-500" />
+                      )}
+                      <span className="text-xs">{post.likeCount}</span>
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCommentClick(post?.id)}
+                      className="gap-1 text-gray-600 hover:text-blue-500 px-2"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span className="text-xs">{post?.commentsCount}</span>
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleShare(post.id)}
+                      className="gap-1 text-gray-600 hover:text-green-500 px-2"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <Link to={`/post/${post.id}/all`}>
+                    <Button variant="outline" size="sm" className="text-xs">
+                      View Post
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </div>
             </Card>
           ))}
         </div>

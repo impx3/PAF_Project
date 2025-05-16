@@ -100,19 +100,4 @@ public class PostService {
     }
 
 
-
-    //like post
-    public PostDTO getPostResponseDTO(Post post) {
-        PostDTO postResponseDTO = new PostDTO();
-        //response dto data
-        postResponseDTO.setId(post.getId());
-        postResponseDTO.setTitle(post.getTitle());
-        postResponseDTO.setContent(post.getContent());
-        postResponseDTO.setLikeCount(post.getLikeCount());
-        postResponseDTO.setIsLiked(likeService.isPostLiked(post));
-
-        return postResponseDTO;
-    }
-
-
 }

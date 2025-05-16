@@ -101,7 +101,7 @@ public class CommentService {
 
             Comment savedComment = commentRepository.save(comment);
             log.info("Comment added: {}", savedComment.getCommentBody());
-            return ApiResponse.success(getCommentResponseDTO(savedComment), "Comment added successfully");
+            return ApiResponse.success(likeService.getCommentResponseDTO(savedComment), "Comment added successfully");
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -129,9 +129,8 @@ public class CommentService {
 
             // Check if comments are empty
             List<CommentResponseDTO> commentDTOs = comments.stream()
-                    .map(this::getCommentResponseDTO)
-
-                    .toList();
+            .map(likeService::getCommentResponseDTO)
+            .toList();
 
             log.info("Comment retrieved: {}", commentDTOs);
             return ApiResponse.success(commentDTOs, "Comments fetched successfully");
@@ -172,7 +171,7 @@ public class CommentService {
             Comment savedComment = commentRepository.save(comment);
             log.info("Comment updated: {}", savedComment);
 
-            return  ApiResponse.success(getCommentResponseDTO(savedComment), "Comment updated successfully");
+            return  ApiResponse.success(likeService.getCommentResponseDTO(savedComment), "Comment updated successfully");
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -212,30 +211,7 @@ public class CommentService {
     }
 
 
-    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
-        CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
-        //response dto data
-        commentResponseDTO.setProfileImage(comment.getUser().getProfileImage() == null ? "" : comment.getUser().getProfileImage());
-        commentResponseDTO.setCreatedUserId(comment.getUser().getId());
-        commentResponseDTO.setCreatedUserName(comment.getUser().getUsername());
-        commentResponseDTO.setCommentBody(comment.getCommentBody());
-        commentResponseDTO.setLikeCount(comment.getLikeCount());
-        commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
-        commentResponseDTO.setCommentId(comment.getCommentId());
-        commentResponseDTO.setIsLiked(likeService.isCommentLiked(comment));
 
-        if (comment.getPost() != null) {
-            //response dto data
-            commentResponseDTO.setPostId(comment.getPost().getId());
-        }
-
-        if (comment.getVideo() != null) {
-            //response dto data
-            commentResponseDTO.setVideoId(comment.getVideo().getId());
-        }
-
-        return commentResponseDTO;
-    }
 
 
 }
