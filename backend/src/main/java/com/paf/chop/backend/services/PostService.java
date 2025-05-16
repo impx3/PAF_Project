@@ -1,6 +1,7 @@
 package com.paf.chop.backend.services;
 
 import com.paf.chop.backend.dto.response.PostDTO;
+import com.paf.chop.backend.enums.CoinType;
 import com.paf.chop.backend.models.Post;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.LikeRepository;
@@ -23,15 +24,18 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final LikeService likeService;
+    private final UserService userService;
 
     //post like
     @Autowired
-    public PostService(PostRepository postRepository, LikeService likeService) {
+    public PostService(PostRepository postRepository, LikeService likeService, UserService userService) {
         this.postRepository = postRepository;
         this.likeService = likeService;
+        this.userService = userService;
     }
 
     public Post createPost(Post post) {
+        userService.addUserCoins(post.getUser().getId(), CoinType.POST);
         return postRepository.save(post);
     }
 

@@ -1,6 +1,7 @@
 package com.paf.chop.backend.services;
 
 
+import com.paf.chop.backend.enums.CoinType;
 import com.paf.chop.backend.enums.CommentType;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
@@ -110,6 +111,8 @@ public class CommentService {
                     NotificationType.COMMENT,
                     comment.getUser().getId()
             );
+
+            userService.addUserCoins(comment.getUser().getId(), CoinType.COMMENT);
 
 
             return ApiResponse.success(likeService.getCommentResponseDTO(savedComment), "Comment added successfully");

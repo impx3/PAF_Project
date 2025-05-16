@@ -4,6 +4,7 @@ import com.paf.chop.backend.enums.Category;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.dto.response.PostDTO;
 import com.paf.chop.backend.dto.response.VideoResponseDTO;
+import com.paf.chop.backend.enums.CoinType;
 import com.paf.chop.backend.enums.NotificationType;
 import com.paf.chop.backend.models.*;
 import com.paf.chop.backend.repositories.CommentRepository;
@@ -96,6 +97,8 @@ public class LikeService {
                         NotificationType.LIKE,
                         comment.getUser().getId()
                 );
+
+                userService.addUserCoins(comment.getUser().getId(), CoinType.LIKE);
 
                 return ApiResponse.success(getCommentResponseDTO(comment), "Comment liked successfully");
             }
@@ -191,6 +194,8 @@ public class LikeService {
                         NotificationType.LIKE,
                         post.getUser().getId()
                 );
+
+                userService.addUserCoins(post.getUser().getId(), CoinType.LIKE);
 
                 return ApiResponse.success(getPostResponseDTO(post), "Post liked successfully");
             }
