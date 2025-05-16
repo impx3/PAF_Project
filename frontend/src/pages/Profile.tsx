@@ -13,6 +13,8 @@ import LearningPlanSelectionModal from "@/components/ui/LearningPlanSelectionMod
 
 import api from "@/utils/axiosConfig";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
+
 import {
   deleteCurrentUser,
   getFollowers,
@@ -177,9 +179,10 @@ export const Profile: React.FC = () => {
           <div className="relative group">
             <Avatar className="h-32 w-32">
               <AvatarImage
-                src={(user.profileImage as string) || "/default-avatar.png"}
-                alt={user.username as string}
-              />
+              src={user.profileImage ? `${BASE_URL}${user.profileImage}` : "/default-avatar.png"}
+              alt={user.username as string}
+            />
+
               <AvatarFallback>
                 {user?.firstName?.[0] as string}
                 {user?.lastName?.[0] as string}

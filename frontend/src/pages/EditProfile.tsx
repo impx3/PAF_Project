@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 
 import styles from "../styles/EditProfile.module.css";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
+
+
 const EditProfile: React.FC = () => {
   const { currentUser } = useAuth();
   const [form, setForm] = useState({
@@ -89,7 +92,8 @@ const EditProfile: React.FC = () => {
       <input type="file" accept="image/*" onChange={handleFileUpload} />
       {uploading && <p>Uploading...</p>}
       {form.profileImage && (
-        <img src={form.profileImage} alt="Preview" width={100} />
+        <img src={`${BASE_URL}${form.profileImage}`} alt="Preview" width={100} />
+
       )}
 
       <button onClick={handleUpdate} className={styles.saveBtn}>
