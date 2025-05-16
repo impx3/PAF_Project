@@ -2,6 +2,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Submit from "@/components/PostComponents/Submit";
+import api from "@/utils/axiosConfig";
 
 
 export const CreateText: React.FC = () => {
@@ -33,18 +34,20 @@ export const CreateText: React.FC = () => {
    console.log("formData",formData)
    
    try {
-     const token = localStorage.getItem('token');
-     const response = await axios.post("http://localhost:8080/api/posts/text", formData, {
+     const token = localStorage.getItem('currentUser');
+     
+     const response = await api.post("http://localhost:8080/api/posts/text", formData, {
        headers: {
          "Content-Type": "multipart/form-data",
           'Authorization': `Bearer ${token}`
        },
      });
-
+     
      setMessage("Post created successfully!");
      navigate('/post/posts');
      console.log(response.data);
    } catch (error) {
+    
      setMessage("Error creating post.");
      console.error(error);
    }

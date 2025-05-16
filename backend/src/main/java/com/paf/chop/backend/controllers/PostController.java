@@ -62,6 +62,9 @@ public class PostController {
             @AuthenticationPrincipal UserDetails userDetails
             ) throws IOException {
 
+                System.out.println("eee");
+                System.out.println(userDetails);
+                
         User user = userRepository.findByUsername(userDetails.getUsername());
 
         System.out.println(title + "hereyrer");

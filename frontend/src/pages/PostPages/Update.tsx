@@ -61,7 +61,7 @@ const Update: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      navigate("/posts");
+      navigate("/post/posts");
     } catch (error) {
       setMessage("Error updating post.");
       console.error(error);

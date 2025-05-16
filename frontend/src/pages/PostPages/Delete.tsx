@@ -18,13 +18,13 @@ const Delete = () => {
       );
 
       if (!confirmDelete) {
-        navigate("/posts");
+        navigate("/post/posts");
         return;
       }
 
       try {
         await api.delete(`/posts/${id}`);
-        navigate("/posts");
+        navigate("/post/posts");
       } catch (err) {
         setError("Failed to delete post. Please try again.");
         console.error(err);

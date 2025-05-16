@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import api from '@/utils/axiosConfig';
 
 const VideoUploadForm: React.FC = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -24,13 +25,14 @@ const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 
     try {
         console.log(formData)
+       
         // const response = await axios.get("http://localhost:8080/videos/home")
-      const response = await axios.post<{ content: string }>("http://localhost:8080/videos", formData, {
+      const response = await api.post<{ content: string }>("/videos", formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+ console.log("ggg")
     console.log("Response",response.data)
       setMessage('Upload successful!');
       const videoLink = response.data.content?.split(' ').pop() || ''; // extract URL if returned

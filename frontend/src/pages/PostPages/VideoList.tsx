@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import api from '@/utils/axiosConfig';
 
 interface Video {
   id: string;
@@ -15,14 +16,14 @@ const VideoList: React.FC = () => {
  
 
   useEffect(() => {
-    axios.get<Video[]>('http://localhost:8080/videos')
+    api.get<Video[]>('/videos')
       .then(res => setVideos(res.data))
       .catch(err => console.error(err));
       console.log(videos)
   }, []);
 
   const deleteVideo = (id: string) => {
-    axios.delete(`http://localhost:8080/videos/${id}`)
+    api.delete(`/videos/${id}`)
       .then(() => {
         setVideos(videos.filter(video => video.id !== id));
       })
