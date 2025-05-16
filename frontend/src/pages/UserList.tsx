@@ -34,7 +34,6 @@ const UserList = () => {
 
   useEffect(() => {
     // Check currentUser is being properly loaded
-    console.log("currentUser:", currentUser);
 
     const fetchUsers = async () => {
       try {
@@ -47,9 +46,6 @@ const UserList = () => {
           (u: PublicUser) => u.id !== currentUser?.id,
         );
 
-        // Log the filtered list of users to ensure the current user is excluded
-        console.log("Filtered users:", otherUsers);
-
         setUsers(otherUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -60,7 +56,6 @@ const UserList = () => {
 
     // Ensure that currentUser is available before fetching users
     if (currentUser) {
-      console.log("Fetching users...");
       fetchUsers();
     } else {
       console.error("currentUser is null or undefined, not fetching users");

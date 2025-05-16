@@ -23,7 +23,7 @@ const Followers: React.FC = () => {
   useEffect(() => {
     const fetchFollowers = async () => {
       if (currentUser?.id) {
-        const res = await api.get(`/users/${currentUser.id}/followers`);
+        const res = await api.get(`/users/${currentUser?.id}/followers`);
         setFollowers(res.data);
       }
     };
