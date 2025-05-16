@@ -27,7 +27,7 @@ public class UserController {
     // ─── Get current user full profile (with follower/following lists) ───
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication auth) {
-        Long userId = userService.findIdByEmail(auth.getName());
+        Long userId = userService.findIdByUsername(auth.getName());
         UserResponseDTO dto = userService.buildFullProfile(userId);
         return ResponseEntity.ok(dto);
     }
@@ -71,15 +71,22 @@ public class UserController {
             return ResponseEntity.badRequest().body("No file uploaded");
         }
         try {
-            String uploadDir = "uploads/profilePictures/";
+            String uploadDir = new File("src/main/resources/static/uploads/profilePictures").getAbsolutePath();
+
+
             File dir = new File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
+            if (!dir.exists() && !dir.mkdirs()) {
+                throw new IOException("Failed to create upload directory: " + uploadDir);
+            }
+
 
             String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            String filepath = uploadDir + filename;
+            String filepath = new File(uploadDir, filename).getAbsolutePath();
             file.transferTo(new File(filepath));
 
-            return ResponseEntity.ok("/" + filepath.replace("\\", "/"));
+
+            return ResponseEntity.ok("/uploads/profilePictures/" + filename);
+
         } catch (IOException e) {
             log.error("Failed to upload profile image", e);
             return ResponseEntity.status(500).body("File upload failed");
@@ -92,7 +99,7 @@ public class UserController {
             @RequestBody Map<String, String> updates,
             Authentication auth
     ) {
-        Long userId = userService.findIdByEmail(auth.getName());
+        Long userId = userService.findIdByUsername(auth.getName());
         System.out.println("Update request received: " + updates);
         userService.updateProfile(userId, updates);
         return ResponseEntity.ok(ApiResponse.success(true,"Profile updated"));
@@ -101,7 +108,7 @@ public class UserController {
     // ─── Delete own account ───
     @DeleteMapping("/me")
     public ResponseEntity<?> deleteCurrentUser(Authentication auth) {
-        Long userId = userService.findIdByEmail(auth.getName());
+        Long userId = userService.findIdByUsername(auth.getName());
         userService.deleteUser(userId);
         return ResponseEntity.ok(ApiResponse.success(true,"User deleted"));
     }

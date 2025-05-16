@@ -24,11 +24,15 @@ public class UserService {
     /**
      * Resolve an authenticated email to its User ID.
      */
-    public Long findIdByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email))
-                .getId();
+    public Long findIdByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found: " + username);
+        }
+        return user.getId();
     }
+
+
 
     /**
      * Build full profile DTO for /me.
