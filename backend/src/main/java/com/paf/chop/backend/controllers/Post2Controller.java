@@ -31,6 +31,8 @@ public class Post2Controller {
     public Post2Controller(PostService postService) {
         this.postService = postService;
     }
+
+
     @GetMapping("/home")
     public String homeEndpointPosts2() {
         return "Home at /api/posts2/home";

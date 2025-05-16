@@ -44,8 +44,8 @@ const GetAllPostsForUsers: React.FC = () => {
           title: post.title,
           content: post.content,
           imageUrl: post.imageUrl || "",
-          likes: post.likeCount || 0,
-          isLiked: false,
+          likeCount: post.likeCount || 0,
+          isLiked: post.isLiked || false,
         }));
         setPosts(transformedPosts);
       } catch (error) {
@@ -61,27 +61,27 @@ const GetAllPostsForUsers: React.FC = () => {
   const handleLike = async (postId: number) => {
     try {
       const response = await api.post(`/posts/like/${postId}`);
-      const updatedPost = response.data.data;
+      const updatedPost = response.data.result;
 
-      const updatedPosts = posts.map((post) => {
-        if (post.id === postId) {
-          return {
-            ...post,
-            likes: updatedPost.likeCount,
-            isLiked: updatedPost.isLiked,
-          };
-        }
-        return post;
-      });
+      // Update the post in the local state
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                likeCount: updatedPost.likeCount,
+                isLiked: updatedPost.isLiked,
+              }
+            : post,
+        ),
+      );
 
-      setPosts(updatedPosts);
-    } catch (error: any) {
-      // Extract error message from the API response
-      const message =
-        error.response?.data?.message ||
-        "An error occurred while liking the post.";
-      alert(message);
-      console.error("Error updating like:", message);
+      console.log(updatedPost);
+    } catch (e: any) {
+      const errorMessage =
+        e.response?.data?.message || "An unexpected error occurred.";
+      alert(errorMessage);
+      console.error("Like error:", errorMessage);
     }
   };
 
@@ -138,16 +138,7 @@ const GetAllPostsForUsers: React.FC = () => {
           {posts?.map((post) => (
             <Card key={post.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="truncate">{post.title}</CardTitle>
-                  <button
-                    onClick={() => handleSaveClick(post)}
-                    className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                    title="Save to Learning Plan"
-                  >
-                    <FaBookmark className="w-5 h-5" />
-                  </button>
-                </div>
+                <CardTitle className="truncate">{post.title}</CardTitle>
               </CardHeader>
 
               <CardContent className="space-y-4">
@@ -168,62 +159,87 @@ const GetAllPostsForUsers: React.FC = () => {
                         </div>
                       ))
                     ) : (
-                      <div className="overflow-hidden rounded-lg">
-                        <AspectRatio ratio={16 / 9}>
-                          <img
-                            src={`http://localhost:8080/images/${
-                              post.imageUrl.length === 40
-                                ? post.imageUrl
-                                : post.imageUrl.split("\\").pop()
-                            }`}
-                            className="object-cover w-full h-full"
-                            alt="Post content"
-                          />
-                        </AspectRatio>
-                      </div>
+                      <img
+                        src={`http://localhost:8080/images/${
+                          post.imageUrl.length === 40
+                            ? post.imageUrl
+                            : post.imageUrl.split("\\").pop()
+                        }`}
+                        className="object-cover w-full h-full"
+                        alt="Post content"
+                      />
                     )}
-                  </div>
-                )}
-              </CardContent>
-
-              <CardFooter className="flex justify-between items-center">
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleLike(post.id)}
-                    className="gap-1 text-gray-600 hover:text-red-500"
-                  >
-                    <Heart className="w-4 h-4" />
-                    <span>{post.likeCount}</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleCommentClick(post?.id)}
-                    className="gap-1 text-gray-600 hover:text-blue-500"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>{post?.commentsCount}</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleShare(post.id)}
-                    className="gap-1 text-gray-600 hover:text-green-500"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
+                  </AspectRatio>
+                  {/* Gradient overlay for better text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 </div>
+              )}
 
-                <Link to={`/post/${post.id}/all`}>
-                  <Button variant="outline" size="sm">
-                    View
-                  </Button>
-                </Link>
-              </CardFooter>
+              {/* Content section at bottom */}
+              <div className="p-4 space-y-3">
+                <CardHeader className="p-0">
+                  <CardTitle className="text-lg font-semibold line-clamp-2">
+                    {post.title}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-0">
+                  <p className="text-gray-600 line-clamp-3 text-sm">
+                    {post.content}
+                  </p>
+                </CardContent>
+
+                {/* Action buttons */}
+                <CardFooter className="p-0 flex justify-between items-center">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(post.id)}
+                      className="gap-1 text-gray-600 hover:text-red-500 px-2"
+                    >
+                      {post?.isLiked ? (
+                        <Heart className="text-red-500 fill-red-500 w-4 h-4" />
+                      ) : (
+                        <Heart className="w-4 h-4 text-red-500" />
+                      )}
+                      <span className="text-xs">{post.likeCount}</span>
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCommentClick(post?.id)}
+                      className="gap-1 text-gray-600 hover:text-blue-500 px-2"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span className="text-xs">{post?.commentsCount}</span>
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleShare(post.id)}
+                      className="gap-1 text-gray-600 hover:text-green-500 px-2"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                    <button
+                        onClick={() => handleSaveClick(post)}
+                        className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                        title="Save to Learning Plan"
+                    >
+                        <FaBookmark className="w-5 h-5" />
+                    </button>
+                  <Link to={`/post/${post.id}/all`}>
+                    <Button variant="outline" size="sm" className="text-xs">
+                      View Post
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </div>
             </Card>
           ))}
         </div>

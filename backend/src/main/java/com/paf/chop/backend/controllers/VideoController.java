@@ -7,9 +7,15 @@ import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.paf.chop.backend.dto.response.CommentResponseDTO;
+import com.paf.chop.backend.dto.response.PostDTO;
+import com.paf.chop.backend.dto.response.VideoResponseDTO;
+import com.paf.chop.backend.services.impl.LikeService;
+import com.paf.chop.backend.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,14 +31,21 @@ import com.paf.chop.backend.services.FileStorageService;
 import com.paf.chop.backend.services.VideoService;
 
 @RestController
-@RequestMapping("/videos")
+@RequestMapping("/api/videos")
 public class VideoController {
 
-    @Autowired
-    private VideoService videoService;
+
+    private final VideoService videoService;
+    private final FileStorageService fileStorageService;
+    private final LikeService likeService;
 
     @Autowired
-    private FileStorageService fileStorageService;
+    public VideoController(VideoService videoService, FileStorageService fileStorageService, LikeService likeService) {
+        this.videoService = videoService;
+        this.fileStorageService = fileStorageService;
+        this.likeService = likeService;
+    }
+
 
     public Long getVideoDurationInSeconds(MultipartFile file) throws IOException {
     File tempFile = File.createTempFile("video", file.getOriginalFilename());
@@ -123,8 +136,8 @@ public ResponseEntity<EntityModel<Video>> uploadShortVideo(
     }
 
     @GetMapping
-    public ResponseEntity<List<Video>> getAllVideos() {
-        return ResponseEntity.ok(videoService.getAllVideos());
+    public ResponseEntity<List<VideoResponseDTO>> getAllVideos() {
+        return ResponseEntity.ok(videoService.getAllVideoResponses());
     }
 
     @DeleteMapping("/{id}")
@@ -132,4 +145,16 @@ public ResponseEntity<EntityModel<Video>> uploadShortVideo(
         videoService.deleteVideo(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/like/{videoId}")
+    public ResponseEntity<ApiResponse<VideoResponseDTO>> likeVideo(@PathVariable Long videoId) {
+        ApiResponse<VideoResponseDTO> videoResponseDTO = likeService.likeVideo(videoId);
+
+        if (videoResponseDTO.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.OK).body(videoResponseDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(videoResponseDTO);
+        }
+    }
+
 }

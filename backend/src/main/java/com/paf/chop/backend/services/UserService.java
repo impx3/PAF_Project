@@ -7,6 +7,7 @@ import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.utils.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -157,5 +158,10 @@ public class UserService {
 
     public Boolean isUserExists(Long userId) {
         return userRepository.existsById(userId);
+    }
+
+    public User getCurrentUser() {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(currentUsername);
     }
 }

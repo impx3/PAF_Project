@@ -1,25 +1,20 @@
 package com.paf.chop.backend.services;
 
-import com.paf.chop.backend.configs.Category;
+
+import com.paf.chop.backend.configs.CommentType;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
-import com.paf.chop.backend.models.Comment;
-import com.paf.chop.backend.models.Like;
-import com.paf.chop.backend.models.Post;
-import com.paf.chop.backend.models.User;
-import com.paf.chop.backend.repositories.CommentRepository;
-import com.paf.chop.backend.repositories.LikeRepository;
-import com.paf.chop.backend.repositories.PostRepository;
-import com.paf.chop.backend.repositories.UserRepository;
+import com.paf.chop.backend.models.*;
+import com.paf.chop.backend.repositories.*;
+import com.paf.chop.backend.services.impl.LikeService;
 import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 @Slf4j
@@ -28,14 +23,18 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final LikeRepository likeRepository;
+    private final VideoRepository videoRepository;
+    private final UserService userService;
+    private final LikeService likeService;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, LikeRepository likeRepository) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, VideoRepository videoRepository, UserService userService, LikeService likeService) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
-        this.likeRepository = likeRepository;
+        this.videoRepository = videoRepository;
+        this.userService = userService;
+        this.likeService = likeService;
     }
 
     //add comment
@@ -43,26 +42,32 @@ public class CommentService {
         try{
             log.info("Received request to add comment: {}", commentRequestDTO);
 
-            if(commentRequestDTO.getUserId()== null
-                    || commentRequestDTO.getPostId()== null) {
-                log.error("All fields are required");
-                return ApiResponse.error("All fields are required");
+            // Validate request body
+            if (commentRequestDTO.getUserId() == null) {
+                log.error("User ID is required");
+                return ApiResponse.error("User ID is required");
             }
+
+            // Check if comment body is empty
             if(!StringUtils.hasText(commentRequestDTO.getCommentBody())){
                 log.error("You cannot enter empty comment");
                 return ApiResponse.error("You cannot enter empty comment");
             }
 
-            User user = userRepository.findById(commentRequestDTO.getUserId()).orElse(null);
-            Post post = postRepository.findById(commentRequestDTO.getPostId()).orElse(null);
+            boolean hasPost = commentRequestDTO.getPostId() != null;
+            boolean hasVideo = commentRequestDTO.getVideoId() != null;
 
-            if(user == null){
+            if ((hasPost && hasVideo) || (!hasPost && !hasVideo)) {
+                log.error("Comment must be associated with either a post or a video, but not both");
+                return ApiResponse.error("Comment must be associated with either a post or a video, but not both");
+            }
+
+            // Check if user exists
+            User user = userRepository.findById(commentRequestDTO.getUserId()).orElse(null);
+
+            if (user == null) {
                 log.error("User not found with ID: {}", commentRequestDTO.getUserId());
                 return ApiResponse.error("User not found");
-            }
-            if(post == null){
-                log.error("Post not found with ID: {}", commentRequestDTO.getPostId());
-                return ApiResponse.error("Post not found");
             }
 
             //send request body data to the database to store
@@ -70,12 +75,33 @@ public class CommentService {
 
             //request dto data
             comment.setCommentBody(commentRequestDTO.getCommentBody());
-            comment.setPost(post);
             comment.setUser(user);
+
+            if (hasPost) {
+                Post post = postRepository.findById(commentRequestDTO.getPostId()).orElse(null);
+                if (post == null) {
+                    log.error("Post not found with ID: {}", commentRequestDTO.getPostId());
+                    return ApiResponse.error("Post not found");
+                }
+                //request dto data
+                comment.setCommentType(CommentType.POST);
+                comment.setPost(post);
+            } else {
+                Video video = videoRepository.findById(commentRequestDTO.getVideoId()).orElse(null);
+                if (video == null) {
+                    log.error("Video not found with ID: {}", commentRequestDTO.getVideoId());
+                    return ApiResponse.error("Video not found");
+                }
+                //request dto data
+                comment.setCommentType(CommentType.VIDEO);
+                comment.setVideo(video);
+            }
+
+
 
             Comment savedComment = commentRepository.save(comment);
             log.info("Comment added: {}", savedComment.getCommentBody());
-            return ApiResponse.success(getCommentResponseDTO(savedComment), "Comment added successfully");
+            return ApiResponse.success(likeService.getCommentResponseDTO(savedComment), "Comment added successfully");
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -84,15 +110,27 @@ public class CommentService {
     }
 
     //display all comments
-    public ApiResponse<List<CommentResponseDTO>> getComments(Long postId) {
+    public ApiResponse<List<CommentResponseDTO>> getComments(Long postId, Long videoId) {
         try {
-            log.info("Received request to retrieve comments for the post: {}", postId);
-            List<Comment> comments = commentRepository.findByPostId(postId);
+            log.info("Fetching comments for postId: {}, videoId: {}", postId, videoId);
 
+            // Check if both postId and videoId are null or both are provided
+            if ((postId != null && videoId != null) || (postId == null && videoId == null)) {
+                return ApiResponse.error("Specify either postId or videoId, but not both");
+            }
+
+            // Fetch comments based on postId or videoId
+            List<Comment> comments;
+            if (postId != null) {
+                comments = commentRepository.findByPostId(postId);
+            } else {
+                comments = commentRepository.findByVideoId(videoId);
+            }
+
+            // Check if comments are empty
             List<CommentResponseDTO> commentDTOs = comments.stream()
-                    .map(this::getCommentResponseDTO)
-
-                    .toList();
+            .map(likeService::getCommentResponseDTO)
+            .toList();
 
             log.info("Comment retrieved: {}", commentDTOs);
             return ApiResponse.success(commentDTOs, "Comments fetched successfully");
@@ -107,7 +145,7 @@ public class CommentService {
 
         try {
             log.info("Received request to update comment: {}", commentRequestDTO);
-            Long userId = getCurrentUser().getId();
+            Long userId = userService.getCurrentUser().getId();
             Comment comment = commentRepository.findById(commentId).orElse(null);
 
             if(comment == null){
@@ -133,7 +171,7 @@ public class CommentService {
             Comment savedComment = commentRepository.save(comment);
             log.info("Comment updated: {}", savedComment);
 
-            return  ApiResponse.success(getCommentResponseDTO(savedComment), "Comment updated successfully");
+            return  ApiResponse.success(likeService.getCommentResponseDTO(savedComment), "Comment updated successfully");
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -146,7 +184,7 @@ public class CommentService {
         try {
             log.info("Received request to delete comment: {}", commentId);
             // Get the logged-in user
-            Long userId = getCurrentUser().getId();
+            Long userId = userService.getCurrentUser().getId();
 
             // Find the comment
             Comment comment = commentRepository.findById(commentId).orElse(null);
@@ -172,74 +210,8 @@ public class CommentService {
         }
     }
 
-    //like and unlike comment
-    public ApiResponse<CommentResponseDTO> likeComment(Long commentId) {
-       try{
-           log.info("Received request to like/unlike comment: {}", commentId);
-           User currentUser = getCurrentUser();
-           Comment comment = commentRepository.findById(commentId).orElse(null);
-
-           if (comment == null) {
-                log.error("likeComment: Comment not found with ID: {}", commentId);
-               return ApiResponse.error("Comment not found");
-           }
-           // Check if user already liked the comment
-           Optional<Like> existingLike = likeRepository.findByUserAndComment(currentUser, comment);
-
-           if (existingLike.isPresent()) {
-
-                // User already liked the comment, so remove the like
-                likeRepository.delete(existingLike.get());
-                comment.setLikeCount(comment.getLikeCount() - 1);
-                commentRepository.save(comment);
-                log.info("Comment unliked: {}", commentId);
-
-               return ApiResponse.success(getCommentResponseDTO(comment), "Comment unliked successfully");
-
-              } else {
-
-                // User has not liked the comment yet, so add a new like
-                Like newLike = new Like();
-                newLike.setUser(currentUser);
-                newLike.setComment(comment);
-                newLike.setCategory(Category.COMMENT);
-                likeRepository.save(newLike);
-                comment.setLikeCount(comment.getLikeCount() + 1);
-               commentRepository.save(comment);
-                log.info("Comment liked: {}", commentId);
-
-               return ApiResponse.success(getCommentResponseDTO(comment), "Comment liked successfully");
-           }
-
-       } catch (Exception e) {
-           throw new RuntimeException(e);
-       }
-    }
 
 
-    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
-        CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
-        //response dto data
-        commentResponseDTO.setProfileImage(comment.getUser().getProfileImage() == null ? "" : comment.getUser().getProfileImage());
-        commentResponseDTO.setCreatedUserId(comment.getUser().getId());
-        commentResponseDTO.setCreatedUserName(comment.getUser().getUsername());
-        commentResponseDTO.setPostId(comment.getPost().getId());
-        commentResponseDTO.setCommentBody(comment.getCommentBody());
-        commentResponseDTO.setLikeCount(comment.getLikeCount());
-        commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
-        commentResponseDTO.setCommentId(comment.getCommentId());
-        commentResponseDTO.setIsLiked(isLiked(comment));
 
-        return commentResponseDTO;
-    }
-
-    public User getCurrentUser() {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(currentUsername);
-    }
-
-    public Boolean isLiked(Comment comment) {
-        return likeRepository.existsByCommentAndUser( comment,  getCurrentUser());
-    }
 
 }

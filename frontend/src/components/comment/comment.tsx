@@ -8,7 +8,8 @@ import { LikeComponent } from "@/components/like/like.tsx";
 
 export type CommentResponse = {
   commentId: number;
-  postId: number;
+  postId?: number;
+  videoId?: number;
   createdUserId: number;
   createdUserName: string;
   commentBody: string;
@@ -20,16 +21,19 @@ export type CommentResponse = {
 
 type CommentRequest = {
   userId: number;
-  postId: number;
+  postId: number | null;
+  videoId: number | null;
   commentBody: string;
 };
 
 export const CommentComponent = ({
   onClose,
   postId,
+  videoId,
 }: {
   onClose: () => void;
-  postId: number;
+  postId?: number;
+  videoId?: number;
 }) => {
   const { currentUser } = useAuth();
   const [comments, setComments] = useState<CommentResponse[]>([]);
@@ -38,15 +42,24 @@ export const CommentComponent = ({
 
   const [newComment, setNewComment] = useState<CommentRequest>({
     userId: Number(currentUser?.id),
-    postId: postId, // Replace with actual postId if needed
+    postId: postId || null, // Replace with actual postId if needed
     commentBody: "",
+    videoId: videoId || null, // Replace with actual videoId if needed
   });
 
   const fetchComments = async () => {
     try {
-      const res = await api.get(`/comments/${postId}`);
+      let res;
 
-      setComments(res.data.result);
+      if (postId) {
+        res = await api.get(`/comments/post/${postId}`);
+      }
+
+      if (videoId) {
+        res = await api.get(`/comments/video/${videoId}`);
+      }
+
+      setComments(res?.data.result);
     } catch (err) {
       console.error("Failed to fetch comments", err);
     }
@@ -109,7 +122,8 @@ export const CommentComponent = ({
     setEditingCommentId(comment.commentId);
     setNewComment({
       userId: Number(currentUser?.id),
-      postId: postId,
+      postId: postId || null,
+      videoId: videoId || null,
       commentBody: comment.commentBody,
     });
   };
