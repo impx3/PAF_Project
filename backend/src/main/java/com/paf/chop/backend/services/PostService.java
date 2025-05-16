@@ -1,10 +1,6 @@
 package com.paf.chop.backend.services;
 
-import com.paf.chop.backend.configs.Category;
-import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.dto.response.PostDTO;
-import com.paf.chop.backend.models.Comment;
-import com.paf.chop.backend.models.Like;
 import com.paf.chop.backend.models.Post;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.LikeRepository;
@@ -12,15 +8,12 @@ import com.paf.chop.backend.repositories.PostRepository;
 import com.paf.chop.backend.repositories.UserRepository;
 
 import com.paf.chop.backend.services.impl.LikeService;
-import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 
 @Slf4j

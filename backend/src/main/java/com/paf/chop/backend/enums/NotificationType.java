@@ -1,5 +1,8 @@
-package com.paf.chop.backend.configs;
+package com.paf.chop.backend.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum NotificationType {
     LIKE("Like"),
     COMMENT("Comment"),

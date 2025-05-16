@@ -1,6 +1,6 @@
 package com.paf.chop.backend.models;
 
-import com.paf.chop.backend.configs.CommentType;
+import com.paf.chop.backend.enums.CommentType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

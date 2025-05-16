@@ -192,7 +192,7 @@ const Login: React.FC = () => {
           <div className="text-center pb-4 text-sage-700 text-sm">
             New to our kitchen?{" "}
             <Link
-              to="/signup"
+              to="/register"
               className="text-sage-800 hover:text-sage-900 underline underline-offset-2"
             >
               Join the community

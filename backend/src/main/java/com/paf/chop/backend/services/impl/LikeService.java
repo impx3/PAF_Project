@@ -1,15 +1,17 @@
 package com.paf.chop.backend.services.impl;
 
-import com.paf.chop.backend.configs.Category;
+import com.paf.chop.backend.enums.Category;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.dto.response.PostDTO;
 import com.paf.chop.backend.dto.response.VideoResponseDTO;
+import com.paf.chop.backend.enums.NotificationType;
 import com.paf.chop.backend.models.*;
 import com.paf.chop.backend.repositories.CommentRepository;
 import com.paf.chop.backend.repositories.LikeRepository;
 
 import com.paf.chop.backend.repositories.PostRepository;
 import com.paf.chop.backend.repositories.VideoRepository;
+import com.paf.chop.backend.services.NotificationService;
 import com.paf.chop.backend.services.UserService;
 import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +29,17 @@ public class LikeService {
     private final UserService userService;
     private final VideoRepository videoRepository;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
 
     @Autowired
-    public LikeService(LikeRepository likeRepository, CommentRepository commentRepository, UserService userService, VideoRepository videoRepository, PostRepository postRepository) {
+    public LikeService(LikeRepository likeRepository, CommentRepository commentRepository, UserService userService, VideoRepository videoRepository, PostRepository postRepository, NotificationService notificationService) {
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.userService = userService;
         this.videoRepository = videoRepository;
         this.postRepository = postRepository;
+        this.notificationService = notificationService;
     }
 
 
@@ -212,6 +216,12 @@ public class LikeService {
                 post.setLikeCount(post.getLikeCount() + 1);
                 postRepository.save(post);
                 log.info("Post liked {}", postId);
+
+                notificationService.createNotification(
+                      "Your post has been liked by " + currentUser.getUsername(),
+                        NotificationType.LIKE,
+                        post.getUser().getId()
+                );
 
                 return ApiResponse.success(getPostResponseDTO(post), "Post liked successfully");
             }

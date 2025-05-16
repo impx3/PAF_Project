@@ -1,7 +1,7 @@
 package com.paf.chop.backend.services;
 
 
-import com.paf.chop.backend.configs.CommentType;
+import com.paf.chop.backend.enums.CommentType;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.models.*;
