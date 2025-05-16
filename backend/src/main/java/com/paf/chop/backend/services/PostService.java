@@ -39,7 +39,14 @@ public class PostService {
     }
 
     public Post createPost(Post post) {
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+
+        // increment totalPost
+        User user = savedPost.getUser();
+        user.setTotalPost(user.getTotalPost() + 1);
+        userRepository.save(user); // persist the update
+
+        return savedPost;
     }
 
     public Post updatePost(Long id, Post post) {
