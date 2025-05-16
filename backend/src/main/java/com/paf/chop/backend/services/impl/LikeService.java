@@ -91,37 +91,18 @@ public class LikeService {
                 commentRepository.save(comment);
                 log.info("Comment liked: {}", commentId);
 
+                notificationService.createNotification(
+                        "Your comment has been liked by " + currentUser.getUsername(),
+                        NotificationType.LIKE,
+                        comment.getUser().getId()
+                );
+
                 return ApiResponse.success(getCommentResponseDTO(comment), "Comment liked successfully");
             }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
-        CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
-        //response dto data
-        commentResponseDTO.setProfileImage(comment.getUser().getProfileImage() == null ? "" : comment.getUser().getProfileImage());
-        commentResponseDTO.setCreatedUserId(comment.getUser().getId());
-        commentResponseDTO.setCreatedUserName(comment.getUser().getUsername());
-        commentResponseDTO.setCommentBody(comment.getCommentBody());
-        commentResponseDTO.setLikeCount(comment.getLikeCount());
-        commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
-        commentResponseDTO.setCommentId(comment.getCommentId());
-        commentResponseDTO.setIsLiked(isCommentLiked(comment));
-
-        if (comment.getPost() != null) {
-            //response dto data
-            commentResponseDTO.setPostId(comment.getPost().getId());
-        }
-
-        if (comment.getVideo() != null) {
-            //response dto data
-            commentResponseDTO.setVideoId(comment.getVideo().getId());
-        }
-
-        return commentResponseDTO;
     }
 
     //video like
@@ -160,6 +141,7 @@ public class LikeService {
                 videoRepository.save(video);
                 log.info("Video liked: {}", videoId);
 
+
                 return ApiResponse.success(getVideoResponseDTO(video), "Video liked successfully");
             }
 
@@ -167,19 +149,6 @@ public class LikeService {
             log.error("Error liking video: {}", e.getMessage());
             return ApiResponse.error("Error liking video: " + e.getMessage());
         }
-    }
-
-    public VideoResponseDTO getVideoResponseDTO(Video video) {
-        VideoResponseDTO videoResponseDTO = new VideoResponseDTO();
-        //response dto data
-        videoResponseDTO.setId(video.getId());
-        videoResponseDTO.setTitle(video.getTitle());
-        videoResponseDTO.setDescription(video.getDescription());
-        videoResponseDTO.setVideoUrl(video.getVideoUrl());
-        videoResponseDTO.setLikeCount(video.getLikeCount());
-        videoResponseDTO.setIsLiked(isVideoLiked(video));
-
-        return videoResponseDTO;
     }
 
     //like post
@@ -231,6 +200,45 @@ public class LikeService {
         }
     }
 
+
+    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
+        CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
+        //response dto data
+        commentResponseDTO.setProfileImage(comment.getUser().getProfileImage() == null ? "" : comment.getUser().getProfileImage());
+        commentResponseDTO.setCreatedUserId(comment.getUser().getId());
+        commentResponseDTO.setCreatedUserName(comment.getUser().getUsername());
+        commentResponseDTO.setCommentBody(comment.getCommentBody());
+        commentResponseDTO.setLikeCount(comment.getLikeCount());
+        commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
+        commentResponseDTO.setCommentId(comment.getCommentId());
+        commentResponseDTO.setIsLiked(isCommentLiked(comment));
+
+        if (comment.getPost() != null) {
+            //response dto data
+            commentResponseDTO.setPostId(comment.getPost().getId());
+        }
+
+        if (comment.getVideo() != null) {
+            //response dto data
+            commentResponseDTO.setVideoId(comment.getVideo().getId());
+        }
+
+        return commentResponseDTO;
+    }
+
+    public VideoResponseDTO getVideoResponseDTO(Video video) {
+        VideoResponseDTO videoResponseDTO = new VideoResponseDTO();
+        //response dto data
+        videoResponseDTO.setId(video.getId());
+        videoResponseDTO.setTitle(video.getTitle());
+        videoResponseDTO.setDescription(video.getDescription());
+        videoResponseDTO.setVideoUrl(video.getVideoUrl());
+        videoResponseDTO.setLikeCount(video.getLikeCount());
+        videoResponseDTO.setIsLiked(isVideoLiked(video));
+
+        return videoResponseDTO;
+    }
+
     public PostDTO getPostResponseDTO(Post post) {
         PostDTO postResponseDTO = new PostDTO();
         //response dto data
@@ -242,6 +250,7 @@ public class LikeService {
 
         return postResponseDTO;
     }
+
 
 
 

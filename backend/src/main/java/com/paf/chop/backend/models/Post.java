@@ -31,8 +31,7 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // <-- ADD THIS
-
-
+    
     @JsonIgnore
     //post like
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

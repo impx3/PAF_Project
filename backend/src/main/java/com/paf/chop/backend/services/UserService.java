@@ -3,6 +3,7 @@ package com.paf.chop.backend.services;
 
 import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.dto.response.user.PublicUserResponseDTO;
+import com.paf.chop.backend.enums.NotificationType;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.utils.ApiResponse;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * Resolve an authenticated email to its User ID.
@@ -83,6 +85,12 @@ public class UserService {
 
             userRepository.save(current);
             userRepository.save(target);
+
+            notificationService.createNotification(
+                    current.getUsername() + " started following you",
+                    NotificationType.FOLLOW,
+                    target.getId()
+            );
             return "Followed successfully";
         }
     }

@@ -22,16 +22,12 @@ public class PostService {
 
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    private final LikeRepository likeRepository;
     private final LikeService likeService;
 
     //post like
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository, LikeService likeService) {
+    public PostService(PostRepository postRepository, LikeService likeService) {
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.likeRepository = likeRepository;
         this.likeService = likeService;
     }
 

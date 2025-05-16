@@ -4,6 +4,7 @@ package com.paf.chop.backend.services;
 import com.paf.chop.backend.enums.CommentType;
 import com.paf.chop.backend.dto.request.CommentRequestDTO;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
+import com.paf.chop.backend.enums.NotificationType;
 import com.paf.chop.backend.models.*;
 import com.paf.chop.backend.repositories.*;
 import com.paf.chop.backend.services.impl.LikeService;
@@ -26,21 +27,24 @@ public class CommentService {
     private final VideoRepository videoRepository;
     private final UserService userService;
     private final LikeService likeService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, VideoRepository videoRepository, UserService userService, LikeService likeService) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, PostRepository postRepository, VideoRepository videoRepository, UserService userService, LikeService likeService, NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.videoRepository = videoRepository;
         this.userService = userService;
         this.likeService = likeService;
+        this.notificationService = notificationService;
     }
 
     //add comment
     public ApiResponse<CommentResponseDTO> comment(CommentRequestDTO commentRequestDTO) {
         try{
             log.info("Received request to add comment: {}", commentRequestDTO);
+            User currentUser = userService.getCurrentUser();
 
             // Validate request body
             if (commentRequestDTO.getUserId() == null) {
@@ -98,9 +102,16 @@ public class CommentService {
             }
 
 
-
             Comment savedComment = commentRepository.save(comment);
             log.info("Comment added: {}", savedComment.getCommentBody());
+
+            notificationService.createNotification(
+                     currentUser.getUsername() + " Commented ",
+                    NotificationType.COMMENT,
+                    comment.getUser().getId()
+            );
+
+
             return ApiResponse.success(likeService.getCommentResponseDTO(savedComment), "Comment added successfully");
 
         } catch (Exception e) {
