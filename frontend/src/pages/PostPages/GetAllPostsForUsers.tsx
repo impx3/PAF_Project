@@ -10,8 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
-import { FaBookmark } from "react-icons/fa";
+import { Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 import { CommentComponent } from "@/components/comment/comment.tsx";
 import { Skeleton } from "@/components/ui/skeleton";
 import LearningPlanSelectionModal from "../../components/ui/LearningPlanSelectionModal";
@@ -136,28 +135,20 @@ const GetAllPostsForUsers: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts?.map((post) => (
-            <Card key={post.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="truncate">{post.title}</CardTitle>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <p className="text-gray-600 line-clamp-3">{post.content}</p>
-
-                {post.imageUrl && (
-                  <div className="grid grid-cols-2 gap-2">
+            <Card
+              key={post.id}
+              className="hover:shadow-lg transition-shadow overflow-hidden"
+            >
+              {/* Image Section */}
+              {post.imageUrl && (
+                <div className="relative">
+                  <AspectRatio ratio={16 / 9}>
                     {post.imageUrl.length > 50 ? (
-                      post.imageUrl.split(",").map((filename, idx) => (
-                        <div key={idx} className="overflow-hidden rounded-lg">
-                          <AspectRatio ratio={16 / 9}>
-                            <img
-                              src={`http://localhost:8080/images/${filename.trim()}`}
-                              alt={`Post ${post.id} - ${idx}`}
-                              className="object-cover w-full h-full"
-                            />
-                          </AspectRatio>
-                        </div>
-                      ))
+                      <img
+                        src={`http://localhost:8080/images/${post.imageUrl.split(",")[0].trim()}`}
+                        alt={`Post ${post.id}`}
+                        className="object-cover w-full h-full"
+                      />
                     ) : (
                       <img
                         src={`http://localhost:8080/images/${
@@ -170,12 +161,11 @@ const GetAllPostsForUsers: React.FC = () => {
                       />
                     )}
                   </AspectRatio>
-                  {/* Gradient overlay for better text readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 </div>
               )}
 
-              {/* Content section at bottom */}
+              {/* Content Section */}
               <div className="p-4 space-y-3">
                 <CardHeader className="p-0">
                   <CardTitle className="text-lg font-semibold line-clamp-2">
@@ -189,7 +179,6 @@ const GetAllPostsForUsers: React.FC = () => {
                   </p>
                 </CardContent>
 
-                {/* Action buttons */}
                 <CardFooter className="p-0 flex justify-between items-center">
                   <div className="flex gap-2">
                     <Button
@@ -226,18 +215,22 @@ const GetAllPostsForUsers: React.FC = () => {
                     </Button>
                   </div>
 
-                    <button
-                        onClick={() => handleSaveClick(post)}
-                        className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                        title="Save to Learning Plan"
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSaveClick(post)}
+                      className="hover:text-blue-600 px-2 gap-1"
+                      title="Save to Learning Plan"
                     >
-                        <FaBookmark className="w-5 h-5" />
-                    </button>
-                  <Link to={`/post/${post.id}/all`}>
-                    <Button variant="outline" size="sm" className="text-xs">
-                      View Post
+                      <Bookmark className="w-5 h-5" />
                     </Button>
-                  </Link>
+                    <Link to={`/post/${post.id}/all`}>
+                      <Button variant="outline" size="sm" className="text-xs">
+                        View Post
+                      </Button>
+                    </Link>
+                  </div>
                 </CardFooter>
               </div>
             </Card>
