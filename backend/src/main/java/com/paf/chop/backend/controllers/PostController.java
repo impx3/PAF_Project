@@ -85,8 +85,8 @@ public class PostController {
 
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).deletePost(savedPost.getId())).withRel("delete"));
-        // resource.add(WebMvcLinkBuilder.linkTo(
-        //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
+        resource.add(WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("get"));
         resource.add(WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(PostController.class).updateTextPost(savedPost.getId(), savedPost.getTitle(), savedPost.getContent())).withRel("put"));
         // resource.add(WebMvcLinkBuilder.linkTo(
