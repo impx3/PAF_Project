@@ -1,15 +1,18 @@
 package com.paf.chop.backend.services.impl;
 
-import com.paf.chop.backend.configs.Category;
+import com.paf.chop.backend.enums.Category;
 import com.paf.chop.backend.dto.response.CommentResponseDTO;
 import com.paf.chop.backend.dto.response.PostDTO;
 import com.paf.chop.backend.dto.response.VideoResponseDTO;
+import com.paf.chop.backend.enums.CoinType;
+import com.paf.chop.backend.enums.NotificationType;
 import com.paf.chop.backend.models.*;
 import com.paf.chop.backend.repositories.CommentRepository;
 import com.paf.chop.backend.repositories.LikeRepository;
 
 import com.paf.chop.backend.repositories.PostRepository;
 import com.paf.chop.backend.repositories.VideoRepository;
+import com.paf.chop.backend.services.NotificationService;
 import com.paf.chop.backend.services.UserService;
 import com.paf.chop.backend.utils.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +30,17 @@ public class LikeService {
     private final UserService userService;
     private final VideoRepository videoRepository;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
 
     @Autowired
-    public LikeService(LikeRepository likeRepository, CommentRepository commentRepository, UserService userService, VideoRepository videoRepository, PostRepository postRepository) {
+    public LikeService(LikeRepository likeRepository, CommentRepository commentRepository, UserService userService, VideoRepository videoRepository, PostRepository postRepository, NotificationService notificationService) {
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.userService = userService;
         this.videoRepository = videoRepository;
         this.postRepository = postRepository;
+        this.notificationService = notificationService;
     }
 
 
@@ -87,37 +92,20 @@ public class LikeService {
                 commentRepository.save(comment);
                 log.info("Comment liked: {}", commentId);
 
+                notificationService.createNotification(
+                        "Your comment has been liked by " + currentUser.getUsername(),
+                        NotificationType.LIKE,
+                        comment.getUser().getId()
+                );
+
+                userService.addUserCoins(comment.getUser().getId(), CoinType.LIKE);
+
                 return ApiResponse.success(getCommentResponseDTO(comment), "Comment liked successfully");
             }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
-        CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
-        //response dto data
-        commentResponseDTO.setProfileImage(comment.getUser().getProfileImage() == null ? "" : comment.getUser().getProfileImage());
-        commentResponseDTO.setCreatedUserId(comment.getUser().getId());
-        commentResponseDTO.setCreatedUserName(comment.getUser().getUsername());
-        commentResponseDTO.setCommentBody(comment.getCommentBody());
-        commentResponseDTO.setLikeCount(comment.getLikeCount());
-        commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
-        commentResponseDTO.setCommentId(comment.getCommentId());
-        commentResponseDTO.setIsLiked(isCommentLiked(comment));
-
-        if (comment.getPost() != null) {
-            //response dto data
-            commentResponseDTO.setPostId(comment.getPost().getId());
-        }
-
-        if (comment.getVideo() != null) {
-            //response dto data
-            commentResponseDTO.setVideoId(comment.getVideo().getId());
-        }
-
-        return commentResponseDTO;
     }
 
     //video like
@@ -156,6 +144,7 @@ public class LikeService {
                 videoRepository.save(video);
                 log.info("Video liked: {}", videoId);
 
+
                 return ApiResponse.success(getVideoResponseDTO(video), "Video liked successfully");
             }
 
@@ -163,19 +152,6 @@ public class LikeService {
             log.error("Error liking video: {}", e.getMessage());
             return ApiResponse.error("Error liking video: " + e.getMessage());
         }
-    }
-
-    public VideoResponseDTO getVideoResponseDTO(Video video) {
-        VideoResponseDTO videoResponseDTO = new VideoResponseDTO();
-        //response dto data
-        videoResponseDTO.setId(video.getId());
-        videoResponseDTO.setTitle(video.getTitle());
-        videoResponseDTO.setDescription(video.getDescription());
-        videoResponseDTO.setVideoUrl(video.getVideoUrl());
-        videoResponseDTO.setLikeCount(video.getLikeCount());
-        videoResponseDTO.setIsLiked(isVideoLiked(video));
-
-        return videoResponseDTO;
     }
 
     //like post
@@ -213,12 +189,59 @@ public class LikeService {
                 postRepository.save(post);
                 log.info("Post liked {}", postId);
 
+                notificationService.createNotification(
+                      "Your post has been liked by " + currentUser.getUsername(),
+                        NotificationType.LIKE,
+                        post.getUser().getId()
+                );
+
+                userService.addUserCoins(post.getUser().getId(), CoinType.LIKE);
+
                 return ApiResponse.success(getPostResponseDTO(post), "Post liked successfully");
             }
 
         } catch (Exception e) {
             return ApiResponse.error("Error liking post: " + e.getMessage());
         }
+    }
+
+
+    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
+        CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
+        //response dto data
+        commentResponseDTO.setProfileImage(comment.getUser().getProfileImage() == null ? "" : comment.getUser().getProfileImage());
+        commentResponseDTO.setCreatedUserId(comment.getUser().getId());
+        commentResponseDTO.setCreatedUserName(comment.getUser().getUsername());
+        commentResponseDTO.setCommentBody(comment.getCommentBody());
+        commentResponseDTO.setLikeCount(comment.getLikeCount());
+        commentResponseDTO.setUpdatedAt(comment.getUpdatedAt());
+        commentResponseDTO.setCommentId(comment.getCommentId());
+        commentResponseDTO.setIsLiked(isCommentLiked(comment));
+
+        if (comment.getPost() != null) {
+            //response dto data
+            commentResponseDTO.setPostId(comment.getPost().getId());
+        }
+
+        if (comment.getVideo() != null) {
+            //response dto data
+            commentResponseDTO.setVideoId(comment.getVideo().getId());
+        }
+
+        return commentResponseDTO;
+    }
+
+    public VideoResponseDTO getVideoResponseDTO(Video video) {
+        VideoResponseDTO videoResponseDTO = new VideoResponseDTO();
+        //response dto data
+        videoResponseDTO.setId(video.getId());
+        videoResponseDTO.setTitle(video.getTitle());
+        videoResponseDTO.setDescription(video.getDescription());
+        videoResponseDTO.setVideoUrl(video.getVideoUrl());
+        videoResponseDTO.setLikeCount(video.getLikeCount());
+        videoResponseDTO.setIsLiked(isVideoLiked(video));
+
+        return videoResponseDTO;
     }
 
     public PostDTO getPostResponseDTO(Post post) {
@@ -232,6 +255,7 @@ public class LikeService {
 
         return postResponseDTO;
     }
+
 
 
 

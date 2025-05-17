@@ -1,4 +1,4 @@
-package com.paf.chop.backend.configs;
+package com.paf.chop.backend.enums;
 
 public enum UserRole {
     USER, ADMIN

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import api from '../utils/axiosConfig';
-import styles from '../styles/FollowButton.module.css';
+import React, { useState, useEffect } from "react";
+import api from "../utils/axiosConfig";
+import styles from "../styles/FollowButton.module.css";
+import { useAuth } from "@/context/AuthContext.tsx";
+import { getFollowing, PublicUser } from "@/services/user.service.ts";
 
 interface FollowButtonProps {
   targetId: string;
@@ -8,23 +10,37 @@ interface FollowButtonProps {
 
 const FollowButton: React.FC<FollowButtonProps> = ({ targetId }) => {
   const [isFollowing, setIsFollowing] = useState(false);
+  const { currentUser } = useAuth();
+  const [followingList, setFollowingList] = useState<PublicUser[]>([]);
+
+  const fetchFollowingList = async () => {
+    if (!currentUser) return;
+    const res = await getFollowing(currentUser?.id);
+
+    setFollowingList(res);
+  };
 
   useEffect(() => {
-    // You can fetch actual follow state here from backend if needed
-  }, [targetId]);
+    fetchFollowingList().then();
+  }, [currentUser?.id]);
+
+  useEffect(() => {
+    const isUserFollowing = followingList.some(
+      (user) => user.id.toString() === targetId,
+    );
+    setIsFollowing(isUserFollowing);
+  }, [followingList, targetId]);
 
   const toggleFollow = async () => {
     if (isFollowing) {
-      const confirmUnfollow = window.confirm("Are you sure you want to unfollow this user?");
+      const confirmUnfollow = window.confirm(
+        "Are you sure you want to unfollow this user?",
+      );
       if (!confirmUnfollow) return;
     }
 
     try {
-      await api.post(`/users/${targetId}/follow`, {}, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      await api.post(`/users/${currentUser?.id}/follow/${targetId}`);
 
       setIsFollowing(!isFollowing);
     } catch (err) {
@@ -37,7 +53,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({ targetId }) => {
       onClick={toggleFollow}
       className={`${styles.followBtn} ${isFollowing ? styles.following : styles.notFollowing}`}
     >
-      {isFollowing ? 'Following' : 'Follow'}
+      {isFollowing ? "Following" : "Follow"}
     </button>
   );
 };

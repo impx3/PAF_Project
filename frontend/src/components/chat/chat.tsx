@@ -27,7 +27,7 @@ export const ChatDialog = ({ isOpen, onClose, recipient }: ChatDialogProps) => {
       );
       setMessages(history);
     };
-    if (isOpen) loadMessages();
+    if (isOpen) loadMessages().then();
   }, [recipient?.id, currentUser?.id, isOpen]);
 
   const scrollToBottom = () => {

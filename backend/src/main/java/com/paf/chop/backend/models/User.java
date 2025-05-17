@@ -1,7 +1,7 @@
 package com.paf.chop.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.paf.chop.backend.configs.UserRole;
+import com.paf.chop.backend.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

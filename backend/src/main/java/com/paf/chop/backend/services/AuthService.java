@@ -2,9 +2,8 @@ package com.paf.chop.backend.services;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
-import com.paf.chop.backend.configs.UserRole;
+import com.paf.chop.backend.enums.UserRole;
 import com.paf.chop.backend.dto.request.LoginRequestDTO;
 import com.paf.chop.backend.dto.request.RegisterRequestDTO;
 import com.paf.chop.backend.dto.response.UserResponseDTO;

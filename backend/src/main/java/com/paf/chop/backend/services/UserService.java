@@ -3,6 +3,8 @@ package com.paf.chop.backend.services;
 
 import com.paf.chop.backend.dto.response.UserResponseDTO;
 import com.paf.chop.backend.dto.response.user.PublicUserResponseDTO;
+import com.paf.chop.backend.enums.CoinType;
+import com.paf.chop.backend.enums.NotificationType;
 import com.paf.chop.backend.models.User;
 import com.paf.chop.backend.repositories.UserRepository;
 import com.paf.chop.backend.utils.ApiResponse;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * Resolve an authenticated email to its User ID.
@@ -83,6 +86,15 @@ public class UserService {
 
             userRepository.save(current);
             userRepository.save(target);
+
+            notificationService.createNotification(
+                    current.getUsername() + " started following you",
+                    NotificationType.FOLLOW,
+                    target.getId()
+            );
+
+            addUserCoins(target.getId(), CoinType.FOLLOW);
+
             return "Followed successfully";
         }
     }
@@ -119,8 +131,8 @@ public class UserService {
         User u = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
-        if (updates.containsKey("username"))   u.setUsername(updates.get("username"));
-        if (updates.containsKey("bio"))        u.setBio(updates.get("bio"));
+        if (updates.containsKey("username")) u.setUsername(updates.get("username"));
+        if (updates.containsKey("bio")) u.setBio(updates.get("bio"));
         if (updates.containsKey("profileImage")) u.setProfileImage(updates.get("profileImage"));
         u.setUpdatedAt(LocalDateTime.now());
 
@@ -163,5 +175,21 @@ public class UserService {
     public User getCurrentUser() {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(currentUsername);
+    }
+
+    /**
+     * Coins are added to the user based on the CoinType.
+     */
+    public void addUserCoins(Long userId, CoinType coinType) {
+        try {
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new RuntimeException("User not found")
+            );
+
+            user.setCoins(user.getCoins() + coinType.getPoints());
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
