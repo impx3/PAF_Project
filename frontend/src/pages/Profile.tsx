@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import coinGif from "@/images/coin2.gif";
-import badge from "@/images/verified-badge.png";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -211,11 +210,6 @@ export const Profile: React.FC = () => {
               </h1>
               {user?.isVerified && (
                 <Badge className="gap-2 px-4 py-1.5">
-                  <img
-                    src={badge}
-                    alt="Verified"
-                    className="w-5 h-5"
-                  />
                   Verified Chef
                 </Badge>
               )}
