@@ -75,19 +75,15 @@ public class UserController {
             return ResponseEntity.badRequest().body("No file uploaded");
         }
         try {
-            String uploadDir = new File("src/main/resources/static/uploads/profilePictures").getAbsolutePath();
-
-
+            String uploadDir = System.getProperty("user.dir") + "/uploads/profilePictures/";
             File dir = new File(uploadDir);
             if (!dir.exists() && !dir.mkdirs()) {
                 throw new IOException("Failed to create upload directory: " + uploadDir);
             }
 
-
             String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            String filepath = new File(uploadDir, filename).getAbsolutePath();
-            file.transferTo(new File(filepath));
-
+            File destination = new File(uploadDir, filename);
+            file.transferTo(destination);
 
             return ResponseEntity.ok("/uploads/profilePictures/" + filename);
 
