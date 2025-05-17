@@ -38,7 +38,7 @@ public class PostService {
 
     public Post createPost(Post post) {
 
-        User user = getCurrentUser();
+        User user = userService.getCurrentUser();
         userService.addUserCoins(post.getUser().getId(), CoinType.POST);
 
         // increment totalPost
