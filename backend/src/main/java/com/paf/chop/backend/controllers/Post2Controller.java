@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,10 +40,26 @@ public class Post2Controller {
     }
 
 
+     @GetMapping("/foraudience/1")
+    public ResponseEntity<List<Post>> forAudience1() {
+        List<Post> posts = postService.getAllPosts();
+        posts.clear();
+        // if (posts.isEmpty) {
+            // return ResponseEntity.status(HttpStatus.OK).body(posts);
+        // } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(posts);
+        // }
+
+        // return ResponseEntity.ok(posts);
+        // return "This is open for everyone (no authentication)";
+    }
+
+
     // public String forAudience() {
     @GetMapping("/foraudience")
     public ResponseEntity<List<Post>> forAudience() {
         List<Post> posts = postService.getAllPosts();
+
         return ResponseEntity.ok(posts);
         // return "This is open for everyone (no authentication)";
     }
@@ -60,6 +77,8 @@ public class Post2Controller {
         //         WebMvcLinkBuilder.methodOn(PostController.class).getAllPosts()).withRel("all-posts"));
         // resource.add(WebMvcLinkBuilder.linkTo(
                 // WebMvcLinkBuilder.methodOn(PostController.class).getPostById(savedPost.getId())).withSelfRel());
+
+        
 
         return ResponseEntity.ok(resource);
     }
