@@ -26,16 +26,24 @@ public class PostService {
     private final LikeService likeService;
     private final UserService userService;
 
+    private final UserRepository userRepository;
     //post like
     @Autowired
-    public PostService(PostRepository postRepository, LikeService likeService, UserService userService) {
+    public PostService(PostRepository postRepository, LikeService likeService, UserService userService, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.likeService = likeService;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public Post createPost(Post post) {
+
+        User user = getCurrentUser();
         userService.addUserCoins(post.getUser().getId(), CoinType.POST);
+
+        // increment totalPost
+        user.setTotalPost(user.getTotalPost() + 1);
+        userRepository.save(user);
         return postRepository.save(post);
     }
 

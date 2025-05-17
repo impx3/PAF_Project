@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+import coinGif from "@/images/coin2.gif";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -12,6 +12,8 @@ import { Trash2, Edit, UserPlus, UserMinus } from "lucide-react";
 import LearningPlanSelectionModal from "@/components/ui/LearningPlanSelectionModal.tsx";
 
 import api from "@/utils/axiosConfig";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:8080";
 
 import {
   deleteCurrentUser,
@@ -99,22 +101,6 @@ export const Profile: React.FC = () => {
     loadData();
   }, [currentUser]);
 
-  const handleFollow = async () => {
-    if (!currentUser || !user) return;
-
-    try {
-      const result = await toggleFollow(currentUser.id, user.id);
-      if (result) {
-        setIsFollowing(!isFollowing);
-        toast.success(
-          isFollowing ? "Unfollowed successfully" : "Followed successfully",
-        );
-      }
-    } catch (error) {
-      toast.error("Failed to update follow status");
-    }
-  };
-
   const handleProfileUpdate = async (updates: {
     bio?: string;
     profileImage?: string;
@@ -193,9 +179,10 @@ export const Profile: React.FC = () => {
           <div className="relative group">
             <Avatar className="h-32 w-32">
               <AvatarImage
-                src={(user.profileImage as string) || "/default-avatar.png"}
-                alt={user.username as string}
-              />
+              src={user.profileImage ? `${BASE_URL}${user.profileImage}` : "/default-avatar.png"}
+              alt={user.username as string}
+            />
+
               <AvatarFallback>
                 {user?.firstName?.[0] as string}
                 {user?.lastName?.[0] as string}
@@ -223,27 +210,10 @@ export const Profile: React.FC = () => {
               </h1>
               {user?.isVerified && (
                 <Badge className="gap-2 px-4 py-1.5">
-                  <img
-                    src="/images/verified-badge.png"
-                    alt="Verified"
-                    className="w-5 h-5"
-                  />
                   Verified Chef
                 </Badge>
               )}
-              {!isOwnProfile && (
-                <Button
-                  variant={isFollowing ? "outline" : "default"}
-                  onClick={handleFollow}
-                >
-                  {isFollowing ? (
-                    <UserMinus className="mr-2" />
-                  ) : (
-                    <UserPlus className="mr-2" />
-                  )}
-                  {isFollowing ? "Following" : "Follow"}
-                </Button>
-              )}
+              
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -259,9 +229,11 @@ export const Profile: React.FC = () => {
                 <p className="text-2xl font-bold">{user.followingCount}</p>
                 <p className="text-sm text-muted-foreground">Following</p>
               </Card>
-              <Card className="p-4 text-center">
+              <Card className="p-4">
+                <div className="flex justify-center items-center gap-2">
                 <p className="text-2xl font-bold">{user.coins}</p>
-                <p className="text-sm text-muted-foreground">Coins</p>
+                <img src={coinGif} alt="Coin" className="w-14 h-14"/> 
+                </div>
               </Card>
             </div>
           </div>

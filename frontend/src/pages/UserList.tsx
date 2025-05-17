@@ -102,10 +102,7 @@ const UserList = () => {
               className="p-4 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between gap-2">
-                <Link
-                  to={`/profile/${user.id}`}
-                  className="flex items-center gap-4 flex-1"
-                >
+                
                   <Avatar className="h-12 w-12">
                     <AvatarImage
                       src={user.profileImage || "/default-avatar.png"}
@@ -127,7 +124,7 @@ const UserList = () => {
                       🎖️ {user.totalLikes.toLocaleString()} Likes
                     </p>
                   </div>
-                </Link>
+                
                 <div className="flex items-center gap-2">
                   <FollowButton targetId={user.id.toString()} />
                   <Button

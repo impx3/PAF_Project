@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:backend/uploads/");
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/");
         // To Allow static access to images
     }
 } 
