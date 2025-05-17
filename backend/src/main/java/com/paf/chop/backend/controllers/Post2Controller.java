@@ -43,12 +43,11 @@ public class Post2Controller {
      @GetMapping("/foraudience/1")
     public ResponseEntity<List<Post>> forAudience1() {
         List<Post> posts = postService.getAllPosts();
-        posts.clear();
-        // if (posts.isEmpty) {
-            // return ResponseEntity.status(HttpStatus.OK).body(posts);
-        // } else {
+        if (posts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(posts);
-        // }
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(posts);
+        }
 
         // return ResponseEntity.ok(posts);
         // return "This is open for everyone (no authentication)";
