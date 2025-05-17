@@ -6,6 +6,7 @@ import {
 import { AppSidebar } from "@/pages/dashboard/dashboard-components/app-sidebar.tsx";
 import { Outlet } from "react-router-dom";
 import { NotificationPopover } from "@/components/notification/notification.tsx";
+import { UserCoins } from "@/components/UserCoins.tsx";
 
 export default function DashboardPage() {
   return (
@@ -16,7 +17,10 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2 px-4 justify-between w-full">
             <SidebarTrigger className="-ml-1" />
 
-            <NotificationPopover />
+            <div className="flex items-center gap-2">
+              <UserCoins />
+              <NotificationPopover />
+            </div>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

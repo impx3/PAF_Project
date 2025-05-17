@@ -187,3 +187,15 @@ export const getAllUsers = async (): Promise<PublicUser[]> => {
     return [];
   }
 };
+
+//call this
+export const getUserCoins = async (): Promise<number> => {
+  try{
+    const resp = await api.get<ApiResponse<number>>("/users/my-coins");
+    return resp.data.result;
+
+  }catch (e) {
+    console.error("getUserCoins error:", e);
+    return 0;
+  }
+}

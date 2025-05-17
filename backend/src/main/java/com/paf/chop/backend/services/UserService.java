@@ -192,4 +192,14 @@ public class UserService {
             throw new RuntimeException(e);
         }
     }
+
+    public ApiResponse<Integer> getMyCoins() {
+        try {
+            User user = getCurrentUser();
+            return ApiResponse.success(user.getCoins(), "Coins fetched");
+        } catch (Exception e) {
+            return ApiResponse.error("Error fetching coins: " + e.getMessage());
+        }
+    }
+
 }

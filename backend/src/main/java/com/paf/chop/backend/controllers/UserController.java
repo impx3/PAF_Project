@@ -114,4 +114,12 @@ public class UserController {
                 ? ResponseEntity.ok(resp)
                 : ResponseEntity.badRequest().body(resp);
     }
+
+    @GetMapping("/my-coins")
+    public ResponseEntity<ApiResponse<Integer>> getMyCoins() {
+        ApiResponse<Integer> resp = userService.getMyCoins();
+        return resp.isSuccess()
+                ? ResponseEntity.ok(resp)
+                : ResponseEntity.badRequest().body(resp);
+    }
 }
